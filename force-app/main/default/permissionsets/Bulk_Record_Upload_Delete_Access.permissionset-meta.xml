@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions><enabled>true</enabled><name
+    >Bulk_Record_Upload_Delete</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >Bulk_Record_Upload_Run</name></customPermissions>
+    <description
+  >Adds permission to run approved delete processes. Assign Bulk Record Upload User and target-object read, delete, sharing, and match-field access separately.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Bulk Record Upload — Delete Access</label>
+</PermissionSet>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>DisplayLabel__c</fullName>
+  <description
+  >Provides an optional friendly name without changing the CSV header contract.</description>
+  <inlineHelpText
+  >Enter the name shown to users, or leave blank to use the Salesforce field label.</inlineHelpText>
+  <label>Column Display Label</label>
+  <length>80</length>
+  <type>Text</type>
+</CustomField>

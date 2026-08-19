@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>BRU_Upload__c</members>
+        <members>BRU_Upload_Chunk__c</members>
+        <members>BRU_Upload_Process__mdt</members>
+        <members>BRU_Upload_Field__mdt</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>bulkRecordUpload</members>
+        <members>bulkRecordUploadConfigured</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>BRU_Upload_User</members>
+        <members>BRU_Upload_Previewer</members>
+        <members>BRU_Upload_Deletion</members>
+        <members>BRU_Upload_Admin</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>BRU_Run_Upload</members>
+        <members>BRU_Preview_Upload</members>
+        <members>BRU_Delete_Upload</members>
+        <members>BRU_Admin</members>
+        <name>CustomPermission</name>
+    </types>
+    <types>
+        <members>BRU_Bulk_Record_Upload</members>
+        <members>BRU_Upload__c</members>
+        <name>CustomTab</name>
+    </types>
+    <version>65.0</version>
+</Package>

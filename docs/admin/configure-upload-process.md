@@ -1,0 +1,31 @@
+# Configure an upload process
+
+> [!NOTE]
+> On this page, create an active Custom Metadata process that selects one approved object, operation, handler, batch size, and retention period.
+
+Create a **Bulk Record Upload Process** (`Bulk_Record_Upload_Process__mdt`) record with a stable Developer Name. Set `ObjectApiName__c`, one supported `Operation__c`, registered `ProcessingHandler__c`, `RowsPerBatch__c` from 25–200, `RetentionDays__c` from 7–365, `ConfigurationVersion__c` to `2`, and `IsActive__c` only after its fields validate.
+
+For the normal path, select **Standard DML** and use processor key `STANDARD_DML_V1`. Use **Custom Apex** only when a reviewed implementation has been added to `BulkRecordUploadProcessorRegistry`; enter its registered key, never a class name. `NONE_V1` is the default post-processing action. A reviewed post-action can be registered for bounded notifications or downstream orchestration after each processor invocation. Post-actions receive correlated results, not raw CSV content.
+
+Object, handler, processor, and post-action text is resolved through Schema and trusted registries. An unknown value returns a safe configuration fault.
+
+## Use the current record as the parent
+
+For a record-page upload, set **Record Context Action** to **Require Parent Record** or **Use Parent When Available**. Enter the record-page object in **Record Page Object API Name** and the target relationship field in **Parent Relationship Field API Name**. For example, a Contact insert process placed on an Account record page uses `Account` and `AccountId`.
+
+The component passes the current record ID automatically. Apex verifies its object type, the user's access to the parent, and the relationship field before accepting the upload. During processing, the verified parent overwrites any value supplied for that relationship in the CSV. Use **Require Parent Record** for a process that must run only on a compatible record page; use **Use Parent When Available** when the same process may also run from an app or home page.
+
+## Choose how users enter the process
+
+The package provides two components; neither replaces the other.
+
+- **Bulk Record Upload — Multiple Processes** lists every active process available to the user and lets the user choose one.
+- **Bulk Record Upload** accepts no App Builder process or instruction override. Apex returns active Upload Process choices; one choice is selected automatically and multiple choices display the runtime selector.
+
+On initialization, the server resolves active configuration and enforces run permission, preview permission, object CRUD, field access, operation permission, trusted handler registration, and bounded field projection. A single available process scopes history automatically.
+
+To offer three distinct jobs, create three process records and place three component instances, each with its own fixed API name. Deactivating or invalidating a process causes its component to fail safely rather than fall back to a different process.
+
+## Next steps
+
+[Configure field behaviors](configure-field-behaviors.md) and verify [limits](limits.md).

@@ -1,0 +1,54 @@
+{
+  "name": "bulk-record-upload",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Configuration-driven bulk CSV upload application for Salesforce",
+  "scripts": {
+    "lint": "eslint force-app/main/default/{aura,lwc}/**/*.js",
+    "test": "npm run test:unit",
+    "test:unit": "sfdx-lwc-jest",
+    "test:unit:watch": "sfdx-lwc-jest --watch",
+    "test:unit:debug": "sfdx-lwc-jest --debug",
+    "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "check:package-boundary": "node scripts/check-package-boundary.mjs",
+    "check:metadata": "node scripts/check-metadata.mjs",
+    "check:apex": "node scripts/check-apex.mjs",
+    "check:source": "npm run check:package-boundary && npm run check:metadata && npm run check:apex",
+    "benchmark:large-schema": "node scripts/run-large-schema-benchmark.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:release-boundary": "node scripts/check-release-boundary.mjs",
+    "check:all": "npm run lint && npm run prettier:verify && npm run test:unit && npm run check:source && npm run check:docs && npm run check:release-boundary && npm run benchmark:large-schema",
+    "sbom": "npm sbom --sbom-format cyclonedx",
+    "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prepare": "husky || true",
+    "precommit": "lint-staged"
+  },
+  "devDependencies": {
+    "@lwc/eslint-plugin-lwc": "^3.1.0",
+    "@prettier/plugin-xml": "^3.4.1",
+    "@sa11y/jest": "^8.0.28",
+    "@salesforce/eslint-config-lwc": "^4.0.0",
+    "@salesforce/eslint-plugin-aura": "^3.0.0",
+    "@salesforce/eslint-plugin-lightning": "^2.0.0",
+    "@salesforce/sfdx-lwc-jest": "^7.0.2",
+    "eslint": "^9.29.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^28.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.5.3",
+    "prettier-plugin-apex": "^2.2.6"
+  },
+  "lint-staged": {
+    "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
+      "prettier --write"
+    ],
+    "**/{aura,lwc}/**/*.js": [
+      "eslint"
+    ],
+    "**/lwc/**": [
+      "sfdx-lwc-jest -- --bail --findRelatedTests --passWithNoTests"
+    ]
+  }
+}

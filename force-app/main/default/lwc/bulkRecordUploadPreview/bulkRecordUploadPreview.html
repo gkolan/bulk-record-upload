@@ -1,0 +1,29 @@
+<template>
+  <section aria-labelledby="preview-heading">
+    <h2
+      id="preview-heading"
+      class="slds-text-heading_small slds-m-bottom_small"
+    >
+      {label.PreviewTitle}
+    </h2>
+    <p class="slds-text-body_small slds-m-bottom_small">{summary}</p>
+    <template lwc:if={preview.isTruncated}>
+      <div
+        class="slds-notify slds-notify_alert slds-alert_warning slds-m-bottom_small"
+        role="status"
+      >
+        <span class="slds-assistive-text">{label.Notice}</span>
+        {label.PreviewCapped}
+      </div>
+    </template>
+    <div class="c-preview-table" tabindex="0" aria-label={label.PreviewAria}>
+      <lightning-datatable
+        key-field="key"
+        data={preview.rows}
+        columns={preview.columns}
+        hide-checkbox-column
+        resize-column-disabled
+      ></lightning-datatable>
+    </div>
+  </section>
+</template>

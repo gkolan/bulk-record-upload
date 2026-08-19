@@ -1,0 +1,3 @@
+Last Name,First Name,Email,Phone,Birthdate,Email Opt Out
+CSV Contact One,Demo,csv.contact1@example.test,312-555-0201,1990-01-15,false
+CSV Contact Two,Demo,csv.contact2@example.test,312-555-0202,1992-06-30,true

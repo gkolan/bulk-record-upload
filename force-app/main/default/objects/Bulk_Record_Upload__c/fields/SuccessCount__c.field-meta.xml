@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>SuccessCount__c</fullName>
+  <description
+  >Stores the number of rows that completed successfully.</description>
+  <inlineHelpText>Shows rows that completed successfully.</inlineHelpText>
+  <label>Successful Rows</label>
+  <precision>5</precision>
+  <scale>0</scale>
+  <type>Number</type>
+</CustomField>

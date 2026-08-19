@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DuplicateTextAction__c</fullName><description
+  >Controls repeated incoming text during Append or Prepend.</description>
+    <inlineHelpText
+  >Skip Duplicate is recommended to keep repeated uploads idempotent.</inlineHelpText><label
+  >Duplicate Text Action</label><required>false</required><type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted
+      >false</sorted>
+        <value><fullName>SKIP</fullName><default>true</default><label
+        >Skip Duplicate</label></value>
+        <value><fullName>KEEP</fullName><default>false</default><label
+        >Keep Duplicate</label></value>
+        <value><fullName>REJECT</fullName><default>false</default><label
+        >Reject Row</label></value>
+    </valueSetDefinition></valueSet>
+</CustomField>

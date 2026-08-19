@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >ParentUpload__c</fullName><description
+  >Links this staging fragment to its parent Bulk Record Upload for parent-controlled access and cleanup.</description><inlineHelpText
+  >Identifies the upload that owns this chunk.</inlineHelpText><label
+  >Parent Upload</label><referenceTo
+  >Bulk_Record_Upload__c</referenceTo><relationshipLabel
+  >Upload Chunks</relationshipLabel><relationshipName
+  >UploadChunks</relationshipName><relationshipOrder
+  >0</relationshipOrder><reparentableMasterDetail
+  >false</reparentableMasterDetail><type
+  >MasterDetail</type><writeRequiresMasterRead
+  >false</writeRequiresMasterRead></CustomField>

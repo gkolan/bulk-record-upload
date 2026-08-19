@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>BulkRecordUpload_Bundle_Configuration_Title</fullName>
+        <categories>Bulk Record Upload</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Upload bundle configuration title</shortDescription>
+        <value>Configure Bulk Record Upload</value>
+    </labels>
+    <labels>
+        <fullName>BulkRecordUpload_Bundle_Not_Configured</fullName>
+        <categories>Bulk Record Upload</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Upload bundle is not configured</shortDescription>
+        <value
+    >Select an Upload Bundle in Lightning App Builder before users can upload files.</value>
+    </labels>
+    <labels><fullName>BulkRecordUpload_App_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Application title</shortDescription><value
+    >Bulk Record Upload</value></labels>
+    <labels><fullName>BulkRecordUpload_Offline</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Offline status</shortDescription><value
+    >Offline</value></labels>
+    <labels><fullName>BulkRecordUpload_Offline_Message</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Offline guidance</shortDescription><value
+    >You are offline. File selection remains available, but submission requires a network connection.</value></labels>
+    <labels><fullName>BulkRecordUpload_Error</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Error status</shortDescription><value
+    >Error</value></labels>
+    <labels><fullName>BulkRecordUpload_Loading_Processes</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Process loading status</shortDescription><value
+    >Loading approved upload processes</value></labels>
+    <labels><fullName>BulkRecordUpload_No_Processes</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >No process message</shortDescription><value
+    >No active upload process is available for your permissions.</value></labels>
+    <labels><fullName>BulkRecordUpload_Rows_Ready</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Rows ready message</shortDescription><value
+    >{0} rows are ready for confirmation.</value></labels>
+    <labels><fullName>BulkRecordUpload_Submitting</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Submission status</shortDescription><value
+    >Submitting the upload.</value></labels>
+    <labels><fullName>BulkRecordUpload_Duplicate_Returned</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Duplicate response</shortDescription><value
+    >The existing upload was returned; no duplicate work was queued.</value></labels>
+    <labels><fullName>BulkRecordUpload_Upload_Queued</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Queued response</shortDescription><value
+    >The upload was queued.</value></labels>
+    <labels><fullName>BulkRecordUpload_Existing_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Existing upload title</shortDescription><value
+    >Existing upload returned</value></labels>
+    <labels><fullName>BulkRecordUpload_Queued_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Queued upload title</shortDescription><value>Upload queued</value></labels>
+    <labels><fullName>BulkRecordUpload_Status_Announcement</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Status announcement</shortDescription><value
+    >Upload status: {0}.</value></labels>
+    <labels><fullName>BulkRecordUpload_Ready_Again</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Reset announcement</shortDescription><value
+    >Ready for another upload.</value></labels>
+    <labels><fullName>BulkRecordUpload_Network_Restored</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Online announcement</shortDescription><value
+    >Network connection restored.</value></labels>
+    <labels><fullName>BulkRecordUpload_Network_Lost</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Offline announcement</shortDescription><value
+    >Network connection lost.</value></labels>
+    <labels><fullName>BulkRecordUpload_Confirm_Submit</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Submit button</shortDescription><value
+    >Confirm and submit</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_File</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>CSV file label</shortDescription><value
+    >CSV file</value></labels>
+    <labels><fullName>BulkRecordUpload_Choose_CSV</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Required CSV message</shortDescription><value
+    >Choose a CSV file.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Too_Large</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>CSV size error</shortDescription><value
+    >The CSV file exceeds the 2 MB limit.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Read_Error</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>CSV read error</shortDescription><value
+    >The CSV file could not be read.</value></labels>
+    <labels><fullName>BulkRecordUpload_History_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>History heading</shortDescription><value
+    >Recent uploads</value></labels>
+    <labels><fullName>BulkRecordUpload_Refresh_History</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Refresh history action</shortDescription><value
+    >Refresh upload history</value></labels>
+    <labels><fullName>BulkRecordUpload_Loading_History</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >History loading status</shortDescription><value
+    >Loading upload history</value></labels>
+    <labels><fullName>BulkRecordUpload_History_Caption</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >History table caption</shortDescription><value
+    >Recent upload status and result files</value></labels>
+    <labels><fullName>BulkRecordUpload_Process</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Process label</shortDescription><value
+    >Process</value></labels>
+    <labels><fullName>BulkRecordUpload_Status</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Status label</shortDescription><value
+    >Status</value></labels>
+    <labels><fullName>BulkRecordUpload_Rows</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Rows label</shortDescription><value
+    >Rows</value></labels>
+    <labels><fullName>BulkRecordUpload_Submitted</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Submitted label</shortDescription><value
+    >Submitted</value></labels>
+    <labels><fullName>BulkRecordUpload_Result</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Result label</shortDescription><value
+    >Result</value></labels>
+    <labels><fullName>BulkRecordUpload_Row</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Row label</shortDescription><value
+    >Row</value></labels>
+    <labels><fullName>BulkRecordUpload_No_History</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >No history message</shortDescription><value
+    >No visible upload history is available.</value></labels>
+    <labels><fullName>BulkRecordUpload_Preview_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Preview heading</shortDescription><value
+    >CSV preview</value></labels>
+    <labels><fullName>BulkRecordUpload_Notice</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Notice status</shortDescription><value
+    >Notice</value></labels>
+    <labels><fullName>BulkRecordUpload_Preview_Capped</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Preview limit guidance</shortDescription><value
+    >Preview is capped for performance. Server validation still checks the complete file.</value></labels>
+    <labels><fullName>BulkRecordUpload_Preview_Aria</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Preview accessible label</shortDescription><value
+    >Scrollable CSV preview</value></labels>
+    <labels><fullName>BulkRecordUpload_Preview_Summary</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Preview summary</shortDescription><value
+    >{0} data rows and {1} columns detected.</value></labels>
+    <labels><fullName>BulkRecordUpload_Upload_Process</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Upload process label</shortDescription><value
+    >Select Process</value></labels>
+    <labels><fullName>BulkRecordUpload_Process_Placeholder</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Process placeholder</shortDescription><value
+    >Select an approved process</value></labels>
+    <labels><fullName>BulkRecordUpload_Progress_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Progress heading</shortDescription><value>Upload status</value></labels>
+    <labels><fullName>BulkRecordUpload_Start_Another</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Reset action</shortDescription><value
+    >Start another upload</value></labels>
+    <labels><fullName>BulkRecordUpload_State_Queued</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Queued state</shortDescription><value
+    >Upload queued.</value></labels>
+    <labels><fullName>BulkRecordUpload_State_Validating</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Validating state</shortDescription><value
+    >Server validation is in progress.</value></labels>
+    <labels><fullName>BulkRecordUpload_State_Processing</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Processing state</shortDescription><value
+    >Rows are being processed.</value></labels>
+    <labels><fullName>BulkRecordUpload_State_Completed</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Completed state</shortDescription><value
+    >Upload completed.</value></labels>
+    <labels><fullName>BulkRecordUpload_State_Partial</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Partial state</shortDescription><value
+    >Upload completed with row errors. Review the result file.</value></labels>
+    <labels><fullName>BulkRecordUpload_State_Failed</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Failed state</shortDescription><value
+    >Upload failed safely. Review the guidance and try again.</value></labels>
+    <labels><fullName>BulkRecordUpload_Result_Expired</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Expired result</shortDescription><value
+    >Result expired</value></labels>
+    <labels><fullName>BulkRecordUpload_Download_Result</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>Download action</shortDescription><value
+    >Download result</value></labels>
+    <labels><fullName>BulkRecordUpload_Validation_Title</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Validation heading</shortDescription><value
+    >Mapping and validation</value></labels>
+    <labels><fullName>BulkRecordUpload_Validation_Guidance</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Validation guidance</shortDescription><value
+    >Select an upload process and a valid CSV file to review the mapping.</value></labels>
+    <labels><fullName>BulkRecordUpload_Validation_Summary</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Validation summary</shortDescription><value
+    >{0} data rows match the selected process.</value></labels>
+    <labels><fullName>BulkRecordUpload_Secure_Random_Error</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Secure random error</shortDescription><value
+    >Secure random values are unavailable.</value></labels>
+    <labels><fullName>BulkRecordUpload_Request_Error</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Generic request error</shortDescription><value
+    >The request could not be completed. Try again or contact your administrator.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Nonempty</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Nonempty CSV error</shortDescription><value
+    >Choose a non-empty CSV file.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Data_Required</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription>CSV data error</shortDescription><value
+    >The CSV must contain a header and at least one data row.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Blank_Header</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Blank header error</shortDescription><value
+    >CSV headers cannot be blank.</value></labels>
+    <labels><fullName
+    >BulkRecordUpload_CSV_Duplicate_Header</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Duplicate header error</shortDescription><value
+    >CSV headers must be unique.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Column_Count</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Column count error</shortDescription><value
+    >CSV row {0} has a different column count.</value></labels>
+    <labels><fullName>BulkRecordUpload_CSV_Unterminated</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Unterminated value error</shortDescription><value
+    >The CSV contains an unterminated quoted value.</value></labels>
+</CustomLabels>

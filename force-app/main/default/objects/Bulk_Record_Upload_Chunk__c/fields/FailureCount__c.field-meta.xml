@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >FailureCount__c</fullName><description
+  >Stores the number of failed rows in this completed chunk so finalization does not reparse result CSV.</description><label
+  >Failure Count</label><inlineHelpText
+  >System-calculated failed row count for this staging chunk.</inlineHelpText><precision
+  >5</precision><scale>0</scale><type>Number</type></CustomField>

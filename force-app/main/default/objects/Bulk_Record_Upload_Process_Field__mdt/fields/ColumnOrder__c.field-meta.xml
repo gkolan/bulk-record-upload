@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>ColumnOrder__c</fullName>
+  <description
+  >Controls template, validation, mapping, and result-column order.</description>
+  <inlineHelpText
+  >Enter a unique whole number from 1–100 within this process.</inlineHelpText>
+  <label>Column Order</label>
+  <precision>3</precision>
+  <required>true</required>
+  <scale>0</scale>
+  <type>Number</type>
+</CustomField>

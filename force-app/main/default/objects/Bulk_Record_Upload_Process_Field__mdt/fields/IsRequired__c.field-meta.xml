@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IsRequired__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description
+  >Requires every CSV row to provide a nonblank value for this field.</description>
+  <inlineHelpText
+  >Select when every uploaded row must provide this value.</inlineHelpText>
+  <label>Required in Every Row</label>
+  <type>Checkbox</type>
+</CustomField>

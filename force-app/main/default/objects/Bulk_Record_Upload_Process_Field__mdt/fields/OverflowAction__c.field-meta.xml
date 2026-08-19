@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OverflowAction__c</fullName><description
+  >Controls text that would exceed the Salesforce field length.</description>
+    <inlineHelpText
+  >Version 2 rejects the row rather than silently truncating business data.</inlineHelpText><label
+  >Text Overflow Action</label><required>false</required><type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted
+      >false</sorted><value><fullName>REJECT</fullName><default
+        >true</default><label
+        >Reject Row</label></value></valueSetDefinition></valueSet>
+</CustomField>

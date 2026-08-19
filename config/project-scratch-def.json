@@ -1,0 +1,15 @@
+{
+  "orgName": "Bulk Record Upload Development",
+  "description": "Reusable scratch org for Bulk Record Upload development. Create for 30 days and reuse until replacement is required.",
+  "edition": "Developer",
+  "hasSampleData": true,
+  "features": ["EnableSetPasswordInApi"],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStoragePref2": false
+    }
+  }
+}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>ValueHandling__c</fullName>
+  <description
+  >Legacy version 1 merge choice retained only for migration.</description>
+  <inlineHelpText
+  >For version 2 processes, use Existing Value Action and Blank CSV Action instead.</inlineHelpText>
+  <label>Legacy Value Handling</label>
+  <required>false</required>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>REPLACE</fullName>
+        <default>true</default>
+        <label>Replace</label>
+      </value>
+      <value>
+        <fullName>APPEND</fullName>
+        <default>false</default>
+        <label>Append</label>
+      </value>
+      <value>
+        <fullName>PREPEND</fullName>
+        <default>false</default>
+        <label>Prepend</label>
+      </value>
+      <value>
+        <fullName>CLEAR_WHEN_BLANK</fullName>
+        <default>false</default>
+        <label>Clear When Blank</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

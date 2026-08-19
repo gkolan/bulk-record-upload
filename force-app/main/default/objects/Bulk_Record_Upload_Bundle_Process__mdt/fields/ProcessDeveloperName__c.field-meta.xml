@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ProcessDeveloperName__c</fullName>
+    <description
+  >Developer Name of the upload process offered by this bundle.</description>
+    <inlineHelpText
+  >Enter the exact Developer Name of an active Bulk Record Upload Process.</inlineHelpText>
+    <label>Process API Name</label>
+    <length>80</length>
+    <required>true</required>
+    <type>Text</type>
+</CustomField>

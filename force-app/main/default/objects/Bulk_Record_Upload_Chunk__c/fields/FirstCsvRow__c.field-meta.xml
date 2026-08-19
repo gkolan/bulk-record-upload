@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>FirstCsvRow__c</fullName>
+  <description
+  >Stores the first one-based physical CSV data-row number represented by this chunk.</description>
+  <inlineHelpText
+  >Shows the first input row represented by this chunk.</inlineHelpText>
+  <label>First CSV Row</label>
+  <precision>5</precision>
+  <required>true</required>
+  <scale>0</scale>
+  <type>Number</type>
+</CustomField>

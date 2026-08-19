@@ -1,0 +1,86 @@
+/**
+ * Loads active version 1 process and field configuration without querying subscriber data.
+ */
+public with sharing class BulkRecordUploadConfigRepository {
+  private final Map<String, Bulk_Record_Upload_Process__mdt> processesByKey;
+  private final List<Bulk_Record_Upload_Process_Field__mdt> fieldRecords;
+
+  /** Creates a repository backed by the org's Custom Metadata records. */
+  public BulkRecordUploadConfigRepository() {
+    this(
+      Bulk_Record_Upload_Process__mdt.getAll(),
+      Bulk_Record_Upload_Process_Field__mdt.getAll().values()
+    );
+  }
+
+  /**
+   * Creates an injectable repository for deterministic tests.
+   * @param processesByKey Process records keyed by Developer Name.
+   * @param fieldRecords Field configuration records.
+   */
+  @TestVisible
+  private BulkRecordUploadConfigRepository(
+    Map<String, Bulk_Record_Upload_Process__mdt> processesByKey,
+    List<Bulk_Record_Upload_Process_Field__mdt> fieldRecords
+  ) {
+    this.processesByKey = processesByKey == null
+      ? new Map<String, Bulk_Record_Upload_Process__mdt>()
+      : new Map<String, Bulk_Record_Upload_Process__mdt>(processesByKey);
+    this.fieldRecords = fieldRecords == null
+      ? new List<Bulk_Record_Upload_Process_Field__mdt>()
+      : new List<Bulk_Record_Upload_Process_Field__mdt>(fieldRecords);
+  }
+
+  /**
+   * Finds one active process and its ordered active field records.
+   * @param processKey Exact subscriber Developer Name.
+   * @return Immutable process snapshot and ordered field records.
+   * @throws BulkRecordUploadException when the process is missing or inactive.
+   */
+  public Configuration findActive(String processKey) {
+    if (String.isBlank(processKey)) {
+      throw new BulkRecordUploadException('Process key is required.');
+    }
+    Bulk_Record_Upload_Process__mdt processRecord = processesByKey.get(
+      processKey.trim()
+    );
+    if (processRecord == null || processRecord.IsActive__c != true) {
+      throw new BulkRecordUploadException(
+        'The requested upload process is unavailable.'
+      );
+    }
+    List<BulkRecordUploadFieldConfigV1> matchingFields = new List<BulkRecordUploadFieldConfigV1>();
+    for (Bulk_Record_Upload_Process_Field__mdt fieldRecord : fieldRecords) {
+      if (
+        fieldRecord.IsActive__c == true &&
+        fieldRecord.ProcessDeveloperName__c == processRecord.DeveloperName
+      ) {
+        matchingFields.add(new BulkRecordUploadFieldConfigV1(fieldRecord));
+      }
+    }
+    matchingFields.sort();
+    return new Configuration(
+      new BulkRecordUploadProcessConfigV1(processRecord),
+      matchingFields
+    );
+  }
+
+  /** Holds one immutable configuration snapshot. */
+  public class Configuration {
+    public BulkRecordUploadProcessConfigV1 process { get; private set; }
+    public List<BulkRecordUploadFieldConfigV1> fields { get; private set; }
+
+    private Configuration(
+      BulkRecordUploadProcessConfigV1 process,
+      List<BulkRecordUploadFieldConfigV1> fields
+    ) {
+      this.process = process;
+      this.fields = new List<BulkRecordUploadFieldConfigV1>(fields);
+    }
+
+    /** @return A defensive copy of ordered field configuration. */
+    public List<BulkRecordUploadFieldConfigV1> getFields() {
+      return new List<BulkRecordUploadFieldConfigV1>(fields);
+    }
+  }
+}

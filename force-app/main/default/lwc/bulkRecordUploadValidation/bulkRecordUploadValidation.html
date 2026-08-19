@@ -1,0 +1,25 @@
+<template>
+  <section aria-labelledby="validation-heading">
+    <h2 id="validation-heading" class="slds-text-heading_small">
+      {label.ValidationTitle}
+    </h2>
+    <template lwc:if={hasSelection}>
+      <dl class="slds-list_horizontal slds-wrap slds-m-top_small">
+        <dt class="slds-item_label slds-truncate" title={label.UploadProcess}>
+          {label.UploadProcess}
+        </dt>
+        <dd class="slds-item_detail slds-truncate">{processKey}</dd>
+        <dt class="slds-item_label slds-truncate" title={label.CsvFile}>
+          {label.CsvFile}
+        </dt>
+        <dd class="slds-item_detail slds-truncate">{fileName}</dd>
+      </dl>
+      <p class="slds-m-top_x-small" role="status">{summary}</p>
+    </template>
+    <template lwc:else>
+      <p class="slds-text-color_weak slds-m-top_x-small">
+        {label.ValidationGuidance}
+      </p>
+    </template>
+  </section>
+</template>

@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  local:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:all
+      - run: npm audit --omit=dev
+      - run: npm run sbom > bulk-record-upload.cdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: bulk-record-upload.cdx.json
+          retention-days: 30
+
+  salesforce:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: salesforce-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Require an explicitly approved target
+        run: test "$SF_TARGET_URL" = "https://sfdo-gk-dev-ed.develop.my.salesforce.com"
+        env:
+          SF_TARGET_URL: ${{ vars.SF_TARGET_URL }}
+      - name: Authenticate approved org
+        run: echo "${{ secrets.SFDX_AUTH_URL }}" | sf org login sfdx-url --sfdx-url-stdin --alias release-target
+      - name: Validate manifest
+        run: sf project deploy start --dry-run --manifest manifest/package.xml --target-org release-target --test-level RunSpecifiedTests --tests BulkRecordUploadConfigProjectionTest --wait 30

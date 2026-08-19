@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HostObjectApiName__c</fullName>
+    <description
+  >Names the Schema-validated object whose record page can supply the parent record.</description>
+    <inlineHelpText
+  >Example: Account for a process that imports Contacts for the current Account.</inlineHelpText>
+    <label>Record Page Object API Name</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

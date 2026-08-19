@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses><apexClass>BulkRecordUploadController</apexClass><enabled
+    >true</enabled></classAccesses>
+    <classAccesses><apexClass>BulkRecordUploadBundlePicklist</apexClass><enabled
+    >true</enabled></classAccesses>
+    <applicationVisibilities>
+        <application>Bulk_Record_Upload</application>
+        <visible>true</visible>
+    </applicationVisibilities>
+    <customMetadataTypeAccesses><enabled>true</enabled><name
+    >Bulk_Record_Upload_Process_Field__mdt</name></customMetadataTypeAccesses>
+    <customMetadataTypeAccesses><enabled>true</enabled><name
+    >Bulk_Record_Upload_Process__mdt</name></customMetadataTypeAccesses>
+    <customPermissions><enabled>true</enabled><name
+    >Bulk_Record_Upload_Administer</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >Bulk_Record_Upload_Delete</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >Bulk_Record_Upload_Preview</name></customPermissions>
+    <customPermissions><enabled>true</enabled><name
+    >Bulk_Record_Upload_Run</name></customPermissions>
+    <description
+  >Allows Bulk Record Upload configuration validation, troubleshooting, and retention administration without granting target-object access, Modify All Data, or View All Data.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Bulk Record Upload — Administrator</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Bulk_Record_Upload__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Bulk_Record_Upload_Chunk__c</object>
+        <viewAllFields>true</viewAllFields>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <tabSettings>
+        <tab>Bulk_Record_Upload</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Bulk_Record_Upload__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+</PermissionSet>

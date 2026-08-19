@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>RetentionDays__c</fullName>
+  <description
+  >Snapshots the validated process retention period so cleanup remains deterministic after configuration changes.</description>
+  <inlineHelpText
+  >Shows the retention period captured at submission, from 7 through 365 days.</inlineHelpText>
+  <label>History Retention Days</label>
+  <precision>3</precision>
+  <required>true</required>
+  <scale>0</scale>
+  <type>Number</type>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >PostProcessingAction__c</fullName><description
+  >Trusted registry key for an action invoked after bounded persistence completes.</description><inlineHelpText
+  >Leave blank for no action. Registered actions receive safe results and identifiers, never raw CSV content.</inlineHelpText><label
+  >Post-Processing Action</label><length>80</length><required
+  >false</required><type>Text</type></CustomField>

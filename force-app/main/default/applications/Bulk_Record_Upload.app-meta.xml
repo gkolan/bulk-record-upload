@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>View</actionName>
+        <content>Bulk_Record_Upload_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>Bulk_Record_Upload__c</pageOrSobjectType>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <content>Account_Bulk_Record_Upload_Demo_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>Account</pageOrSobjectType>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+    </actionOverrides>
+    <brand>
+        <headerColor>#032D60</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description
+  >Provides focused navigation for approved Bulk Record Upload processes and their execution history.</description>
+    <formFactors>Large</formFactors>
+    <formFactors>Small</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <label>Bulk Record Upload</label>
+    <navType>Standard</navType>
+    <tabs>Bulk_Record_Upload</tabs>
+    <tabs>Bulk_Record_Upload__c</tabs>
+    <tabs>standard-Account</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

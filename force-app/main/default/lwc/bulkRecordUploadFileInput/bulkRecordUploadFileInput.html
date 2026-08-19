@@ -1,0 +1,25 @@
+<template>
+  <div class="bru-drop-zone">
+    <input
+      class="bru-file-input"
+      type="file"
+      name="csvFile"
+      aria-label={label.CsvFile}
+      accept=".csv,text/csv"
+      required
+      disabled={disabled}
+      onclick={handleFileClick}
+      onchange={handleFileChange}
+    />
+    <lightning-icon
+      icon-name={displayIcon}
+      variant={displayVariant}
+      size="small"
+      alternative-text=""
+    ></lightning-icon>
+    <p class="bru-upload-label">{displayLabel}</p>
+    <p class="bru-upload-help">
+      UTF-8 CSV, up to 2 MB, 5,000 data rows, and 100 columns.
+    </p>
+  </div>
+</template>
