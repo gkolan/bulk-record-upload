@@ -1,13 +1,13 @@
 # Configure an upload process
 
 > [!NOTE]
-> On this page, create an active Custom Metadata process that selects one approved object, operation, handler, batch size, and retention period.
+> On this page, create an active Custom Metadata process that selects one approved object, operation, batch size, and retention period.
 
-Create a **Bulk Record Upload Process** (`Bulk_Record_Upload_Process__mdt`) record with a stable Developer Name. Set `ObjectApiName__c`, one supported `Operation__c`, registered `ProcessingHandler__c`, `RowsPerBatch__c` from 25–200, `RetentionDays__c` from 7–365, `ConfigurationVersion__c` to `2`, and `IsActive__c` only after its fields validate.
+Create a **Bulk Record Upload Process** (`Bulk_Record_Upload_Process__mdt`) record with a stable Developer Name. Set `ObjectApiName__c`, one supported `Operation__c`, `RowsPerBatch__c` from 25–200, `RetentionDays__c` from 7–365, `ConfigurationVersion__c` to `2`, and `IsActive__c` only after its fields validate.
 
-For the normal path, select **Standard DML** and use processor key `STANDARD_DML_V1`. Use **Custom Apex** only when a reviewed implementation has been added to `BulkRecordUploadProcessorRegistry`; enter its registered key, never a class name. `NONE_V1` is the default post-processing action. A reviewed post-action can be registered for bounded notifications or downstream orchestration after each processor invocation. Post-actions receive correlated results, not raw CSV content.
+For the normal path, select **Standard DML** and use processor key `STANDARD_DML_V1`; this closed persistence path is package-owned and always user-mode (see [ADR-0007](../../specs/decisions/ADR-0007-configuration-over-code-extension.md)). To run reviewed Apex before mapping or after processing, register it as an extension — see [Write and register an extension](../developer/custom-handler.md) — rather than through a processor key.
 
-Object, handler, processor, and post-action text is resolved through Schema and trusted registries. An unknown value returns a safe configuration fault.
+Object and processor text is resolved through Schema and trusted registries. An unknown value returns a safe configuration fault.
 
 ## Use the current record as the parent
 
@@ -22,7 +22,7 @@ The package provides two components; neither replaces the other.
 - **Bulk Record Upload — Multiple Processes** lists every active process available to the user and lets the user choose one.
 - **Bulk Record Upload** accepts no App Builder process or instruction override. Apex returns active Upload Process choices; one choice is selected automatically and multiple choices display the runtime selector.
 
-On initialization, the server resolves active configuration and enforces run permission, preview permission, object CRUD, field access, operation permission, trusted handler registration, and bounded field projection. A single available process scopes history automatically.
+On initialization, the server resolves active configuration and enforces run permission, preview permission, object CRUD, field access, operation permission, trusted extension registration, and bounded field projection. A single available process scopes history automatically.
 
 To offer three distinct jobs, create three process records and place three component instances, each with its own fixed API name. Deactivating or invalidating a process causes its component to fail safely rather than fall back to a different process.
 

@@ -53,9 +53,10 @@ public with sharing class BulkRecordUploadProjectionService {
     accessPolicy.requirePreviewPermission(
       configuration.process.previewPermission
     );
-    validateHandler(configuration.process.handlerKey);
+    List<String> extensionClassNames = extensionClassNames(configuration);
+    new BulkRecordUploadExtensionRegistry().resolve(extensionClassNames);
 
-    String configHash = createConfigHash(configuration);
+    String configHash = createConfigHash(configuration, extensionClassNames);
     String cacheKey = createCacheKey(
       configuration.process,
       configHash,
@@ -69,7 +70,8 @@ public with sharing class BulkRecordUploadProjectionService {
     BulkRecordUploadProjectionV1 projection = buildProjection(
       configuration,
       objectDescribe,
-      configHash
+      configHash,
+      extensionClassNames
     );
     projectionCache.put(cacheKey, projection);
     return projection;
@@ -78,7 +80,8 @@ public with sharing class BulkRecordUploadProjectionService {
   private BulkRecordUploadProjectionV1 buildProjection(
     BulkRecordUploadConfigRepository.Configuration configuration,
     Schema.DescribeSObjectResult objectDescribe,
-    String configHash
+    String configHash,
+    List<String> extensionClassNames
   ) {
     List<BulkRecordUploadFieldConfigV1> fieldConfigs = configuration.getFields();
     if (fieldConfigs.isEmpty() || fieldConfigs.size() > 100) {
@@ -110,9 +113,8 @@ public with sharing class BulkRecordUploadProjectionService {
       configHash,
       objectDescribe.getName(),
       configuration.process.operation,
-      configuration.process.handlerKey,
+      extensionClassNames,
       configuration.process.processorKey,
-      configuration.process.postProcessingAction,
       configuration.process.recordContextAction,
       configuration.process.hostObjectApiName,
       configuration.process.recordContextFieldApiName,
@@ -120,6 +122,18 @@ public with sharing class BulkRecordUploadProjectionService {
       configuration.process.retentionDays,
       projectedFields
     );
+  }
+
+  private static List<String> extensionClassNames(
+    BulkRecordUploadConfigRepository.Configuration configuration
+  ) {
+    List<String> classNames = new List<String>();
+    for (
+      BulkRecordUploadExtensionConfigV1 extensionConfig : configuration.getExtensions()
+    ) {
+      classNames.add(extensionConfig.className);
+    }
+    return classNames;
   }
 
   private static void validateRecordContext(
@@ -233,24 +247,16 @@ public with sharing class BulkRecordUploadProjectionService {
     sequences.add(config.sequence);
   }
 
-  private static void validateHandler(String handlerKey) {
-    if (!BulkRecordUploadHandlerRegistry.isRegistered(handlerKey)) {
-      throw new BulkRecordUploadException(
-        'Configured handler is not registered.'
-      );
-    }
-  }
-
   private static String createConfigHash(
-    BulkRecordUploadConfigRepository.Configuration configuration
+    BulkRecordUploadConfigRepository.Configuration configuration,
+    List<String> extensionClassNames
   ) {
     List<String> parts = new List<String>{
       configuration.process.processKey,
       configuration.process.objectApiName,
       configuration.process.operation,
-      configuration.process.handlerKey,
+      String.join(extensionClassNames, ','),
       configuration.process.processorKey,
-      configuration.process.postProcessingAction,
       configuration.process.recordContextAction,
       configuration.process.hostObjectApiName,
       configuration.process.recordContextFieldApiName,

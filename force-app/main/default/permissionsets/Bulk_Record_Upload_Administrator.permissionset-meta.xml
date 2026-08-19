@@ -9,6 +9,8 @@
         <visible>true</visible>
     </applicationVisibilities>
     <customMetadataTypeAccesses><enabled>true</enabled><name
+    >Bulk_Record_Upload_Extension__mdt</name></customMetadataTypeAccesses>
+    <customMetadataTypeAccesses><enabled>true</enabled><name
     >Bulk_Record_Upload_Process_Field__mdt</name></customMetadataTypeAccesses>
     <customMetadataTypeAccesses><enabled>true</enabled><name
     >Bulk_Record_Upload_Process__mdt</name></customMetadataTypeAccesses>

@@ -29,7 +29,46 @@ Use user-mode SOQL and user-mode partial DML for business data. Schema/configura
 
 Object, field, operation, behavior, permission, group/share target, and handler keys resolve through code-owned registries plus Schema describe. Store canonical qualified API names after validation. Bind every data value. Dynamic SOQL may concatenate only canonical field/object identifiers emitted by the projection builder; it never concatenates CSV or administrator-supplied values.
 
-Handlers use `BulkRecordUploadHandlerV1` registry keys compiled into a project-owned registry. `Type.forName` on configuration text is prohibited. Adding a handler requires code review, registry membership, interface tests, and documented permission/data behavior.
+Operations and processor selection use code-owned closed-set resolvers (`BulkRecordUploadOperations`, `BulkRecordUploadProcessors`) compiled into the package. `Type.forName` on configuration text is prohibited everywhere except the one narrow, reviewed exception below.
+
+### Amendment 2026-08-19 (convergence step 06): the one extension seam
+
+`BulkRecordUploadExtensionRegistry` resolves `Type.forName` on a class name,
+but only under all of the following guardrails, none of which existed when
+the original prohibition above was written for the then-five-registry
+design:
+
+- The name is sourced **only** from `Bulk_Record_Upload_Extension__mdt.ClassName__c`,
+  a reviewed Custom Metadata record. It is never read from CSV content, a
+  component property, or any other administrator-editable free-text
+  surface at request time.
+- The resolved type must instantiate and pass an `instanceof BulkRecordUploadExtensionV1`
+  check before it is ever invoked. A name that resolves to an unrelated
+  type, or that does not resolve at all, is rejected with a configuration
+  error naming the class — never silently skipped, never invoked
+  unchecked.
+- This validation runs twice: once when the process configuration loads
+  (so a broken registration is caught before an upload runs), and again at
+  every run (so a class removed or broken after configuration load is
+  caught before it executes).
+- The resolved extension can transform and observe rows; it cannot
+  perform DML. The persistence path stays package-owned and user-mode,
+  resolved through the closed `BulkRecordUploadProcessors` set above — an
+  extension is never a substitute for it. See
+  [ADR-0007](ADR-0007-configuration-over-code-extension.md).
+
+This is the package's one open extension point, replacing what were three
+differently-scoped registries (`HandlerRegistry`, `ProcessorRegistry`,
+`PostActionRegistry`) with one class subscribers can actually find and use
+safely. The original prohibition remains in force for every other
+identifier class named above: object, field, operation, permission,
+group/share target, and processor keys are still never resolved through
+`Type.forName`.
+
+Adding or changing an extension requires code review, a
+`Bulk_Record_Upload_Extension__mdt` record, interface tests, and documented
+permission/data behavior — the same bar the original handler-registry
+sentence set, carried forward to the new seam.
 
 ## Field eligibility
 

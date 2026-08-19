@@ -1,5 +1,11 @@
-/** Resolves only code-reviewed processor keys; administrator text is never instantiated as a class. */
-public with sharing class BulkRecordUploadProcessorRegistry {
+/**
+ * Resolves only code-reviewed processor keys; administrator text is never
+ * instantiated as a class. Closed set, per ADR-0007: the DML/persistence
+ * path stays package-owned so user-mode enforcement cannot be bypassed.
+ * Not named `Registry` for that reason -- `BulkRecordUploadExtensionRegistry`
+ * is the package's one open extension point.
+ */
+public with sharing class BulkRecordUploadProcessors {
   public static final String STANDARD_DML_V1 = 'STANDARD_DML_V1';
   /** Returns a fresh trusted processor. */
   public BulkRecordUploadProcessorV1 resolve(String processorKey) {

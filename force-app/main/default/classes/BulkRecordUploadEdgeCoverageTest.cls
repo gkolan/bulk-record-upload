@@ -23,10 +23,9 @@ private class BulkRecordUploadEdgeCoverageTest {
   }
 
   @IsTest
-  static void handlers_NullInputs_AreRejected() {
+  static void trimExtension_NullInputs_AreRejected() {
     Test.startTest();
-    assertHandlerFailure(new BulkRecordUploadStandardHandlerV1());
-    assertHandlerFailure(new BulkRecordUploadTrimHandlerV1());
+    assertExtensionFailure(new BulkRecordUploadTrimHandlerV1());
     Test.stopTest();
   }
 
@@ -124,11 +123,9 @@ private class BulkRecordUploadEdgeCoverageTest {
   }
 
   @IsTest
-  static void operationRegistry_TrimsAndResolvesKnownKey() {
+  static void operations_TrimsAndResolvesKnownKey() {
     Test.startTest();
-    Assert.isNotNull(
-      new BulkRecordUploadOperationRegistry().resolve(' insert ')
-    );
+    Assert.isNotNull(new BulkRecordUploadOperations().resolve(' insert '));
     Test.stopTest();
   }
 
@@ -149,10 +146,12 @@ private class BulkRecordUploadEdgeCoverageTest {
     }
   }
 
-  private static void assertHandlerFailure(BulkRecordUploadHandlerV1 handler) {
+  private static void assertExtensionFailure(
+    BulkRecordUploadExtensionV1 extension
+  ) {
     try {
-      handler.handle(null, null);
-      Assert.fail('Invalid handler input should fail.');
+      extension.beforeMap(null, null);
+      Assert.fail('Invalid extension input should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
         error.getMessage().contains('required'),
@@ -171,7 +170,7 @@ private class BulkRecordUploadEdgeCoverageTest {
         'H',
         'Account',
         'INSERT',
-        'STANDARD_V1',
+        new List<String>(),
         100,
         retention,
         new List<BulkRecordUploadFieldProjectionV1>{ field(false, false, 1) }
@@ -192,7 +191,7 @@ private class BulkRecordUploadEdgeCoverageTest {
         'H',
         'Account',
         'INSERT',
-        'STANDARD_V1',
+        new List<String>(),
         100,
         30,
         new List<BulkRecordUploadFieldProjectionV1>{ field(false, false, 1) }
@@ -308,7 +307,6 @@ private class BulkRecordUploadEdgeCoverageTest {
       DeveloperName = name,
       ObjectApiName__c = 'Account',
       Operation__c = 'INSERT',
-      ProcessingHandler__c = 'STANDARD_V1',
       RowsPerBatch__c = batch,
       RetentionDays__c = retention,
       ConfigurationVersion__c = version,
@@ -341,7 +339,7 @@ private class BulkRecordUploadEdgeCoverageTest {
       'H',
       'Account',
       operation,
-      'STANDARD_V1',
+      new List<String>(),
       100,
       30,
       new List<BulkRecordUploadFieldProjectionV1>{ projectedField }

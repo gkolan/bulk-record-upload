@@ -5,14 +5,12 @@ public class BulkRecordUploadProcessConfigV1 {
   public String processKey { get; private set; }
   public String objectApiName { get; private set; }
   public String operation { get; private set; }
-  public String handlerKey { get; private set; }
   public String previewPermission { get; private set; }
   public Integer batchSize { get; private set; }
   public Integer retentionDays { get; private set; }
   public Integer contractVersion { get; private set; }
   public String processingMode { get; private set; }
   public String processorKey { get; private set; }
-  public String postProcessingAction { get; private set; }
   public String recordContextAction { get; private set; }
   public String hostObjectApiName { get; private set; }
   public String recordContextFieldApiName { get; private set; }
@@ -34,8 +32,6 @@ public class BulkRecordUploadProcessConfigV1 {
     objectApiName = requireText(recordValue.ObjectApiName__c, 'Target object');
     operation = requireText(recordValue.Operation__c, 'Operation')
       .toUpperCase();
-    handlerKey = requireText(recordValue.ProcessingHandler__c, 'Handler key')
-      .toUpperCase();
     previewPermission = String.isBlank(recordValue.PreviewPermissionApiName__c)
       ? null
       : recordValue.PreviewPermissionApiName__c.trim();
@@ -48,9 +44,6 @@ public class BulkRecordUploadProcessConfigV1 {
     processorKey = String.isBlank(recordValue.ProcessorKey__c)
       ? 'STANDARD_DML_V1'
       : recordValue.ProcessorKey__c.trim().toUpperCase();
-    postProcessingAction = String.isBlank(recordValue.PostProcessingAction__c)
-      ? null
-      : recordValue.PostProcessingAction__c.trim().toUpperCase();
     recordContextAction = String.isBlank(recordValue.RecordContextAction__c)
       ? 'NONE'
       : recordValue.RecordContextAction__c.trim().toUpperCase();
@@ -101,8 +94,7 @@ public class BulkRecordUploadProcessConfigV1 {
     if (
       !new Set<String>{ 'STANDARD_DML', 'CUSTOM_APEX' }
         .contains(processingMode) ||
-      !BulkRecordUploadProcessorRegistry.isRegistered(processorKey) ||
-      !BulkRecordUploadPostActionRegistry.isRegistered(postProcessingAction)
+      !BulkRecordUploadProcessors.isRegistered(processorKey)
     ) {
       throw new BulkRecordUploadException(
         'Process processor configuration is not supported.'

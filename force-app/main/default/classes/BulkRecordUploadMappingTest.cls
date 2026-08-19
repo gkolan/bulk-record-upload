@@ -128,7 +128,7 @@ private class BulkRecordUploadMappingTest {
       'hash',
       'Account',
       'INSERT',
-      'STANDARD_V1',
+      new List<String>(),
       100,
       30,
       fields

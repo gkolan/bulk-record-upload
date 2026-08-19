@@ -147,7 +147,7 @@ private with sharing class BulkRecordUploadScaleTest {
       'hash-' + key,
       'Synthetic__c',
       'INSERT',
-      'STANDARD_V1',
+      new List<String>(),
       200,
       30,
       fields

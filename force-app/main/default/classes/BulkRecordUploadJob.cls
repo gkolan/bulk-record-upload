@@ -97,16 +97,18 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
         ? new BulkRecordUploadProjectionService()
             .getProjection(upload.ProcessDeveloperName__c)
         : projectionOverride;
-      new BulkRecordUploadOperationRegistry()
+      new BulkRecordUploadOperations()
         .resolve(projection.operation)
         .validateProjection(projection);
       List<BulkRecordUploadRowV1> rows = (List<BulkRecordUploadRowV1>) JSON.deserialize(
         chunk.StagedRowData__c,
         List<BulkRecordUploadRowV1>.class
       );
-      rows = new BulkRecordUploadHandlerRegistry()
-        .resolve(projection.handlerKey)
-        .handle(projection, rows);
+      List<BulkRecordUploadExtensionV1> extensions = new BulkRecordUploadExtensionRegistry()
+        .resolve(projection.extensionClassNames);
+      for (BulkRecordUploadExtensionV1 extension : extensions) {
+        rows = extension.beforeMap(projection, rows);
+      }
       List<BulkRecordUploadMappedRowV1> mapped = new BulkRecordUploadRecordMapper()
         .mapRows(projection, rows);
       if (
@@ -127,13 +129,13 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
       new BulkRecordUploadRecordContextService()
         .applyContext(projection, upload.ContextRecordId__c, mapped);
       Schema.SObjectField upsertField = resolveUpsertField(projection);
-      List<BulkRecordUploadRowResultV1> outcomes = new BulkRecordUploadProcessorRegistry()
+      List<BulkRecordUploadRowResultV1> outcomes = new BulkRecordUploadProcessors()
         .resolve(projection.processorKey)
         .process(projection, mapped, upsertField);
       persistenceCompleted = true;
-      new BulkRecordUploadPostActionRegistry()
-        .resolve(projection.postProcessingAction)
-        .afterProcess(uploadId, projection, outcomes);
+      for (BulkRecordUploadExtensionV1 extension : extensions) {
+        extension.afterProcess(uploadId, projection, outcomes);
+      }
       chunk.StagedRowData__c = new BulkRecordUploadResultWriter()
         .write(outcomes, projection, rows)
         .toString();

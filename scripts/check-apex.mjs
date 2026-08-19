@@ -70,7 +70,16 @@ if (existsSync(classesDirectory)) {
         `${entry.name}: record-accessing class lacks an explicit sharing declaration`
       );
     }
-    if (/\b(Type\.forName|SELECT\s+\*)\b/i.test(source)) {
+    // ADR-0004 (2026-08-19 amendment) permits Type.forName in exactly one
+    // reviewed class: the package's one open extension seam. The name it
+    // resolves comes only from a Bulk_Record_Upload_Extension__mdt record,
+    // never CSV or free text, and is gated by an instanceof check before
+    // use. Every other class stays subject to the blanket prohibition.
+    const allowsDynamicType = className === "BulkRecordUploadExtensionRegistry";
+    if (
+      (/\bType\.forName\b/i.test(source) && !allowsDynamicType) ||
+      /\bSELECT\s+\*\b/i.test(source)
+    ) {
       errors.push(
         `${entry.name}: untrusted dynamic type or unbounded field selection`
       );

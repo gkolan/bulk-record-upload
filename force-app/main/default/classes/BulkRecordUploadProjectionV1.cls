@@ -8,11 +8,10 @@ public class BulkRecordUploadProjectionV1 {
   public String configHash { get; private set; }
   public String objectApiName { get; private set; }
   public String operation { get; private set; }
-  public String handlerKey { get; private set; }
+  public List<String> extensionClassNames { get; private set; }
   public Integer batchSize { get; private set; }
   public Integer retentionDays { get; private set; }
   public String processorKey { get; private set; }
-  public String postProcessingAction { get; private set; }
   public String recordContextAction { get; private set; }
   public String hostObjectApiName { get; private set; }
   public String recordContextFieldApiName { get; private set; }
@@ -24,7 +23,7 @@ public class BulkRecordUploadProjectionV1 {
    * @param configHash Hash of configuration inputs.
    * @param objectApiName Schema-resolved target object API name.
    * @param operation Approved operation code.
-   * @param handlerKey Trusted registered handler key.
+   * @param extensionClassNames Ordered, validated registered extension class names.
    * @param batchSize Bounded rows processed per chunk.
    * @param retentionDays Bounded retention copied to the upload record.
    * @param fields Ordered compact field projection.
@@ -34,7 +33,7 @@ public class BulkRecordUploadProjectionV1 {
     String configHash,
     String objectApiName,
     String operation,
-    String handlerKey,
+    List<String> extensionClassNames,
     Integer batchSize,
     Integer retentionDays,
     List<BulkRecordUploadFieldProjectionV1> fields
@@ -44,9 +43,8 @@ public class BulkRecordUploadProjectionV1 {
       configHash,
       objectApiName,
       operation,
-      handlerKey,
+      extensionClassNames,
       'STANDARD_DML_V1',
-      null,
       'NONE',
       null,
       null,
@@ -56,15 +54,14 @@ public class BulkRecordUploadProjectionV1 {
     );
   }
 
-  /** Creates a version 2 process projection with registered processing extensions. */
+  /** Creates a version 2 process projection with a registered processor. */
   public BulkRecordUploadProjectionV1(
     String processKey,
     String configHash,
     String objectApiName,
     String operation,
-    String handlerKey,
+    List<String> extensionClassNames,
     String processorKey,
-    String postProcessingAction,
     Integer batchSize,
     Integer retentionDays,
     List<BulkRecordUploadFieldProjectionV1> fields
@@ -74,9 +71,8 @@ public class BulkRecordUploadProjectionV1 {
       configHash,
       objectApiName,
       operation,
-      handlerKey,
+      extensionClassNames,
       processorKey,
-      postProcessingAction,
       'NONE',
       null,
       null,
@@ -92,9 +88,8 @@ public class BulkRecordUploadProjectionV1 {
     String configHash,
     String objectApiName,
     String operation,
-    String handlerKey,
+    List<String> extensionClassNames,
     String processorKey,
-    String postProcessingAction,
     String recordContextAction,
     String hostObjectApiName,
     String recordContextFieldApiName,
@@ -106,11 +101,19 @@ public class BulkRecordUploadProjectionV1 {
     this.configHash = requireText(configHash, 'configHash');
     this.objectApiName = requireText(objectApiName, 'objectApiName');
     this.operation = requireText(operation, 'operation');
-    this.handlerKey = requireText(handlerKey, 'handlerKey');
+    if (
+      extensionClassNames != null &&
+      extensionClassNames.size() >
+      BulkRecordUploadRuntimeContract.MAX_EXTENSIONS_PER_PROCESS
+    ) {
+      throw new BulkRecordUploadException(
+        'Too many extensions are registered for this process.'
+      );
+    }
+    this.extensionClassNames = extensionClassNames == null
+      ? new List<String>()
+      : new List<String>(extensionClassNames);
     this.processorKey = requireText(processorKey, 'processorKey');
-    this.postProcessingAction = String.isBlank(postProcessingAction)
-      ? null
-      : postProcessingAction.trim();
     this.recordContextAction = String.isBlank(recordContextAction)
       ? 'NONE'
       : recordContextAction.trim();

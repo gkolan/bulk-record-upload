@@ -12,6 +12,7 @@ public class BulkRecordUploadRuntimeContract {
   public static final Integer MAX_CHUNK_BYTES = 524288;
   public static final Integer MAX_CHUNK_CHARACTERS = 131072;
   public static final Integer MAX_CHUNKS = 200;
+  public static final Integer MAX_EXTENSIONS_PER_PROCESS = 10;
   public static final Integer MAX_HISTORY_ROWS = 50;
   public static final Integer MAX_ERROR_CODE_CHARACTERS = 80;
   public static final Integer MAX_ERROR_MESSAGE_CHARACTERS = 255;

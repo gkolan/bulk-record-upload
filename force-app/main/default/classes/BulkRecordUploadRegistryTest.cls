@@ -1,62 +1,90 @@
 @IsTest
 private class BulkRecordUploadRegistryTest {
   @IsTest
-  static void handlerRegistry_StandardHandler_PreservesRows() {
-    BulkRecordUploadProjectionV1 projection = projection(
-      'INSERT',
-      false,
-      false
-    );
-    List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>{
-      new BulkRecordUploadRowV1(2, new Map<String, String>{ 'name' => 'Acme' })
-    };
+  static void extensionRegistry_NoConfiguredExtensions_ResolvesEmptyOrderedList() {
+    List<BulkRecordUploadExtensionV1> resolved = new BulkRecordUploadExtensionRegistry()
+      .resolve(new List<String>());
 
-    List<BulkRecordUploadRowV1> actual = new BulkRecordUploadHandlerRegistry()
-      .resolve('STANDARD_V1')
-      .handle(projection, rows);
-
-    Assert.areEqual('Acme', actual[0].getValuesByColumn().get('name'));
-    Assert.isTrue(BulkRecordUploadHandlerRegistry.isRegistered('STANDARD_V1'));
+    Assert.isTrue(resolved.isEmpty());
   }
 
   @IsTest
-  static void handlerRegistry_CustomTrimHandler_ProvesExtensionBoundary() {
-    BulkRecordUploadProjectionV1 projection = projection(
-      'INSERT',
-      false,
-      false
-    );
+  static void extensionRegistry_ShippedTrimExtension_ProvesExtensionBoundary() {
     List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>{
       new BulkRecordUploadRowV1(
         2,
         new Map<String, String>{ 'name' => '  Acme  ' }
       )
     };
+    BulkRecordUploadProjectionV1 projection = projection(
+      'INSERT',
+      false,
+      false
+    );
 
-    List<BulkRecordUploadRowV1> actual = new BulkRecordUploadHandlerRegistry()
-      .resolve('TRIM_TEXT_V1')
-      .handle(projection, rows);
+    List<BulkRecordUploadExtensionV1> resolved = new BulkRecordUploadExtensionRegistry()
+      .resolve(new List<String>{ 'BulkRecordUploadTrimHandlerV1' });
+    List<BulkRecordUploadRowV1> actual = resolved[0]
+      .beforeMap(projection, rows);
 
     Assert.areEqual('Acme', actual[0].getValuesByColumn().get('name'));
     Assert.areEqual('  Acme  ', rows[0].getValuesByColumn().get('name'));
   }
 
   @IsTest
-  static void handlerRegistry_AdministratorClassName_IsRejected() {
+  static void extensionRegistry_UnresolvableClassName_IsRejected() {
     try {
-      new BulkRecordUploadHandlerRegistry().resolve('System.String');
-      Assert.fail('Expected an unregistered-handler exception.');
+      new BulkRecordUploadExtensionRegistry()
+        .resolve(new List<String>{ 'System.String' });
+      Assert.fail('Expected an unregistered-extension exception.');
     } catch (BulkRecordUploadException error) {
-      Assert.areEqual(
-        'The configured handler is not registered.',
-        error.getMessage()
+      Assert.isTrue(
+        error.getMessage().contains('is not registered'),
+        'Safe error naming the class expected.'
       );
     }
   }
 
   @IsTest
-  static void operationRegistry_AllSupportedOperations_Resolve() {
-    BulkRecordUploadOperationRegistry registry = new BulkRecordUploadOperationRegistry();
+  static void extensionRegistry_NonImplementingClassName_IsRejected() {
+    try {
+      new BulkRecordUploadExtensionRegistry()
+        .resolve(
+          new List<String>{ 'BulkRecordUploadRegistryTest.NotAnExtension' }
+        );
+      Assert.fail('Expected an unregistered-extension exception.');
+    } catch (BulkRecordUploadException error) {
+      Assert.isTrue(
+        error.getMessage().contains('is not registered'),
+        'Safe error naming the class expected.'
+      );
+    }
+  }
+
+  @IsTest
+  static void extensionRegistry_TooManyExtensions_IsRejected() {
+    List<String> tooMany = new List<String>();
+    for (
+      Integer i = 0;
+      i < BulkRecordUploadRuntimeContract.MAX_EXTENSIONS_PER_PROCESS + 1;
+      i++
+    ) {
+      tooMany.add('BulkRecordUploadTrimHandlerV1');
+    }
+    try {
+      new BulkRecordUploadExtensionRegistry().resolve(tooMany);
+      Assert.fail('Expected a too-many-extensions exception.');
+    } catch (BulkRecordUploadException error) {
+      Assert.isTrue(
+        error.getMessage().contains('Too many extensions'),
+        'Bounded-count error expected.'
+      );
+    }
+  }
+
+  @IsTest
+  static void operations_AllSupportedOperations_Resolve() {
+    BulkRecordUploadOperations registry = new BulkRecordUploadOperations();
     registry.resolve('insert')
       .validateProjection(projection('INSERT', false, false));
     registry.resolve('UPDATE')
@@ -70,7 +98,7 @@ private class BulkRecordUploadRegistryTest {
   @IsTest
   static void operationStrategy_MissingRequiredKey_IsRejected() {
     try {
-      new BulkRecordUploadOperationRegistry()
+      new BulkRecordUploadOperations()
         .resolve('UPDATE')
         .validateProjection(projection('UPDATE', false, false));
       Assert.fail('Expected a match-key exception.');
@@ -83,9 +111,9 @@ private class BulkRecordUploadRegistryTest {
   }
 
   @IsTest
-  static void operationRegistry_UnknownOperation_IsRejected() {
+  static void operations_UnknownOperation_IsRejected() {
     try {
-      new BulkRecordUploadOperationRegistry().resolve('MERGE');
+      new BulkRecordUploadOperations().resolve('MERGE');
       Assert.fail('Expected an unsupported-operation exception.');
     } catch (BulkRecordUploadException error) {
       Assert.areEqual(
@@ -96,33 +124,18 @@ private class BulkRecordUploadRegistryTest {
   }
 
   @IsTest
-  static void processorAndPostActionRegistries_ResolveOnlyTrustedKeys() {
+  static void processors_ResolveOnlyTrustedKeys() {
     Assert.isNotNull(
-      new BulkRecordUploadProcessorRegistry().resolve('STANDARD_DML_V1')
+      new BulkRecordUploadProcessors().resolve('STANDARD_DML_V1')
     );
-    Assert.isTrue(
-      BulkRecordUploadProcessorRegistry.isRegistered('STANDARD_DML_V1')
-    );
-    Assert.isNotNull(
-      new BulkRecordUploadPostActionRegistry().resolve('NONE_V1')
-    );
-    Assert.isTrue(BulkRecordUploadPostActionRegistry.isRegistered('NONE_V1'));
+    Assert.isTrue(BulkRecordUploadProcessors.isRegistered('STANDARD_DML_V1'));
 
     try {
-      new BulkRecordUploadProcessorRegistry().resolve('System.String');
+      new BulkRecordUploadProcessors().resolve('System.String');
       Assert.fail('Expected an unregistered-processor exception.');
     } catch (BulkRecordUploadException error) {
       Assert.areEqual(
         'The configured custom processor is not registered.',
-        error.getMessage()
-      );
-    }
-    try {
-      new BulkRecordUploadPostActionRegistry().resolve('System.String');
-      Assert.fail('Expected an unregistered-action exception.');
-    } catch (BulkRecordUploadException error) {
-      Assert.areEqual(
-        'The configured post-processing action is not registered.',
         error.getMessage()
       );
     }
@@ -152,10 +165,14 @@ private class BulkRecordUploadRegistryTest {
       'hash',
       'Account',
       operation,
-      'STANDARD_V1',
+      new List<String>(),
       100,
       30,
       new List<BulkRecordUploadFieldProjectionV1>{ field }
     );
+  }
+
+  /** Test-only class that does not implement BulkRecordUploadExtensionV1. */
+  public class NotAnExtension {
   }
 }

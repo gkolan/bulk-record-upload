@@ -42,7 +42,7 @@ private with sharing class BulkRecordUploadResolverTest {
       'hash',
       'Account',
       'UPDATE',
-      'STANDARD_V1',
+      new List<String>(),
       100,
       30,
       new List<BulkRecordUploadFieldProjectionV1>{ field }

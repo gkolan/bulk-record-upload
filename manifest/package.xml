@@ -12,28 +12,24 @@
         <members>BulkRecordUploadEdgeCoverageTest</members>
         <members>BulkRecordUploadException</members>
         <members>BulkRecordUploadFieldConfigV1</members>
-        <members>BulkRecordUploadFieldBehavior</members>
-        <members>BulkRecordUploadFieldBehaviorRegistry</members>
-        <members>BulkRecordUploadFieldBehaviorV1</members>
         <members>BulkRecordUploadFieldMergePolicy</members>
         <members>BulkRecordUploadExistingValueMerger</members>
         <members>BulkRecordUploadFieldProjectionV1</members>
         <members>BulkRecordUploadFileService</members>
         <members>BulkRecordUploadFinalizer</members>
-        <members>BulkRecordUploadHandlerV1</members>
-        <members>BulkRecordUploadHandlerRegistry</members>
+        <members>BulkRecordUploadExtensionV1</members>
+        <members>BulkRecordUploadExtensionAdapterV1</members>
+        <members>BulkRecordUploadExtensionConfigV1</members>
+        <members>BulkRecordUploadExtensionRegistry</members>
         <members>BulkRecordUploadHistoryItemV1</members>
         <members>BulkRecordUploadJob</members>
         <members>BulkRecordUploadJobTest</members>
-        <members>BulkRecordUploadOperationRegistry</members>
+        <members>BulkRecordUploadOperations</members>
         <members>BulkRecordUploadOperationStrategy</members>
         <members>BulkRecordUploadOperationStrategyV1</members>
         <members>BulkRecordUploadProcessorV1</members>
-        <members>BulkRecordUploadProcessorRegistry</members>
+        <members>BulkRecordUploadProcessors</members>
         <members>BulkRecordUploadStandardProcessorV1</members>
-        <members>BulkRecordUploadPostActionV1</members>
-        <members>BulkRecordUploadPostActionRegistry</members>
-        <members>BulkRecordUploadNoOpPostActionV1</members>
         <members>BulkRecordUploadOrchestrator</members>
         <members>BulkRecordUploadParsedCsvV1</members>
         <members>BulkRecordUploadPersistenceGateway</members>
@@ -68,7 +64,6 @@
         <members>BulkRecordUploadResultWriter</members>
         <members>BulkRecordUploadRuntimeContract</members>
         <members>BulkRecordUploadTestDataFactory</members>
-        <members>BulkRecordUploadStandardHandlerV1</members>
         <members>BulkRecordUploadStagingService</members>
         <members>BulkRecordUploadStagingTest</members>
         <members>BulkRecordUploadSubmissionV1</members>
@@ -198,16 +193,18 @@
         <members>Bulk_Record_Upload_Process__mdt.ProcessingMode__c</members>
         <members>Bulk_Record_Upload_Process__mdt.ProcessorKey__c</members>
         <members
-    >Bulk_Record_Upload_Process__mdt.PostProcessingAction__c</members>
-        <members
     >Bulk_Record_Upload_Process__mdt.ConfigurationVersion__c</members>
-        <members>Bulk_Record_Upload_Process__mdt.ProcessingHandler__c</members>
         <members>Bulk_Record_Upload_Process__mdt.IsActive__c</members>
         <members>Bulk_Record_Upload_Process__mdt.Operation__c</members>
         <members
     >Bulk_Record_Upload_Process__mdt.PreviewPermissionApiName__c</members>
         <members>Bulk_Record_Upload_Process__mdt.RetentionDays__c</members>
         <members>Bulk_Record_Upload_Process__mdt.ObjectApiName__c</members>
+        <members
+    >Bulk_Record_Upload_Extension__mdt.ProcessDeveloperName__c</members>
+        <members>Bulk_Record_Upload_Extension__mdt.ClassName__c</members>
+        <members>Bulk_Record_Upload_Extension__mdt.SortOrder__c</members>
+        <members>Bulk_Record_Upload_Extension__mdt.IsActive__c</members>
         <members>Bulk_Record_Upload_Bundle__mdt.IsActive__c</members>
         <members
     >Bulk_Record_Upload_Bundle_Process__mdt.BundleDeveloperName__c</members>
@@ -238,6 +235,7 @@
         <members>Bulk_Record_Upload_Chunk__c</members>
         <members>Bulk_Record_Upload_Process_Field__mdt</members>
         <members>Bulk_Record_Upload_Process__mdt</members>
+        <members>Bulk_Record_Upload_Extension__mdt</members>
         <members>Bulk_Record_Upload_Bundle__mdt</members>
         <members>Bulk_Record_Upload_Bundle_Process__mdt</members>
         <members>Bulk_Record_Upload__c</members>

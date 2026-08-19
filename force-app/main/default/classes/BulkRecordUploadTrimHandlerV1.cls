@@ -1,12 +1,17 @@
-/** Example trusted extension that trims projected string values without performing DML. */
-public with sharing class BulkRecordUploadTrimHandlerV1 implements BulkRecordUploadHandlerV1 {
+/**
+ * Shipped example extension that trims projected string values before
+ * mapping, without performing DML. Registered by class name in
+ * Bulk_Record_Upload_Extension__mdt; see docs/developer/custom-handler.md
+ * for the worked example.
+ */
+public with sharing class BulkRecordUploadTrimHandlerV1 extends BulkRecordUploadExtensionAdapterV1 {
   /** {@inheritDoc} */
-  public List<BulkRecordUploadRowV1> handle(
+  public override List<BulkRecordUploadRowV1> beforeMap(
     BulkRecordUploadProjectionV1 projection,
     List<BulkRecordUploadRowV1> rows
   ) {
     if (projection == null || rows == null) {
-      throw new BulkRecordUploadException('Handler input is required.');
+      throw new BulkRecordUploadException('Extension input is required.');
     }
     List<BulkRecordUploadRowV1> transformed = new List<BulkRecordUploadRowV1>();
     for (BulkRecordUploadRowV1 row : rows) {

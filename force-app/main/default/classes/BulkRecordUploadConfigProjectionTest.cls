@@ -6,11 +6,11 @@ private class BulkRecordUploadConfigProjectionTest {
   @IsTest
   static void repository_ActiveProcess_ReturnsOrderedFields() {
     BulkRecordUploadConfigRepository repository = createRepository(
-      'STANDARD_V1',
       new List<Bulk_Record_Upload_Process_Field__mdt>{
         createField('last_name', 'LastName', 2),
         createField('email', 'Email', 1)
-      }
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
     );
 
     Test.startTest();
@@ -37,10 +37,45 @@ private class BulkRecordUploadConfigProjectionTest {
   }
 
   @IsTest
+  static void repository_MultipleExtensions_ReturnsSortedBySortOrder() {
+    BulkRecordUploadConfigRepository repository = createRepository(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>{
+        extensionRecord('SecondExtension', 20),
+        extensionRecord('FirstExtension', 10)
+      }
+    );
+
+    Test.startTest();
+    BulkRecordUploadConfigRepository.Configuration result = repository.findActive(
+      'CONTACT_INSERT'
+    );
+    Test.stopTest();
+
+    Assert.areEqual(
+      2,
+      result.getExtensions().size(),
+      'Repository should return both active extensions.'
+    );
+    Assert.areEqual(
+      'FirstExtension',
+      result.getExtensions()[0].className,
+      'Extensions should be sorted by sort order.'
+    );
+    Assert.areEqual(
+      'SecondExtension',
+      result.getExtensions()[1].className,
+      'Higher sort order should follow lower.'
+    );
+  }
+
+  @IsTest
   static void repository_MissingProcess_ThrowsSafeException() {
     BulkRecordUploadConfigRepository repository = createRepository(
-      'STANDARD_V1',
-      new List<Bulk_Record_Upload_Process_Field__mdt>()
+      new List<Bulk_Record_Upload_Process_Field__mdt>(),
+      new List<Bulk_Record_Upload_Extension__mdt>()
     );
 
     Test.startTest();
@@ -67,11 +102,11 @@ private class BulkRecordUploadConfigProjectionTest {
       new Set<String>{ 'Bulk_Record_Upload_User' }
     );
     BulkRecordUploadProjectionService service = createService(
-      'STANDARD_V1',
       new List<Bulk_Record_Upload_Process_Field__mdt>{
         createField('last_name', 'LastName', 1),
         createField('email', 'Email', 2)
-      }
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
     );
 
     System.runAs(operatorUser) {
@@ -100,16 +135,18 @@ private class BulkRecordUploadConfigProjectionTest {
   }
 
   @IsTest
-  static void projection_UnregisteredHandler_ThrowsSafeException() {
+  static void projection_UnregisteredExtension_ThrowsSafeExceptionAtConfigLoad() {
     User operatorUser = BulkRecordUploadTestDataFactory.createUser('handler');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
       new Set<String>{ 'Bulk_Record_Upload_User' }
     );
     BulkRecordUploadProjectionService service = createService(
-      'ARBITRARY_CLASS',
       new List<Bulk_Record_Upload_Process_Field__mdt>{
         createField('last_name', 'LastName', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>{
+        extensionRecord('Subscriber_Arbitrary_Class', 1)
       }
     );
 
@@ -117,12 +154,11 @@ private class BulkRecordUploadConfigProjectionTest {
       Test.startTest();
       try {
         service.getProjection('CONTACT_INSERT');
-        Assert.fail('Expected an unregistered handler to fail.');
+        Assert.fail('Expected an unregistered extension to fail.');
       } catch (BulkRecordUploadException exceptionValue) {
-        Assert.areEqual(
-          'Configured handler is not registered.',
-          exceptionValue.getMessage(),
-          'Failure should enforce the trusted registry boundary.'
+        Assert.isTrue(
+          exceptionValue.getMessage().contains('is not registered'),
+          'Failure should name the class and enforce the trusted boundary.'
         );
       }
       Test.stopTest();
@@ -137,10 +173,10 @@ private class BulkRecordUploadConfigProjectionTest {
       new Set<String>{ 'Bulk_Record_Upload_User' }
     );
     BulkRecordUploadProjectionService service = createService(
-      'STANDARD_V1',
       new List<Bulk_Record_Upload_Process_Field__mdt>{
         createField('unknown', 'NotAField__c', 1)
-      }
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
     );
 
     System.runAs(operatorUser) {
@@ -275,7 +311,6 @@ private class BulkRecordUploadConfigProjectionTest {
       DeveloperName = 'INVALID_PROCESS',
       ObjectApiName__c = 'Contact',
       Operation__c = 'MERGE',
-      ProcessingHandler__c = 'STANDARD_V1',
       RowsPerBatch__c = 100,
       RetentionDays__c = 90,
       IsActive__c = true,
@@ -297,25 +332,24 @@ private class BulkRecordUploadConfigProjectionTest {
   }
 
   private static BulkRecordUploadProjectionService createService(
-    String handlerKey,
-    List<Bulk_Record_Upload_Process_Field__mdt> fields
+    List<Bulk_Record_Upload_Process_Field__mdt> fields,
+    List<Bulk_Record_Upload_Extension__mdt> extensions
   ) {
     return new BulkRecordUploadProjectionService(
-      createRepository(handlerKey, fields),
+      createRepository(fields, extensions),
       new BulkRecordUploadAccessPolicy(),
       new BulkRecordUploadProjectionCache()
     );
   }
 
   private static BulkRecordUploadConfigRepository createRepository(
-    String handlerKey,
-    List<Bulk_Record_Upload_Process_Field__mdt> fields
+    List<Bulk_Record_Upload_Process_Field__mdt> fields,
+    List<Bulk_Record_Upload_Extension__mdt> extensions
   ) {
     Bulk_Record_Upload_Process__mdt process = new Bulk_Record_Upload_Process__mdt(
       DeveloperName = 'CONTACT_INSERT',
       ObjectApiName__c = 'Contact',
       Operation__c = 'INSERT',
-      ProcessingHandler__c = handlerKey,
       RowsPerBatch__c = 100,
       RetentionDays__c = 90,
       IsActive__c = true,
@@ -325,7 +359,8 @@ private class BulkRecordUploadConfigProjectionTest {
       new Map<String, Bulk_Record_Upload_Process__mdt>{
         process.DeveloperName => process
       },
-      fields
+      fields,
+      extensions
     );
   }
 
@@ -344,6 +379,19 @@ private class BulkRecordUploadConfigProjectionTest {
       ExistingValueAction__c = 'REPLACE',
       IsRequired__c = fieldApiName == 'LastName',
       IncludeInResult__c = true,
+      IsActive__c = true
+    );
+  }
+
+  private static Bulk_Record_Upload_Extension__mdt extensionRecord(
+    String className,
+    Integer sortOrder
+  ) {
+    return new Bulk_Record_Upload_Extension__mdt(
+      DeveloperName = 'EXT_' + sortOrder,
+      ProcessDeveloperName__c = 'CONTACT_INSERT',
+      ClassName__c = className,
+      SortOrder__c = sortOrder,
       IsActive__c = true
     );
   }

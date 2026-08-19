@@ -113,7 +113,6 @@ for (const [objectApi, config] of Object.entries(objects)) {
     const processValues = [
       value("ObjectApiName__c", "string", objectApi),
       value("Operation__c", "string", operation),
-      value("ProcessingHandler__c", "string", "STANDARD_V1"),
       value("RowsPerBatch__c", "double", 100),
       value("RetentionDays__c", "double", 30),
       value("ConfigurationVersion__c", "double", 2),

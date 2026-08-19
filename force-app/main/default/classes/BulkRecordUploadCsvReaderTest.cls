@@ -228,7 +228,7 @@ private class BulkRecordUploadCsvReaderTest {
       'hash',
       'Contact',
       'INSERT',
-      'STANDARD_V1',
+      new List<String>(),
       100,
       90,
       new List<BulkRecordUploadFieldProjectionV1>{

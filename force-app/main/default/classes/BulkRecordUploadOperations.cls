@@ -1,5 +1,10 @@
-/** Resolves the four version 1 operation strategies from an explicit allowlist. */
-public with sharing class BulkRecordUploadOperationRegistry {
+/**
+ * Resolves the four version 1 operation strategies from an explicit
+ * allowlist. Closed set, per ADR-0007: insert/update/upsert/delete are
+ * package-owned code constants a subscriber selects by configuration, not an
+ * extension point. Not named `Registry` for that reason.
+ */
+public with sharing class BulkRecordUploadOperations {
   private static final Set<String> OPERATIONS = new Set<String>{
     'INSERT',
     'UPDATE',

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Contact Insert Trim</label>
+    <protected>false</protected>
+    <values>
+        <field>ProcessDeveloperName__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >Contact_Insert_Demo</value>
+    </values>
+    <values>
+        <field>ClassName__c</field>
+        <value
+      xsi:type="xsd:string"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >BulkRecordUploadTrimHandlerV1</value>
+    </values>
+    <values>
+        <field>SortOrder__c</field>
+        <value
+      xsi:type="xsd:double"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >10</value>
+    </values>
+    <values>
+        <field>IsActive__c</field>
+        <value
+      xsi:type="xsd:boolean"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >true</value>
+    </values>
+</CustomMetadata>

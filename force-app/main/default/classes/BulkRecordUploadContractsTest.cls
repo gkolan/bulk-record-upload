@@ -13,7 +13,7 @@ private class BulkRecordUploadContractsTest {
       'hash-1',
       'Contact',
       'INSERT',
-      'STANDARD_V1',
+      new List<String>(),
       100,
       90,
       new List<BulkRecordUploadFieldProjectionV1>{ field }
@@ -46,7 +46,7 @@ private class BulkRecordUploadContractsTest {
         'hash-1',
         'Contact',
         'INSERT',
-        'STANDARD_V1',
+        new List<String>(),
         24,
         90,
         new List<BulkRecordUploadFieldProjectionV1>{ createField(1) }
@@ -75,7 +75,7 @@ private class BulkRecordUploadContractsTest {
         'hash-1',
         'Contact',
         'INSERT',
-        'STANDARD_V1',
+        new List<String>(),
         100,
         90,
         fields

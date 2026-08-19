@@ -5,7 +5,7 @@
 
 The Lightning controller calls a thin Apex controller. Configuration and Schema services build a versioned projection containing only 1–100 configured fields and current-user access decisions. The request service validates CSV, creates the upload and Files, and stores ordered chunks. Queueable jobs map rows, resolve existing records in one bounded query when required, use partial user-mode DML, and write correlated results.
 
-Registries own operation, row-handler, processor, post-action, and field-policy extensions. The standard processor performs partial-success user-mode DML. Custom processors are selected only by reviewed registry keys, and post-actions receive safe row results after a bounded processor invocation. Logs store safe lifecycle data, while retention removes expired package-owned state without deleting a File that has another link.
+Operation and processor selection are closed sets resolved from reviewed code-owned allowlists, never subscriber-extensible (see [ADR-0007](../../specs/decisions/ADR-0007-configuration-over-code-extension.md)). The standard processor performs partial-success user-mode DML. `BulkRecordUploadExtensionRegistry` is the package's one open extension point: a registered, validated Apex class runs `beforeMap` where row preparation happens and `afterProcess` after a bounded processor invocation, receiving safe row results and never raw CSV content. Logs store safe lifecycle data, while retention removes expired package-owned state without deleting a File that has another link.
 
 ## Component entry points
 
