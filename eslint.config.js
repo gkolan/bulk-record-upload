@@ -44,9 +44,7 @@ module.exports = defineConfig([
 
   // Core v1 has no event contract; this component owns one bounded timer and clears it on terminal state/disconnect.
   {
-    files: [
-      "**/lwc/bulkRecordUploadMultiProcess/bulkRecordUploadMultiProcess.js"
-    ],
+    files: ["**/lwc/bulkRecordUpload/bulkRecordUpload.js"],
     rules: {
       "@lwc/lwc/no-async-operation": "off"
     }

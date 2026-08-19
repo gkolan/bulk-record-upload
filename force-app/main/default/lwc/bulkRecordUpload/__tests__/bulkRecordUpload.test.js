@@ -1,11 +1,10 @@
 import { createElement } from "lwc";
-import BulkRecordUpload from "c/bulkRecordUploadMultiProcess";
+import BulkRecordUpload from "c/bulkRecordUpload";
 import getSelection from "@salesforce/apex/BulkRecordUploadController.getSelection";
 
 import getProcessPresentation from "@salesforce/apex/BulkRecordUploadController.getProcessPresentation";
 import getTemplate from "@salesforce/apex/BulkRecordUploadController.getTemplate";
 import getHistory from "@salesforce/apex/BulkRecordUploadController.getHistory";
-import getHistoryForProcess from "@salesforce/apex/BulkRecordUploadController.getHistoryForProcess";
 import submit from "@salesforce/apex/BulkRecordUploadController.submit";
 import { TextEncoder } from "util";
 
@@ -23,11 +22,6 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/BulkRecordUploadController.getSelection",
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  "@salesforce/apex/BulkRecordUploadController.getHistoryForProcess",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -71,7 +65,6 @@ describe("c-bulk-record-upload", () => {
     });
     getTemplate.mockResolvedValue('"name"\r\n');
     getHistory.mockResolvedValue([]);
-    getHistoryForProcess.mockResolvedValue([]);
     submit.mockResolvedValue({
       uploadId: "a00000000000001",
       status: "QUEUED",
@@ -119,6 +112,7 @@ describe("c-bulk-record-upload", () => {
     ).toContain("BulkRecordUpload_Upload_Process");
     expect(card.textContent).not.toContain("Account uploads");
     expect(element.shadowRoot.querySelector("[aria-live]")).not.toBeNull();
+    expect(getHistory).toHaveBeenCalledWith({ processKey: null });
     await expect(element).toBeAccessible();
   });
 
@@ -170,7 +164,7 @@ describe("c-bulk-record-upload", () => {
     expect(getSelection).toHaveBeenCalledWith({
       bundleDeveloperName: "ACCOUNT_OPERATIONS"
     });
-    expect(getHistoryForProcess).toHaveBeenCalledWith({
+    expect(getHistory).toHaveBeenCalledWith({
       processKey: "ACCOUNT_INSERT"
     });
     expect(

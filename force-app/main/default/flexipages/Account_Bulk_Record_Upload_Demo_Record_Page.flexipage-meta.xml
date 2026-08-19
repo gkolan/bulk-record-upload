@@ -215,8 +215,8 @@
                     <name>bundleDeveloperName</name>
                     <value>Account_Operations_Demo</value>
                 </componentInstanceProperties>
-                <componentName>bulkRecordUploadMultiProcess</componentName>
-                <identifier>c_bulkRecordUploadMultiProcess</identifier>
+                <componentName>bulkRecordUpload</componentName>
+                <identifier>c_bulkRecordUpload</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

@@ -6,7 +6,7 @@ Produce reproducible evidence that the public release is installable, secure, su
 
 ## Late product-contract clarification
 
-On 2026-08-13, the owner clarified the selection contract further: `bulkRecordUploadMultiProcess` is the only exposed upload component. An administrator selects one active upload bundle in App Builder; `contextRecordId` and `contextObjectApiName` remain the only runtime context properties. Apex returns only active processes assigned to that bundle; one choice is selected automatically and hides the selector, while multiple choices display the selector. The component has no process or instruction override.
+On 2026-08-13, the owner clarified the selection contract further: `bulkRecordUpload` (named `bulkRecordUploadMultiProcess` before convergence step 05's rename) is the only exposed upload component. An administrator selects one active upload bundle in App Builder; `contextRecordId` and `contextObjectApiName` remain the only runtime context properties. Apex returns only active processes assigned to that bundle; one choice is selected automatically and hides the selector, while multiple choices display the selector. The component has no process or instruction override.
 
 The App Builder bundle picker uses the FlexiPage object context. It lists only active bundles containing an active process compatible with that record-page object. Exactly one compatible bundle is selected by default; zero or multiple compatible bundles remain unselected. An unselected component renders a visible administrator configuration message and no upload controls.
 
@@ -83,7 +83,7 @@ reporting fails. Negative numeric result values retain their CSV round-trip valu
 while nonnumeric formula-like values remain guarded.
 
 The release-isolation demo must also deploy and activate an Account record page
-inside the Bulk Record Upload app. That page hosts `bulkRecordUploadMultiProcess` with
+inside the Bulk Record Upload app. That page hosts `bulkRecordUpload` with
 the upload component so the current Account supplies the validated `AccountId`
 context. The complete demo setup assigns the Core user,
 preview, delete, administrator, and target-object permission sets and reseeds

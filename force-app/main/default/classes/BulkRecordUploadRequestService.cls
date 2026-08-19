@@ -53,30 +53,6 @@ public with sharing class BulkRecordUploadRequestService {
     );
   }
 
-  /** Returns active process keys as safe selector values. */
-  public List<String> listProcessKeys() {
-    new BulkRecordUploadAccessPolicy().requireRunPermission();
-    List<String> keys = new List<String>();
-    for (
-      Bulk_Record_Upload_Process__mdt process : Bulk_Record_Upload_Process__mdt.getAll()
-        .values()
-    ) {
-      if (
-        process.IsActive__c == true &&
-        isSupportedConfigurationVersion(process.ConfigurationVersion__c)
-      ) {
-        keys.add(process.DeveloperName);
-      }
-    }
-    keys.sort();
-    return keys;
-  }
-
-  @TestVisible
-  private static Boolean isSupportedConfigurationVersion(Decimal version) {
-    return version == 1 || version == 2;
-  }
-
   private static void requireRequest(BulkRecordUploadSubmitRequestV1 request) {
     if (
       request == null ||

@@ -9,7 +9,7 @@ Operation and processor selection are closed sets resolved from reviewed code-ow
 
 ## Component entry points
 
-`bulkRecordUploadMultiProcess` is the single exposed App Builder component. An administrator selects one active bundle for each component instance. Apex resolves only the active processes assigned to that bundle in configured display order. The component selects a sole process automatically and shows the process selector only when the bundle contains multiple available processes.
+`bulkRecordUpload` is the single exposed App Builder component. An administrator selects one active bundle for each component instance. Apex resolves only the active processes assigned to that bundle in configured display order. The component selects a sole process automatically and shows the process selector only when the bundle contains multiple available processes.
 
 On record FlexiPages, the design-time bundle picker scopes choices to bundles containing an active process for the page object. It defaults the sole compatible bundle, leaves ambiguous choices unset, and the runtime displays an administrator configuration notice until a bundle is selected.
 

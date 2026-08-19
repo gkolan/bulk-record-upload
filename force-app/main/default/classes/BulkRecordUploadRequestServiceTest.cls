@@ -53,40 +53,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
   }
 
   @IsTest
-  static void controller_AuthorizedUser_ReturnsSafeProcessKeyList() {
-    User userRecord = BulkRecordUploadTestDataFactory.createUser('processkeys');
-    BulkRecordUploadTestDataFactory.assignPermissionSets(
-      userRecord.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
-    );
-    System.runAs(userRecord) {
-      List<String> keys = BulkRecordUploadController.getProcessKeys();
-      Assert.isNotNull(keys);
-      Assert.isFalse(
-        keys.isEmpty(),
-        'At least one active supported process should be visible.'
-      );
-    }
-  }
-
-  @IsTest
-  static void listProcessKeys_ConfigurationVersions_UsesNumericComparison() {
-    Assert.isTrue(
-      BulkRecordUploadRequestService.isSupportedConfigurationVersion(1),
-      'Version 1 should remain supported.'
-    );
-    Assert.isTrue(
-      BulkRecordUploadRequestService.isSupportedConfigurationVersion(2),
-      'Version 2 should be supported.'
-    );
-    Assert.isFalse(
-      BulkRecordUploadRequestService.isSupportedConfigurationVersion(3),
-      'Unknown future versions should remain hidden.'
-    );
-  }
-
-  @IsTest
-  static void controller_FixedProcess_ReturnsValidatedKeyAndScopedHistory() {
+  static void controller_FixedProcess_ReturnsScopedHistory() {
     User userRecord = BulkRecordUploadTestDataFactory.createUser('fixedkey');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       userRecord.Id,
@@ -101,15 +68,11 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       BulkRecordUploadTestDataFactory.createUpload('OTHER_PROCESS');
 
       Test.startTest();
-      String processKey = BulkRecordUploadController.getProcessKey(
-        configuredProjection.processKey
-      );
-      List<BulkRecordUploadHistoryItemV1> history = BulkRecordUploadController.getHistoryForProcess(
+      List<BulkRecordUploadHistoryItemV1> history = BulkRecordUploadController.getHistory(
         configuredProjection.processKey
       );
       Test.stopTest();
 
-      Assert.areEqual(configuredProjection.processKey, processKey);
       Assert.areEqual(1, history.size());
       Assert.areEqual(matching.Id, history[0].uploadId);
     }
@@ -121,7 +84,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
 
     Test.startTest();
     try {
-      BulkRecordUploadController.getProcessKey('OTHER_PROCESS');
+      BulkRecordUploadController.getHistory('OTHER_PROCESS');
       Assert.fail('Expected a mismatched fixed process to be rejected.');
     } catch (AuraHandledException error) {
       Assert.areEqual('The upload process is invalid.', error.getMessage());
