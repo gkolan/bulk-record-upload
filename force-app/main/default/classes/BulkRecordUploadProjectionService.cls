@@ -265,7 +265,7 @@ public with sharing class BulkRecordUploadProjectionService {
           new List<String>{
             fieldConfig.columnKey,
             fieldConfig.fieldApiName,
-            fieldConfig.behavior,
+            fieldConfig.existingValueAction,
             fieldConfig.blankValueAction,
             fieldConfig.textSeparator,
             fieldConfig.duplicateTextAction,

@@ -341,7 +341,7 @@ private class BulkRecordUploadConfigProjectionTest {
       CsvColumnHeader__c = columnKey,
       DisplayLabel__c = columnKey,
       ColumnOrder__c = sequence,
-      ValueHandling__c = 'REPLACE',
+      ExistingValueAction__c = 'REPLACE',
       IsRequired__c = fieldApiName == 'LastName',
       IncludeInResult__c = true,
       IsActive__c = true

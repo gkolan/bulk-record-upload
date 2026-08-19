@@ -28,24 +28,6 @@ private class BulkRecordUploadMappingTest {
   }
 
   @IsTest
-  static void fieldBehavior_CustomAppend_ProvesIndependentExtension() {
-    BulkRecordUploadFieldBehaviorV1 behavior = new BulkRecordUploadFieldBehaviorRegistry()
-      .resolve('APPEND');
-    Assert.areEqual('existing -new', behavior.apply('existing', '-new'));
-    Assert.areEqual(
-      'new- existing',
-      new BulkRecordUploadFieldBehaviorRegistry()
-        .resolve('PREPEND')
-        .apply('existing', 'new-')
-    );
-    Assert.isNull(
-      new BulkRecordUploadFieldBehaviorRegistry()
-        .resolve('CLEAR_WHEN_BLANK')
-        .apply('old', ' ')
-    );
-  }
-
-  @IsTest
   static void mergePolicy_AppendSeparatorDuplicateAndOverflow_AreSafe() {
     BulkRecordUploadFieldProjectionV1 appendField = new BulkRecordUploadFieldProjectionV1(
       'description',
@@ -138,19 +120,6 @@ private class BulkRecordUploadMappingTest {
     }
   }
 
-  @IsTest
-  static void behaviorRegistry_UnknownKey_IsRejected() {
-    try {
-      new BulkRecordUploadFieldBehaviorRegistry().resolve('EXECUTE_TEXT');
-      Assert.fail('Expected unregistered-behavior exception.');
-    } catch (BulkRecordUploadException error) {
-      Assert.areEqual(
-        'The configured field behavior is not registered.',
-        error.getMessage()
-      );
-    }
-  }
-
   private static BulkRecordUploadProjectionV1 projection(
     List<BulkRecordUploadFieldProjectionV1> fields
   ) {
@@ -170,7 +139,7 @@ private class BulkRecordUploadMappingTest {
     String columnKey,
     String apiName,
     String fieldType,
-    String behavior,
+    String existingValueAction,
     Integer sequence
   ) {
     return new BulkRecordUploadFieldProjectionV1(
@@ -178,7 +147,7 @@ private class BulkRecordUploadMappingTest {
       columnKey,
       apiName,
       fieldType,
-      behavior,
+      existingValueAction,
       sequence,
       true,
       false,

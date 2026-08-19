@@ -1,7 +1,6 @@
 /** Maps projected CSV rows to records using only Schema-approved object and field identifiers. */
 public with sharing class BulkRecordUploadRecordMapper {
   private final BulkRecordUploadValueCoercer coercer = new BulkRecordUploadValueCoercer();
-  private final BulkRecordUploadFieldBehaviorRegistry behaviors = new BulkRecordUploadFieldBehaviorRegistry();
 
   /** Maps one bounded row collection without querying or persisting records. */
   public List<BulkRecordUploadMappedRowV1> mapRows(

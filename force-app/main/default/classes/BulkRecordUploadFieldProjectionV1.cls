@@ -6,7 +6,6 @@ public class BulkRecordUploadFieldProjectionV1 {
   public String displayLabel { get; private set; }
   public String fieldApiName { get; private set; }
   public String fieldType { get; private set; }
-  public String behavior { get; private set; }
   public String existingValueAction { get; private set; }
   public String blankValueAction { get; private set; }
   public String textSeparator { get; private set; }
@@ -26,7 +25,7 @@ public class BulkRecordUploadFieldProjectionV1 {
    * @param displayLabel Safe user-facing column label.
    * @param fieldApiName Resolved target field API name.
    * @param fieldType Resolved Salesforce display type.
-   * @param behavior Registered field behavior key.
+   * @param existingValueAction Registered existing-value merge action key.
    * @param sequence One-based configured order.
    * @param isRequired Whether an input value is required.
    * @param isMatchKey Whether this field identifies an existing record.
@@ -40,7 +39,7 @@ public class BulkRecordUploadFieldProjectionV1 {
     String displayLabel,
     String fieldApiName,
     String fieldType,
-    String behavior,
+    String existingValueAction,
     Integer sequence,
     Boolean isRequired,
     Boolean isMatchKey,
@@ -54,7 +53,7 @@ public class BulkRecordUploadFieldProjectionV1 {
       displayLabel,
       fieldApiName,
       fieldType,
-      behavior,
+      existingValueAction,
       'IGNORE',
       'SPACE',
       'SKIP',
@@ -92,8 +91,10 @@ public class BulkRecordUploadFieldProjectionV1 {
     this.displayLabel = requireText(displayLabel, 'displayLabel');
     this.fieldApiName = requireText(fieldApiName, 'fieldApiName');
     this.fieldType = requireText(fieldType, 'fieldType');
-    this.behavior = requireText(existingValueAction, 'existingValueAction');
-    this.existingValueAction = this.behavior;
+    this.existingValueAction = requireText(
+      existingValueAction,
+      'existingValueAction'
+    );
     this.blankValueAction = requireText(blankValueAction, 'blankValueAction');
     this.textSeparator = requireText(textSeparator, 'textSeparator');
     this.duplicateTextAction = requireText(

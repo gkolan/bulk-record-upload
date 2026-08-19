@@ -5,7 +5,6 @@ public class BulkRecordUploadFieldConfigV1 implements Comparable {
   public String columnKey { get; private set; }
   public String displayLabel { get; private set; }
   public String fieldApiName { get; private set; }
-  public String behavior { get; private set; }
   public String existingValueAction { get; private set; }
   public String blankValueAction { get; private set; }
   public String textSeparator { get; private set; }
@@ -32,17 +31,11 @@ public class BulkRecordUploadFieldConfigV1 implements Comparable {
     );
     displayLabel = requireText(recordValue.DisplayLabel__c, 'Display label');
     fieldApiName = requireText(recordValue.FieldApiName__c, 'Field API name');
-    behavior = String.isBlank(recordValue.ValueHandling__c)
-      ? 'REPLACE'
-      : recordValue.ValueHandling__c.trim().toUpperCase();
     existingValueAction = defaultCode(
       recordValue.ExistingValueAction__c,
-      behavior == 'CLEAR_WHEN_BLANK' ? 'REPLACE' : behavior
+      'REPLACE'
     );
-    blankValueAction = defaultCode(
-      recordValue.BlankValueAction__c,
-      behavior == 'CLEAR_WHEN_BLANK' ? 'CLEAR' : 'IGNORE'
-    );
+    blankValueAction = defaultCode(recordValue.BlankValueAction__c, 'IGNORE');
     textSeparator = defaultCode(recordValue.TextSeparator__c, 'SPACE');
     duplicateTextAction = defaultCode(
       recordValue.DuplicateTextAction__c,

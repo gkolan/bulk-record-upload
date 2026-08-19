@@ -16,8 +16,9 @@ Duplicate text is `SKIP`, `KEEP`, or `REJECT`. Overflow always rejects the row.
 
 Append and Prepend require a text-like field. Update and Upsert load only the
 configured existing fields in one bounded user-mode query. Insert stays query-free;
-Delete never invokes merge behavior. Version 1 `ValueHandling__c` remains only as
-a migration fallback.
+Delete never invokes merge behavior. There is exactly one way to configure field
+behavior: Existing Value Action and Blank CSV Action. The earlier `ValueHandling__c`
+field has been removed.
 
 ## Related
 

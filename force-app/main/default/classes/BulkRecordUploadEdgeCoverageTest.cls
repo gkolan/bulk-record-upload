@@ -124,25 +124,8 @@ private class BulkRecordUploadEdgeCoverageTest {
   }
 
   @IsTest
-  static void fieldBehavior_NullsAndUnknownKey_AreHandled() {
+  static void operationRegistry_TrimsAndResolvesKnownKey() {
     Test.startTest();
-    Assert.areEqual(
-      'new',
-      new BulkRecordUploadFieldBehavior('APPEND').apply(null, 'new')
-    );
-    Assert.areEqual(
-      'old',
-      new BulkRecordUploadFieldBehavior('APPEND').apply('old', null)
-    );
-    try {
-      new BulkRecordUploadFieldBehavior('UNKNOWN').apply(null, null);
-      Assert.fail('Unknown behavior should fail.');
-    } catch (BulkRecordUploadException error) {
-      Assert.isTrue(
-        error.getMessage().contains('not registered'),
-        'Safe error expected.'
-      );
-    }
     Assert.isNotNull(
       new BulkRecordUploadOperationRegistry().resolve(' insert ')
     );
@@ -335,7 +318,7 @@ private class BulkRecordUploadEdgeCoverageTest {
 
   private static Bulk_Record_Upload_Process_Field__mdt fieldRecord(
     String column,
-    String behavior,
+    String existingValueAction,
     Decimal orderValue
   ) {
     return new Bulk_Record_Upload_Process_Field__mdt(
@@ -344,7 +327,7 @@ private class BulkRecordUploadEdgeCoverageTest {
       FieldApiName__c = column == 'beta'
         ? 'Beta__c'
         : column == 'alpha' ? 'Alpha__c' : 'Name',
-      ValueHandling__c = behavior,
+      ExistingValueAction__c = existingValueAction,
       ColumnOrder__c = orderValue
     );
   }

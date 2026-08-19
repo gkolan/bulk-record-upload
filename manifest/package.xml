@@ -163,8 +163,6 @@
         <members>Bulk_Record_Upload_Chunk__c.FailureCount__c</members>
         <members>Bulk_Record_Upload_Chunk__c.ParentUpload__c</members>
         <members
-    >Bulk_Record_Upload_Process_Field__mdt.ValueHandling__c</members>
-        <members
     >Bulk_Record_Upload_Process_Field__mdt.ExistingValueAction__c</members>
         <members
     >Bulk_Record_Upload_Process_Field__mdt.BlankValueAction__c</members>
