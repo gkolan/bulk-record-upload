@@ -47,6 +47,15 @@ export default class BulkRecordUpload extends NavigationMixin(
   instructions;
   iconName = "utility:upload";
   label = labels;
+  recordContextAction = "NONE";
+  recordContextSource = "PAGE";
+  hostObjectApiName;
+  primarySearchField;
+  additionalSearchFields = [];
+  primaryDisplayField;
+  additionalDisplayFields = [];
+  filterCriteriaJson;
+  pickedRecordId;
 
   connectedCallback() {
     window.addEventListener("online", this.handleOnline);
@@ -73,12 +82,67 @@ export default class BulkRecordUpload extends NavigationMixin(
     return Boolean(this.bundleDeveloperName?.trim());
   }
 
-  get effectiveRecordId() {
+  get pageRecordId() {
     return this.recordId ?? this.contextRecordId;
   }
 
   get effectiveObjectApiName() {
     return this.objectApiName ?? this.contextObjectApiName;
+  }
+
+  get effectiveRecordId() {
+    return this.pageRecordId ?? this.pickedRecordId;
+  }
+
+  get showRecordPicker() {
+    return (
+      this.recordContextAction !== "NONE" &&
+      this.recordContextSource === "USER_CHOICE" &&
+      !this.pageRecordId
+    );
+  }
+
+  get pickerDisabled() {
+    return this.isBusy || Boolean(this.preview);
+  }
+
+  get requireParentBlocked() {
+    return (
+      this.recordContextAction === "REQUIRE_PARENT" && !this.effectiveRecordId
+    );
+  }
+
+  get matchingInfo() {
+    if (!this.primarySearchField) {
+      return undefined;
+    }
+    return {
+      primaryField: { fieldPath: this.primarySearchField },
+      additionalFields: this.additionalSearchFields.map((fieldPath) => ({
+        fieldPath
+      }))
+    };
+  }
+
+  get displayInfo() {
+    if (!this.primaryDisplayField) {
+      return undefined;
+    }
+    return {
+      primaryField: this.primaryDisplayField,
+      additionalFields: this.additionalDisplayFields
+    };
+  }
+
+  get pickerFilter() {
+    if (!this.filterCriteriaJson) {
+      return undefined;
+    }
+    try {
+      return JSON.parse(this.filterCriteriaJson);
+    } catch {
+      return undefined;
+    }
   }
 
   get displaySubtitle() {
@@ -117,7 +181,13 @@ export default class BulkRecordUpload extends NavigationMixin(
   }
 
   get submitDisabled() {
-    return this.isBusy || this.isOffline || !this.processKey || !this.fileText;
+    return (
+      this.isBusy ||
+      this.isOffline ||
+      !this.processKey ||
+      !this.fileText ||
+      this.requireParentBlocked
+    );
   }
 
   get usesFixedProcess() {
@@ -159,6 +229,7 @@ export default class BulkRecordUpload extends NavigationMixin(
   async handleProcessChange(event) {
     this.processKey = event.detail.value;
     this.errorMessage = undefined;
+    this.pickedRecordId = undefined;
     await this.refreshPresentation();
   }
 
@@ -166,6 +237,14 @@ export default class BulkRecordUpload extends NavigationMixin(
     this.subtitle = undefined;
     this.instructions = undefined;
     this.iconName = "utility:upload";
+    this.recordContextAction = "NONE";
+    this.recordContextSource = "PAGE";
+    this.hostObjectApiName = undefined;
+    this.primarySearchField = undefined;
+    this.additionalSearchFields = [];
+    this.primaryDisplayField = undefined;
+    this.additionalDisplayFields = [];
+    this.filterCriteriaJson = undefined;
     if (!this.processKey) {
       return;
     }
@@ -176,9 +255,21 @@ export default class BulkRecordUpload extends NavigationMixin(
       this.subtitle = presentation.subtitle;
       this.instructions = presentation.instructions;
       this.iconName = presentation.iconName || "utility:upload";
+      this.recordContextAction = presentation.recordContextAction || "NONE";
+      this.recordContextSource = presentation.recordContextSource || "PAGE";
+      this.hostObjectApiName = presentation.hostObjectApiName;
+      this.primarySearchField = presentation.primarySearchField;
+      this.additionalSearchFields = presentation.additionalSearchFields || [];
+      this.primaryDisplayField = presentation.primaryDisplayField;
+      this.additionalDisplayFields = presentation.additionalDisplayFields || [];
+      this.filterCriteriaJson = presentation.filterCriteriaJson;
     } catch (error) {
       this.errorMessage = normalizeError(error);
     }
+  }
+
+  handleParentChange(event) {
+    this.pickedRecordId = event.detail.recordId;
   }
 
   handleUploadTab() {

@@ -59,11 +59,15 @@ public with sharing class BulkRecordUploadController {
           'The upload process is unavailable.'
         );
       }
+      BulkRecordUploadProjectionV1 projection = projectionOverride == null
+        ? new BulkRecordUploadProjectionService().getProjection(validatedKey)
+        : projectionOverride;
       return new BulkRecordUploadPresentationV1(
         validatedKey,
         process.Subtitle__c,
         process.Instructions__c,
-        process.IconName__c
+        process.IconName__c,
+        projection
       );
     } catch (BulkRecordUploadException error) {
       throw aura(error.getMessage());

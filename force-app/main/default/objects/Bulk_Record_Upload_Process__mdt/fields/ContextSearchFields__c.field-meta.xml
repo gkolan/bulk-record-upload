@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ContextSearchFields__c</fullName>
+    <description
+  >Comma-separated host object field API names the record picker searches. The first entry is the primary field; the rest are additional fields. Blank defaults to the host object's name field.</description>
+    <inlineHelpText
+  >Enter searchable field API names separated by commas, primary field first. Leave blank to search only the name field.</inlineHelpText>
+    <label>Context Search Fields</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

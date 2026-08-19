@@ -92,11 +92,37 @@
         </template>
 
         <template lwc:if={showForm}>
-          <c-bulk-record-upload-file-input
-            disabled={isBusy}
-            onfileready={handleFileReady}
-            onfileerror={handleFileError}
-          ></c-bulk-record-upload-file-input>
+          <template lwc:if={showRecordPicker}>
+            <div class="bru-record-picker">
+              <lightning-record-picker
+                label={label.ParentRecordLabel}
+                object-api-name={hostObjectApiName}
+                matching-info={matchingInfo}
+                display-info={displayInfo}
+                filter={pickerFilter}
+                disabled={pickerDisabled}
+                value={pickedRecordId}
+                onchange={handleParentChange}
+              ></lightning-record-picker>
+            </div>
+          </template>
+
+          <template lwc:if={requireParentBlocked}>
+            <div
+              class="slds-notify slds-notify_alert slds-alert_warning bru-message"
+              role="alert"
+            >
+              <span class="slds-assistive-text">{label.ErrorLabel}</span>
+              {label.RequireParentBlocked}
+            </div>
+          </template>
+          <template lwc:else>
+            <c-bulk-record-upload-file-input
+              disabled={isBusy}
+              onfileready={handleFileReady}
+              onfileerror={handleFileError}
+            ></c-bulk-record-upload-file-input>
+          </template>
 
           <template lwc:if={preview}>
             <div class="bru-review">

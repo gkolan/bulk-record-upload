@@ -15,6 +15,10 @@ public class BulkRecordUploadProjectionV1 {
   public String recordContextAction { get; private set; }
   public String hostObjectApiName { get; private set; }
   public String recordContextFieldApiName { get; private set; }
+  public BulkRecordUploadContextProjectionV1 contextProjection {
+    get;
+    private set;
+  }
   public List<BulkRecordUploadFieldProjectionV1> fields { get; private set; }
 
   /**
@@ -48,6 +52,7 @@ public class BulkRecordUploadProjectionV1 {
       'NONE',
       null,
       null,
+      null,
       batchSize,
       retentionDays,
       fields
@@ -76,6 +81,7 @@ public class BulkRecordUploadProjectionV1 {
       'NONE',
       null,
       null,
+      null,
       batchSize,
       retentionDays,
       fields
@@ -93,6 +99,7 @@ public class BulkRecordUploadProjectionV1 {
     String recordContextAction,
     String hostObjectApiName,
     String recordContextFieldApiName,
+    BulkRecordUploadContextProjectionV1 contextProjection,
     Integer batchSize,
     Integer retentionDays,
     List<BulkRecordUploadFieldProjectionV1> fields
@@ -123,6 +130,16 @@ public class BulkRecordUploadProjectionV1 {
     this.recordContextFieldApiName = String.isBlank(recordContextFieldApiName)
       ? null
       : recordContextFieldApiName.trim();
+    this.contextProjection = contextProjection == null
+      ? new BulkRecordUploadContextProjectionV1(
+          'PAGE',
+          null,
+          null,
+          null,
+          null,
+          null
+        )
+      : contextProjection;
     if (batchSize == null || batchSize < 25 || batchSize > 200) {
       throw new BulkRecordUploadException(
         'Batch size must be between 25 and 200.'

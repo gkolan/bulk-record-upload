@@ -55,8 +55,15 @@ public with sharing class BulkRecordUploadProjectionService {
     );
     List<String> extensionClassNames = extensionClassNames(configuration);
     new BulkRecordUploadExtensionRegistry().resolve(extensionClassNames);
+    BulkRecordUploadContextProjectionV1 contextProjection = buildContextProjection(
+      configuration.process
+    );
 
-    String configHash = createConfigHash(configuration, extensionClassNames);
+    String configHash = createConfigHash(
+      configuration,
+      extensionClassNames,
+      contextProjection
+    );
     String cacheKey = createCacheKey(
       configuration.process,
       configHash,
@@ -71,17 +78,38 @@ public with sharing class BulkRecordUploadProjectionService {
       configuration,
       objectDescribe,
       configHash,
-      extensionClassNames
+      extensionClassNames,
+      contextProjection
     );
     projectionCache.put(cacheKey, projection);
     return projection;
+  }
+
+  private static BulkRecordUploadContextProjectionV1 buildContextProjection(
+    BulkRecordUploadProcessConfigV1 process
+  ) {
+    if (
+      process.recordContextAction == 'NONE' ||
+      String.isBlank(process.hostObjectApiName)
+    ) {
+      return null;
+    }
+    return new BulkRecordUploadContextSourceService()
+      .buildContextProjection(
+        process.recordContextSource,
+        process.hostObjectApiName,
+        process.contextSearchFields,
+        process.contextDisplayFields,
+        process.contextFilterCriteria
+      );
   }
 
   private BulkRecordUploadProjectionV1 buildProjection(
     BulkRecordUploadConfigRepository.Configuration configuration,
     Schema.DescribeSObjectResult objectDescribe,
     String configHash,
-    List<String> extensionClassNames
+    List<String> extensionClassNames,
+    BulkRecordUploadContextProjectionV1 contextProjection
   ) {
     List<BulkRecordUploadFieldConfigV1> fieldConfigs = configuration.getFields();
     if (fieldConfigs.isEmpty() || fieldConfigs.size() > 100) {
@@ -118,6 +146,7 @@ public with sharing class BulkRecordUploadProjectionService {
       configuration.process.recordContextAction,
       configuration.process.hostObjectApiName,
       configuration.process.recordContextFieldApiName,
+      contextProjection,
       configuration.process.batchSize,
       configuration.process.retentionDays,
       projectedFields
@@ -249,7 +278,8 @@ public with sharing class BulkRecordUploadProjectionService {
 
   private static String createConfigHash(
     BulkRecordUploadConfigRepository.Configuration configuration,
-    List<String> extensionClassNames
+    List<String> extensionClassNames,
+    BulkRecordUploadContextProjectionV1 contextProjection
   ) {
     List<String> parts = new List<String>{
       configuration.process.processKey,
@@ -260,6 +290,19 @@ public with sharing class BulkRecordUploadProjectionService {
       configuration.process.recordContextAction,
       configuration.process.hostObjectApiName,
       configuration.process.recordContextFieldApiName,
+      contextProjection == null
+        ? ''
+        : String.join(
+            new List<String>{
+              contextProjection.recordContextSource,
+              contextProjection.primarySearchField,
+              String.join(contextProjection.additionalSearchFields, ','),
+              contextProjection.primaryDisplayField,
+              String.join(contextProjection.additionalDisplayFields, ','),
+              contextFilterHashPart(contextProjection.filterConditions)
+            },
+            '|'
+          ),
       String.valueOf(configuration.process.batchSize),
       String.valueOf(configuration.process.retentionDays)
     };
@@ -313,6 +356,20 @@ public with sharing class BulkRecordUploadProjectionService {
       configHash +
       ':' +
       accessFingerprint;
+  }
+
+  private static String contextFilterHashPart(
+    List<BulkRecordUploadContextFilterConditionV1> conditions
+  ) {
+    List<String> parts = new List<String>();
+    for (BulkRecordUploadContextFilterConditionV1 condition : conditions) {
+      parts.add(
+        condition.fieldApiName +
+          condition.operatorCode +
+          String.join(condition.values, ',')
+      );
+    }
+    return String.join(parts, ';');
   }
 
   private static String digest(String value) {

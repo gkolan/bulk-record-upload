@@ -355,6 +355,220 @@ describe("c-bulk-record-upload", () => {
     );
   });
 
+  it("renders a working picker from HostObjectApiName alone, proving the zero-config default", async () => {
+    getProcessPresentation.mockResolvedValue({
+      processKey: "ACCOUNT_INSERT",
+      recordContextAction: "DEFAULT_PARENT",
+      recordContextSource: "USER_CHOICE",
+      hostObjectApiName: "Account",
+      primarySearchField: "Name",
+      additionalSearchFields: [],
+      primaryDisplayField: "Name",
+      additionalDisplayFields: [],
+      filterCriteriaJson: null
+    });
+    const element = createElement("c-bulk-record-upload", {
+      is: BulkRecordUpload
+    });
+    element.bundleDeveloperName = "ACCOUNT_OPERATIONS";
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-process-selector")
+      .dispatchEvent(
+        new CustomEvent("processchange", {
+          detail: { value: "ACCOUNT_INSERT" }
+        })
+      );
+    await flushPromises();
+
+    const picker = element.shadowRoot.querySelector("lightning-record-picker");
+    expect(picker).not.toBeNull();
+    expect(picker.objectApiName).toBe("Account");
+    expect(picker.matchingInfo).toEqual({
+      primaryField: { fieldPath: "Name" },
+      additionalFields: []
+    });
+    expect(picker.displayInfo).toEqual({
+      primaryField: "Name",
+      additionalFields: []
+    });
+    await expect(element).toBeAccessible();
+  });
+
+  it("blocks file selection with a stated reason when REQUIRE_PARENT has no chosen parent", async () => {
+    getProcessPresentation.mockResolvedValue({
+      processKey: "ACCOUNT_INSERT",
+      recordContextAction: "REQUIRE_PARENT",
+      recordContextSource: "USER_CHOICE",
+      hostObjectApiName: "Account",
+      primarySearchField: "Name",
+      additionalSearchFields: [],
+      primaryDisplayField: "Name",
+      additionalDisplayFields: [],
+      filterCriteriaJson: null
+    });
+    const element = createElement("c-bulk-record-upload", {
+      is: BulkRecordUpload
+    });
+    element.bundleDeveloperName = "ACCOUNT_OPERATIONS";
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-process-selector")
+      .dispatchEvent(
+        new CustomEvent("processchange", {
+          detail: { value: "ACCOUNT_INSERT" }
+        })
+      );
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector("c-bulk-record-upload-file-input")
+    ).toBeNull();
+    expect(
+      element.shadowRoot.querySelector('[role="alert"]').textContent
+    ).toContain("BulkRecordUpload_Require_Parent_Blocked");
+
+    element.shadowRoot.querySelector("lightning-record-picker").dispatchEvent(
+      new CustomEvent("change", {
+        detail: { recordId: "001000000000009AAA" }
+      })
+    );
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector("c-bulk-record-upload-file-input")
+    ).not.toBeNull();
+  });
+
+  it("clears the chosen parent when the process changes", async () => {
+    getProcessPresentation.mockResolvedValue({
+      processKey: "ACCOUNT_INSERT",
+      recordContextAction: "DEFAULT_PARENT",
+      recordContextSource: "USER_CHOICE",
+      hostObjectApiName: "Account",
+      primarySearchField: "Name",
+      additionalSearchFields: [],
+      primaryDisplayField: "Name",
+      additionalDisplayFields: [],
+      filterCriteriaJson: null
+    });
+    const element = createElement("c-bulk-record-upload", {
+      is: BulkRecordUpload
+    });
+    element.bundleDeveloperName = "ACCOUNT_OPERATIONS";
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-process-selector")
+      .dispatchEvent(
+        new CustomEvent("processchange", {
+          detail: { value: "ACCOUNT_INSERT" }
+        })
+      );
+    await flushPromises();
+    element.shadowRoot.querySelector("lightning-record-picker").dispatchEvent(
+      new CustomEvent("change", {
+        detail: { recordId: "001000000000009AAA" }
+      })
+    );
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector("lightning-record-picker").value
+    ).toBe("001000000000009AAA");
+
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-process-selector")
+      .dispatchEvent(
+        new CustomEvent("processchange", {
+          detail: { value: "ACCOUNT_UPDATE" }
+        })
+      );
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector("lightning-record-picker").value
+    ).toBeUndefined();
+  });
+
+  it("locks the picker once a file is staged", async () => {
+    getProcessPresentation.mockResolvedValue({
+      processKey: "ACCOUNT_INSERT",
+      recordContextAction: "DEFAULT_PARENT",
+      recordContextSource: "USER_CHOICE",
+      hostObjectApiName: "Account",
+      primarySearchField: "Name",
+      additionalSearchFields: [],
+      primaryDisplayField: "Name",
+      additionalDisplayFields: [],
+      filterCriteriaJson: null
+    });
+    const element = createElement("c-bulk-record-upload", {
+      is: BulkRecordUpload
+    });
+    element.bundleDeveloperName = "ACCOUNT_OPERATIONS";
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-process-selector")
+      .dispatchEvent(
+        new CustomEvent("processchange", {
+          detail: { value: "ACCOUNT_INSERT" }
+        })
+      );
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector("lightning-record-picker").disabled
+    ).toBe(false);
+
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-file-input")
+      .dispatchEvent(
+        new CustomEvent("fileready", {
+          detail: { fileName: "accounts.csv", text: "Name\nAcme\n" }
+        })
+      );
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector("lightning-record-picker").disabled
+    ).toBe(true);
+  });
+
+  it("lets the host record page win over the picker when both are available", async () => {
+    getProcessPresentation.mockResolvedValue({
+      processKey: "ACCOUNT_INSERT",
+      recordContextAction: "DEFAULT_PARENT",
+      recordContextSource: "USER_CHOICE",
+      hostObjectApiName: "Account",
+      primarySearchField: "Name",
+      additionalSearchFields: [],
+      primaryDisplayField: "Name",
+      additionalDisplayFields: [],
+      filterCriteriaJson: null
+    });
+    const element = createElement("c-bulk-record-upload", {
+      is: BulkRecordUpload
+    });
+    element.recordId = "001000000000009AAA";
+    element.bundleDeveloperName = "ACCOUNT_OPERATIONS";
+    document.body.appendChild(element);
+    await flushPromises();
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-process-selector")
+      .dispatchEvent(
+        new CustomEvent("processchange", {
+          detail: { value: "ACCOUNT_INSERT" }
+        })
+      );
+    await flushPromises();
+
+    expect(
+      element.shadowRoot.querySelector("lightning-record-picker")
+    ).toBeNull();
+  });
+
   it("disables submission while offline and announces recovery", async () => {
     Object.defineProperty(window.navigator, "onLine", {
       configurable: true,

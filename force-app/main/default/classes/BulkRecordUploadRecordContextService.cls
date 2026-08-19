@@ -29,14 +29,13 @@ public with sharing class BulkRecordUploadRecordContextService {
         'The parent record does not match this upload process.'
       );
     }
-    List<SObject> visible = Database.queryWithBinds(
-      'SELECT Id FROM ' +
-        projection.hostObjectApiName +
-        ' WHERE Id = :contextId',
-      new Map<String, Object>{ 'contextId' => contextId },
-      AccessLevel.USER_MODE
-    );
-    if (visible.isEmpty()) {
+    Boolean eligible = new BulkRecordUploadContextSourceService()
+      .isEligible(
+        projection.hostObjectApiName,
+        contextId,
+        projection.contextProjection.filterConditions
+      );
+    if (!eligible) {
       throw new BulkRecordUploadException('The parent record is unavailable.');
     }
     return contextId;

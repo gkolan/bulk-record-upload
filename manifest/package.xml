@@ -7,6 +7,11 @@
         <members>BulkRecordUploadConfigRepository</members>
         <members>BulkRecordUploadController</members>
         <members>BulkRecordUploadContractsTest</members>
+        <members>BulkRecordUploadContextFilterConditionV1</members>
+        <members>BulkRecordUploadContextHashTest</members>
+        <members>BulkRecordUploadContextProjectionV1</members>
+        <members>BulkRecordUploadContextSourceService</members>
+        <members>BulkRecordUploadContextSourceServiceTest</members>
         <members>BulkRecordUploadCsvReader</members>
         <members>BulkRecordUploadCsvReaderTest</members>
         <members>BulkRecordUploadEdgeCoverageTest</members>
@@ -106,6 +111,7 @@
         <members>BulkRecordUpload_Notice</members>
         <members>BulkRecordUpload_Offline</members>
         <members>BulkRecordUpload_Offline_Message</members>
+        <members>BulkRecordUpload_Parent_Record_Label</members>
         <members>BulkRecordUpload_Preview_Aria</members>
         <members>BulkRecordUpload_Preview_Capped</members>
         <members>BulkRecordUpload_Preview_Summary</members>
@@ -116,6 +122,7 @@
         <members>BulkRecordUpload_Queued_Title</members>
         <members>BulkRecordUpload_Ready_Again</members>
         <members>BulkRecordUpload_Request_Error</members>
+        <members>BulkRecordUpload_Require_Parent_Blocked</members>
         <members>BulkRecordUpload_Refresh_History</members>
         <members>BulkRecordUpload_Result</members>
         <members>BulkRecordUpload_Result_Expired</members>
@@ -190,6 +197,14 @@
         <members>Bulk_Record_Upload_Process__mdt.HostObjectApiName__c</members>
         <members
     >Bulk_Record_Upload_Process__mdt.RecordContextFieldApiName__c</members>
+        <members
+    >Bulk_Record_Upload_Process__mdt.RecordContextSource__c</members>
+        <members
+    >Bulk_Record_Upload_Process__mdt.ContextSearchFields__c</members>
+        <members
+    >Bulk_Record_Upload_Process__mdt.ContextDisplayFields__c</members>
+        <members
+    >Bulk_Record_Upload_Process__mdt.ContextFilterCriteria__c</members>
         <members>Bulk_Record_Upload_Process__mdt.ProcessingMode__c</members>
         <members>Bulk_Record_Upload_Process__mdt.ProcessorKey__c</members>
         <members

@@ -291,4 +291,14 @@
     >false</protected><shortDescription
     >Unterminated value error</shortDescription><value
     >The CSV contains an unterminated quoted value.</value></labels>
+    <labels><fullName>BulkRecordUpload_Parent_Record_Label</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Record picker label</shortDescription><value>Parent Record</value></labels>
+    <labels><fullName
+    >BulkRecordUpload_Require_Parent_Blocked</fullName><categories
+    >Bulk Record Upload</categories><language>en_US</language><protected
+    >false</protected><shortDescription
+    >Require parent empty state</shortDescription><value
+    >This process requires a parent record. Choose one above before selecting a file.</value></labels>
 </CustomLabels>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RecordContextSource__c</fullName>
+    <description
+  >Controls where the parent record comes from when Record Context Action is not Do Not Use Record Context.</description>
+    <inlineHelpText
+  >Page uses only the host record page. User Choice also shows a record picker when no page context is present; the page always wins when both are available.</inlineHelpText>
+    <label>Record Context Source</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>PAGE</fullName><default>true</default><label
+        >Page</label></value>
+            <value><fullName>USER_CHOICE</fullName><default
+        >false</default><label>User Choice</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

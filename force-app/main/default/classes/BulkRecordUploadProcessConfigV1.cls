@@ -14,6 +14,10 @@ public class BulkRecordUploadProcessConfigV1 {
   public String recordContextAction { get; private set; }
   public String hostObjectApiName { get; private set; }
   public String recordContextFieldApiName { get; private set; }
+  public String recordContextSource { get; private set; }
+  public String contextSearchFields { get; private set; }
+  public String contextDisplayFields { get; private set; }
+  public String contextFilterCriteria { get; private set; }
 
   /**
    * Creates a validated process snapshot from Custom Metadata.
@@ -51,6 +55,12 @@ public class BulkRecordUploadProcessConfigV1 {
     recordContextFieldApiName = trimToNull(
       recordValue.RecordContextFieldApiName__c
     );
+    recordContextSource = String.isBlank(recordValue.RecordContextSource__c)
+      ? 'PAGE'
+      : recordValue.RecordContextSource__c.trim().toUpperCase();
+    contextSearchFields = trimToNull(recordValue.ContextSearchFields__c);
+    contextDisplayFields = trimToNull(recordValue.ContextDisplayFields__c);
+    contextFilterCriteria = trimToNull(recordValue.ContextFilterCriteria__c);
     validateBounds();
   }
 
@@ -74,6 +84,13 @@ public class BulkRecordUploadProcessConfigV1 {
     ) {
       throw new BulkRecordUploadException(
         'Process record context configuration is not supported.'
+      );
+    }
+    if (
+      !new Set<String>{ 'PAGE', 'USER_CHOICE' }.contains(recordContextSource)
+    ) {
+      throw new BulkRecordUploadException(
+        'Process record context source is not supported.'
       );
     }
     if (batchSize < 25 || batchSize > 200) {

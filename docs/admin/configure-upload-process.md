@@ -15,6 +15,10 @@ For a record-page upload, set **Record Context Action** to **Require Parent Reco
 
 The component passes the current record ID automatically. Apex verifies its object type, the user's access to the parent, and the relationship field before accepting the upload. During processing, the verified parent overwrites any value supplied for that relationship in the CSV. Use **Require Parent Record** for a process that must run only on a compatible record page; use **Use Parent When Available** when the same process may also run from an app or home page.
 
+## Let the user choose the parent off a record page
+
+Set **Record Context Source** to **User Choice** so the same process also works from an app page, home page, tab, or Experience Cloud page. When no host record page provides a parent, the component shows a record picker instead; the host page still wins whenever it does provide one, so nothing about the record-page placement changes. Configure the picker with `ContextSearchFields__c`, `ContextDisplayFields__c`, and `ContextFilterCriteria__c` — see [Configuration fields](../reference/configuration-fields.md) for the shared field-list convention and the filter grammar. Leaving Record Context Source at its default, **Page**, keeps the current record-page-only behavior exactly as it was.
+
 ## Choose how users enter the process
 
 The package provides two components; neither replaces the other.

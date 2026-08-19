@@ -11,6 +11,19 @@ public with sharing class BulkRecordUploadTestDataFactory {
   }
 
   /**
+   * Creates one reusable Account parent with a filterable standard field
+   * set, for record-context eligibility filter tests.
+   */
+  public static Account createAccountWithIndustry(
+    String name,
+    String industry
+  ) {
+    Account recordValue = new Account(Name = name, Industry = industry);
+    insert recordValue;
+    return recordValue;
+  }
+
+  /**
    * Creates one active internal test user with the current test profile.
    * @param key Unique readable suffix for the test method.
    * @return Inserted user.

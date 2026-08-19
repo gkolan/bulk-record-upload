@@ -227,6 +227,118 @@ private with sharing class BulkRecordUploadRequestServiceTest {
     Test.stopTest();
   }
 
+  @IsTest
+  static void recordContext_FilteredOutParent_IsRejectedEvenWhenVisible() {
+    Account eligible = BulkRecordUploadTestDataFactory.createAccountWithIndustry(
+      'Eligible Parent',
+      'Technology'
+    );
+    Account ineligible = BulkRecordUploadTestDataFactory.createAccountWithIndustry(
+      'Ineligible Parent',
+      'Retail'
+    );
+    BulkRecordUploadProjectionV1 projection = filteredContextProjection(
+      'Industry',
+      '=',
+      new List<String>{ 'Technology' }
+    );
+    BulkRecordUploadRecordContextService service = new BulkRecordUploadRecordContextService();
+
+    Test.startTest();
+    Id validated = service.validateContext(projection, eligible.Id);
+    Exception caughtError;
+    try {
+      service.validateContext(projection, ineligible.Id);
+      Assert.fail('Expected the filtered-out parent to be rejected.');
+    } catch (BulkRecordUploadException error) {
+      caughtError = error;
+    }
+    Test.stopTest();
+
+    Assert.areEqual(eligible.Id, validated);
+    Assert.areEqual(
+      'The parent record is unavailable.',
+      caughtError.getMessage()
+    );
+  }
+
+  @IsTest
+  static void recordContext_IdInFilter_RejectsVisibleNonMemberBypassingTheComponent() {
+    Account member = BulkRecordUploadTestDataFactory.createAccount(
+      'Allowed Parent'
+    );
+    Account nonMember = BulkRecordUploadTestDataFactory.createAccount(
+      'Other Parent'
+    );
+    BulkRecordUploadProjectionV1 projection = filteredContextProjection(
+      'Id',
+      'IN',
+      new List<String>{ member.Id }
+    );
+    BulkRecordUploadRecordContextService service = new BulkRecordUploadRecordContextService();
+
+    Test.startTest();
+    try {
+      service.validateContext(projection, nonMember.Id);
+      Assert.fail(
+        'A client-supplied ID outside the filter must be rejected server-side, proving a caller cannot bypass the LWC picker.'
+      );
+    } catch (BulkRecordUploadException error) {
+      Assert.areEqual('The parent record is unavailable.', error.getMessage());
+    }
+    Test.stopTest();
+  }
+
+  private static BulkRecordUploadProjectionV1 filteredContextProjection(
+    String fieldApiName,
+    String operatorCode,
+    List<String> values
+  ) {
+    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+      'last name',
+      'Last Name',
+      'LastName',
+      'STRING',
+      'REPLACE',
+      1,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    BulkRecordUploadContextProjectionV1 contextProj = new BulkRecordUploadContextProjectionV1(
+      'USER_CHOICE',
+      'Name',
+      new List<String>(),
+      'Name',
+      new List<String>(),
+      new List<BulkRecordUploadContextFilterConditionV1>{
+        new BulkRecordUploadContextFilterConditionV1(
+          fieldApiName,
+          operatorCode,
+          values
+        )
+      }
+    );
+    return new BulkRecordUploadProjectionV1(
+      'CONTACT_FOR_ACCOUNT',
+      'hash',
+      'Contact',
+      'INSERT',
+      new List<String>(),
+      'STANDARD_DML_V1',
+      'REQUIRE_PARENT',
+      'Account',
+      'AccountId',
+      contextProj,
+      100,
+      30,
+      new List<BulkRecordUploadFieldProjectionV1>{ field }
+    );
+  }
+
   private static BulkRecordUploadSubmitRequestV1 request(String csv) {
     BulkRecordUploadSubmitRequestV1 request = new BulkRecordUploadSubmitRequestV1();
     request.processKey = 'REQUEST';
@@ -290,6 +402,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       'REQUIRE_PARENT',
       'Account',
       'AccountId',
+      null,
       100,
       30,
       new List<BulkRecordUploadFieldProjectionV1>{ field }

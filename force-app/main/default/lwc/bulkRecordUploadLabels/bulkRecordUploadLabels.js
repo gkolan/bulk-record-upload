@@ -27,6 +27,7 @@ import NoProcesses from "@salesforce/label/c.BulkRecordUpload_No_Processes";
 import Notice from "@salesforce/label/c.BulkRecordUpload_Notice";
 import Offline from "@salesforce/label/c.BulkRecordUpload_Offline";
 import OfflineMessage from "@salesforce/label/c.BulkRecordUpload_Offline_Message";
+import ParentRecordLabel from "@salesforce/label/c.BulkRecordUpload_Parent_Record_Label";
 import PreviewAria from "@salesforce/label/c.BulkRecordUpload_Preview_Aria";
 import PreviewCapped from "@salesforce/label/c.BulkRecordUpload_Preview_Capped";
 import PreviewSummary from "@salesforce/label/c.BulkRecordUpload_Preview_Summary";
@@ -40,6 +41,7 @@ import RefreshHistory from "@salesforce/label/c.BulkRecordUpload_Refresh_History
 import Result from "@salesforce/label/c.BulkRecordUpload_Result";
 import ResultExpired from "@salesforce/label/c.BulkRecordUpload_Result_Expired";
 import RequestError from "@salesforce/label/c.BulkRecordUpload_Request_Error";
+import RequireParentBlocked from "@salesforce/label/c.BulkRecordUpload_Require_Parent_Blocked";
 import Row from "@salesforce/label/c.BulkRecordUpload_Row";
 import Rows from "@salesforce/label/c.BulkRecordUpload_Rows";
 import RowsReady from "@salesforce/label/c.BulkRecordUpload_Rows_Ready";
@@ -91,6 +93,7 @@ export const labels = Object.freeze({
   Notice,
   Offline,
   OfflineMessage,
+  ParentRecordLabel,
   PreviewAria,
   PreviewCapped,
   PreviewSummary,
@@ -102,6 +105,7 @@ export const labels = Object.freeze({
   ReadyAgain,
   RefreshHistory,
   RequestError,
+  RequireParentBlocked,
   Result,
   ResultExpired,
   Row,

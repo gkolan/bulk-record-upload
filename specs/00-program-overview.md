@@ -39,8 +39,9 @@ its steps are tracked independently of the Steps 1–10 exit gates above.
 9. `09-ci-documentation-and-community.md`
 10. `10-release-validation.md`
 11. `convergence/` — authorized remediation program. Start at
-    `convergence/00-overview.md`. Supersedes the superseded draft
-    `11-record-context-sources.md`.
+    `convergence/00-overview.md`. Superseded the earlier draft
+    `11-record-context-sources.md`, since deleted; its subject is now
+    `convergence/07-record-context-sources.md`.
 
 Do not begin a step until all prior exit-gate checkboxes are satisfied and evidence paths are recorded in that step. If discovery changes a public contract or cross-step assumption, update this overview and every affected downstream step before implementation continues.
 
