@@ -1,5 +1,5 @@
 import { createElement } from "lwc";
-import BulkRecordUpload from "c/bulkRecordUploadMultiProcess";
+import BulkRecordUpload from "c/bulkRecordUpload";
 import getSelection from "@salesforce/apex/BulkRecordUploadController.getSelection";
 
 import getProcessPresentation from "@salesforce/apex/BulkRecordUploadController.getProcessPresentation";

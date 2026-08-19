@@ -246,7 +246,7 @@
         <name>CustomObject</name>
     </types>
     <types>
-        <members>bulkRecordUploadMultiProcess</members>
+        <members>bulkRecordUpload</members>
         <members>bulkRecordUploadConfirmation</members>
         <members>bulkRecordUploadFileInput</members>
         <members>bulkRecordUploadHistory</members>
