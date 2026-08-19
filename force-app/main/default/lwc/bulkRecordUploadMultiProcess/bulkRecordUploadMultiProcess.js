@@ -5,7 +5,6 @@ import getSelection from "@salesforce/apex/BulkRecordUploadController.getSelecti
 import getProcessPresentation from "@salesforce/apex/BulkRecordUploadController.getProcessPresentation";
 import getTemplate from "@salesforce/apex/BulkRecordUploadController.getTemplate";
 import getHistory from "@salesforce/apex/BulkRecordUploadController.getHistory";
-import getHistoryForProcess from "@salesforce/apex/BulkRecordUploadController.getHistoryForProcess";
 import submit from "@salesforce/apex/BulkRecordUploadController.submit";
 import { formatLabel, labels } from "c/bulkRecordUploadLabels";
 import {
@@ -263,9 +262,9 @@ export default class BulkRecordUpload extends NavigationMixin(
     this.historyLoading = true;
     this.historyError = undefined;
     try {
-      const rows = this.usesFixedProcess
-        ? await getHistoryForProcess({ processKey: this.processKey })
-        : await getHistory();
+      const rows = await getHistory({
+        processKey: this.usesFixedProcess ? this.processKey : null
+      });
       this.historyRows = rows.map((row) => ({
         ...row,
         downloadDisabled: !row.resultFileId

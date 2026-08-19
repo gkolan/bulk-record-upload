@@ -100,7 +100,9 @@ private with sharing class BulkRecordUploadLogTest {
       Bulk_Record_Upload__c upload = BulkRecordUploadTestDataFactory.createUpload(
         'HISTORY'
       );
-      List<BulkRecordUploadHistoryItemV1> items = BulkRecordUploadController.getHistory();
+      List<BulkRecordUploadHistoryItemV1> items = BulkRecordUploadController.getHistory(
+        null
+      );
       Assert.areEqual(1, items.size());
       Assert.areEqual(upload.Id, items[0].uploadId);
       Assert.areEqual('HISTORY', items[0].processKey);

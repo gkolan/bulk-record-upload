@@ -18,26 +18,6 @@ public with sharing class BulkRecordUploadController {
     }
   }
 
-  /** Returns active authorized process keys. */
-  @AuraEnabled(cacheable=true)
-  public static List<String> getProcessKeys() {
-    try {
-      return new BulkRecordUploadRequestService().listProcessKeys();
-    } catch (BulkRecordUploadException error) {
-      throw aura(error.getMessage());
-    }
-  }
-
-  /** Returns one active, authorized process key for a fixed component instance. */
-  @AuraEnabled(cacheable=true)
-  public static String getProcessKey(String processKey) {
-    try {
-      return resolveProcessKey(processKey);
-    } catch (BulkRecordUploadException error) {
-      throw aura(error.getMessage());
-    }
-  }
-
   /** Returns presentation settings for one active, authorized process. */
   @AuraEnabled(cacheable=true)
   public static BulkRecordUploadPresentationV1 getProcessPresentation(
@@ -90,22 +70,19 @@ public with sharing class BulkRecordUploadController {
     }
   }
 
-  /** Returns access-filtered recent upload history. */
+  /**
+   * Returns access-filtered upload history. A blank processKey returns
+   * recent history across every process the running user may see; a
+   * populated processKey is validated and scopes history to that process.
+   */
   @AuraEnabled
-  public static List<BulkRecordUploadHistoryItemV1> getHistory() {
-    try {
-      return new BulkRecordUploadLogService().getHistory();
-    } catch (BulkRecordUploadException error) {
-      throw aura(error.getMessage());
-    }
-  }
-
-  /** Returns access-filtered history for one validated process. */
-  @AuraEnabled
-  public static List<BulkRecordUploadHistoryItemV1> getHistoryForProcess(
+  public static List<BulkRecordUploadHistoryItemV1> getHistory(
     String processKey
   ) {
     try {
+      if (String.isBlank(processKey)) {
+        return new BulkRecordUploadLogService().getHistory();
+      }
       String validatedKey = resolveProcessKey(processKey);
       return new BulkRecordUploadLogService().getHistory(validatedKey);
     } catch (BulkRecordUploadException error) {
