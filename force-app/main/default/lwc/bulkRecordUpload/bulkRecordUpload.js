@@ -19,6 +19,8 @@ const POLL_INTERVAL = 3000;
 export default class BulkRecordUpload extends NavigationMixin(
   LightningElement
 ) {
+  @api recordId;
+  @api objectApiName;
   @api contextRecordId;
   @api contextObjectApiName;
   @api bundleDeveloperName;
@@ -68,6 +70,14 @@ export default class BulkRecordUpload extends NavigationMixin(
 
   get isBundleConfigured() {
     return Boolean(this.bundleDeveloperName?.trim());
+  }
+
+  get effectiveRecordId() {
+    return this.recordId ?? this.contextRecordId;
+  }
+
+  get effectiveObjectApiName() {
+    return this.objectApiName ?? this.contextObjectApiName;
   }
 
   get displaySubtitle() {
@@ -232,7 +242,7 @@ export default class BulkRecordUpload extends NavigationMixin(
           fileName: this.fileName,
           contentBase64: toBase64(this.fileText),
           idempotencyKey: this.idempotencyKey,
-          contextRecordId: this.contextRecordId
+          contextRecordId: this.effectiveRecordId
         }
       });
       this.currentUploadId = response.uploadId;
