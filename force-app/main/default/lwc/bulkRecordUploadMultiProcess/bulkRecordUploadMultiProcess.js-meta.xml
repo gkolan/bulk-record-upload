@@ -35,6 +35,20 @@
         datasource="apex://BulkRecordUploadBundlePicklist"
         required="false"
       />
+            <property
+        name="contextRecordId"
+        type="String"
+        label="Context Record Id"
+        description="Bind to the current page record so REQUIRE_PARENT processes can validate and stamp it. Use {!recordId} on a record-bound Experience Cloud page."
+        required="false"
+      />
+            <property
+        name="contextObjectApiName"
+        type="String"
+        label="Context Object API Name"
+        description="Bind to the current page record's object API name alongside Context Record Id. Use {!objectApiName} on a record-bound Experience Cloud page."
+        required="false"
+      />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

@@ -267,6 +267,58 @@ describe("c-bulk-record-upload", () => {
     ).toBe("QUEUED");
   });
 
+  it("sends the platform-injected recordId on a record page", async () => {
+    const element = await createReadyElement();
+    element.recordId = "001000000000002AAA";
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-confirmation")
+      .dispatchEvent(new CustomEvent("uploadconfirm"));
+    await flushPromises();
+
+    expect(submit.mock.calls[0][0].request.contextRecordId).toBe(
+      "001000000000002AAA"
+    );
+  });
+
+  it("sends the Experience Cloud contextRecordId when recordId is absent", async () => {
+    const element = await createReadyElement();
+    element.contextRecordId = "001000000000003AAA";
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-confirmation")
+      .dispatchEvent(new CustomEvent("uploadconfirm"));
+    await flushPromises();
+
+    expect(submit.mock.calls[0][0].request.contextRecordId).toBe(
+      "001000000000003AAA"
+    );
+  });
+
+  it("prefers the platform recordId over contextRecordId when both are set", async () => {
+    const element = await createReadyElement();
+    element.recordId = "001000000000004AAA";
+    element.contextRecordId = "001000000000005AAA";
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-confirmation")
+      .dispatchEvent(new CustomEvent("uploadconfirm"));
+    await flushPromises();
+
+    expect(submit.mock.calls[0][0].request.contextRecordId).toBe(
+      "001000000000004AAA"
+    );
+  });
+
+  it("submits a null context when neither recordId nor contextRecordId is set", async () => {
+    const element = await createReadyElement();
+    element.shadowRoot
+      .querySelector("c-bulk-record-upload-confirmation")
+      .dispatchEvent(new CustomEvent("uploadconfirm"));
+    await flushPromises();
+
+    expect(submit).toHaveBeenCalledTimes(1);
+    expect(submit.mock.calls[0][0].request.contextRecordId).toBeUndefined();
+    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
+  });
+
   it("surfaces an Apex submission failure without losing retry state", async () => {
     submit.mockRejectedValue({ body: { message: "Request rejected." } });
     const element = await createReadyElement();
