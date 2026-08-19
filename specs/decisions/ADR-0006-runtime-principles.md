@@ -33,3 +33,4 @@ The instruction to reject system mode applies at the business-data and configura
 - [Product contract](ADR-0002-product-contract.md)
 - [Security model](ADR-0004-security-model.md)
 - [Runtime and cache architecture](ADR-0005-runtime-and-cache-architecture.md)
+- [Configuration over code extension](ADR-0007-configuration-over-code-extension.md)

@@ -65,3 +65,4 @@ Executable tests must cover every case in Step 3, including restricted users, ma
 
 - [Version 1 product contract](ADR-0002-product-contract.md)
 - [Step 3 specification](../03-security-and-data-boundaries.md)
+- [Configuration over code extension](ADR-0007-configuration-over-code-extension.md)
