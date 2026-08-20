@@ -1,54 +1,48 @@
-# Configuration, metadata, and permissions
+# Configuration, storage, and permissions
 
 > [!NOTE]
-> On this page, understand the version 1 metadata model, sharing boundary, and permission assignments for Bulk Record Upload.
+> On this page, see the formal authorization and storage model — what's configuration versus what's an actual access grant, and exactly what each Permission Set unlocks.
+> **Reference:** technical detail for anyone auditing access or storage behavior. See [Configure an upload process](../admin/configure-upload-process.md) and [Configuration fields](configuration-fields.md) for what each configuration field is, and [Security and access](../admin/security-and-access.md) for the same permission model explained for an admin.
 
-## Configuration model
+## Configuration is not authorization
 
-`Bulk_Record_Upload_Process__mdt` defines an approved upload process. Its target object, operation, handler key, batch size, retention period, optional preview permission, active state, and contract version are configuration inputs—not authorization grants.
+A **Bulk Record Upload Process** record's target object, operation, processor key, batch size, retention period, and active state are configuration inputs — none of them grant access on their own. Every object, field, Apex extension class, or merge strategy class a process names is still re-checked against Schema and the package's own reviewed registries at run time; naming something in configuration that isn't actually allowed produces a configuration error, not a bypass.
 
-`Bulk_Record_Upload_Process_Field__mdt` defines the compact field projection for a process. Each active row names one CSV column and one target field plus ordering, blank-value behavior, match/upsert roles, required behavior, and result inclusion. Runtime validation must resolve every object, field, permission, and handler through Schema describe or a project-owned registry before processing begins.
-
-Version 1 ships no Custom Metadata records. Subscribers create records for their own approved objects and fields after installation. Example and test records remain outside the Core manifest.
+Version 1 ships with no Custom Metadata records of its own — a subscriber creates every process, field, bundle, and extension record for their own approved objects and fields after installing. The shipped example and test records live outside the core package manifest.
 
 ## Stored records and Files
 
-`Bulk_Record_Upload__c` is a private execution record. Salesforce sharing determines who can see it. It stores lifecycle state, bounded counts, contract identifiers, retention state, and Salesforce File document IDs; it does not store CSV content.
+| Object                        | What it is                                                                                                                                                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Bulk_Record_Upload__c`       | One record per upload. Ordinary Salesforce sharing controls who can see it. Stores lifecycle status, row counts, and links to the input/result Files — never the CSV content itself.                                            |
+| `Bulk_Record_Upload_Chunk__c` | Internal, package-managed staging records used to process a file in bounded pieces. Only the package's own Apex creates or removes these — an end user never interacts with them directly, and their contents are never logged. |
 
-`Bulk_Record_Upload_Chunk__c` is a controlled-by-parent system record used for bounded, ordered staging. Application code—not end users—creates and removes chunks. Chunk payloads must never be logged.
+The input file and the results file are both stored as ordinary Salesforce Files, linked to the private upload record through a `ContentDocumentLink`. Access to them follows normal Salesforce File sharing — nothing here creates a public link, a Public Group, or any other broadened access. If a subscriber org wants to share upload records more broadly, that's done with the org's own sharing rules, not anything this package configures automatically.
 
-The input and result CSVs use Salesforce Files. Runtime code must create record links and re-check record and File access at each synchronous and asynchronous boundary. A stored File ID never bypasses sharing.
+## What each Permission Set unlocks
 
-Core creates no public File distribution and no Public Group. Files are linked to
-the private upload record through `ContentDocumentLink`. Subscribers may share
-upload records through their own Public Groups and sharing rules; the package
-never hardcodes a group or broadens access to target records.
+| Permission Set               | API name                            | Grants                                                                                | Deliberately does not grant                                 |
+| ---------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Bulk Record Upload User      | `Bulk_Record_Upload_User`           | Run approved processes; access the app, the upload history, and Custom Metadata Types | Object/field access on the target object, Delete, preview   |
+| Bulk Record Upload Previewer | `Bulk_Record_Upload_Preview_Access` | Everything User grants, plus the row-preview step                                     | Object/field access on the target object                    |
+| Bulk Record Upload Deletion  | `Bulk_Record_Upload_Delete_Access`  | Everything User grants, plus running approved Delete processes                        | Delete access on the target object itself                   |
+| Bulk Record Upload Admin     | `Bulk_Record_Upload_Administrator`  | Inspect configuration, uploads, and staging records, for support and troubleshooting  | Modify All Data, View All Data, or any target-object access |
 
-## Permission sets
+Each Permission Set is built from an underlying Custom Permission of the same shape (`Bulk_Record_Upload_Run`, `Bulk_Record_Upload_Preview`, `Bulk_Record_Upload_Delete`, `Bulk_Record_Upload_Administer`) — code checks the Custom Permission, and the shipped Permission Set is just a convenient way to grant it.
 
-| Permission set                   | Purpose                                                                                               | Deliberately excluded                                               |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Bulk Record Upload User          | Run approved processes and access the app, upload tab, configuration types, and shared upload records | Target-object CRUD/FLS, delete operation, preview, broad org access |
-| Bulk Record Upload Previewer     | Grants run and preview capabilities                                                                   | Target-object access                                                |
-| Bulk Record Upload Deletion      | Grants run and approved delete-process capabilities                                                   | Target-object delete/FLS                                            |
-| Bulk Record Upload Administrator | Inspect configuration, uploads, and staging records for support and retention                         | Modify All Data, View All Data, target-object access                |
+Every operator still needs their own ordinary object CRUD, field-level security, record sharing, and Salesforce Files access, through their Profile or another Permission Set — this package never grants any of that implicitly. See [Assign permissions](../get-started/permissions.md).
 
-Every operator also needs the appropriate target-object CRUD, field-level security, record sharing, and Salesforce Files access through subscriber-owned permissions. The package never grants those rights implicitly.
+## Retention
 
-## Stable status values
+Retention is one setting per process, 7–365 days (default 90), applied together to that process's upload history and its input and result Files — cleanup removes expired chunks and Files without needing Modify All Data, and only ever records safe identifiers and counts, never CSV content.
 
-Upload status values are `QUEUED`, `VALIDATING`, `PROCESSING`, `COMPLETED`, `COMPLETED_WITH_ERRORS`, and `FAILED`. Chunk status values are `READY`, `PROCESSING`, `COMPLETED`, and `FAILED`. These stored values are public automation contracts; labels may be translated without changing them.
+## What fails configuration validation before any record is touched
 
-## Retention and audit
-
-Upload history tracking is enabled for status and counts that drive operational review. Retention is configured from 7 through 365 days, defaults to 90, and must be copied to the upload record when work is accepted. Cleanup removes chunks and eligible Files without requiring Modify All Data and records only safe identifiers and aggregate outcomes.
-
-## Subscriber-supplied reference failures
-
-An inactive process, unknown object or field, disallowed operation, unregistered handler, missing preview permission, duplicate column/sequence, or inaccessible target projection must fail configuration validation before any target DML. User-facing guidance names the configuration entry and safe API identifier, never CSV values. Portability tests install the package without subscriber records and exercise valid and invalid records created only in test setup.
+An inactive process, an object or field Salesforce doesn't recognize, a disallowed operation, an unregistered extension or merge strategy class, a missing required preview permission, a duplicate column key or sequence, or a field the current user can't actually access — every one of these is caught at configuration-load time, before any target-object DML runs. The error a user sees names the configuration entry and a safe identifier, never a CSV value.
 
 ## Related
 
+- [Configuration fields](configuration-fields.md)
+- [Security and access](../admin/security-and-access.md)
 - [Product contract](product-contract.md)
-- [CSV and results contract](csv-and-results-contract.md)
 - [Step 5 evidence](../evidence/05-metadata-and-permissions/README.md)

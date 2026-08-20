@@ -28,10 +28,13 @@ began, satisfying the step's "01, 03, 06" precondition. The merge was clean
   conservative, documented placeholder — recorded here explicitly so it is
   easy to find and correct against the verified platform value before
   release, per Step 10's release-validation gate.
-- **Context settings as one value object.** `BulkRecordUploadContextProjectionV1`
-  holds all four settings as a single `BulkRecordUploadProjectionV1` property,
+- **Context settings as one value object.** `BulkRecordUploadContextProjection
+`
+  holds all four settings as a single `BulkRecordUploadProjection
+` property,
   per the spec's explicit design section, rather than extending the
-  already-telescoping `BulkRecordUploadProjectionV1` constructor chain
+  already-telescoping `BulkRecordUploadProjection
+` constructor chain
   further.
 
 ## Prove-before-delete
@@ -50,7 +53,7 @@ deleted per the exit gate.
 - [x] **`matching-info` receives field objects, `display-info` receives
       strings, exact shapes asserted.** Same Jest test asserts
       `picker.matchingInfo` equals `{ primaryField: { fieldPath: 'Name' },
-  additionalFields: [] }` and `picker.displayInfo` equals
+additionalFields: [] }` and `picker.displayInfo` equals
       `{ primaryField: 'Name', additionalFields: [] }` — objects for one,
       strings for the other, per field.
 - [x] **Non-searchable and non-existent fields fail validation with
@@ -100,7 +103,8 @@ deleted per the exit gate.
 - [x] **Changing the process clears the chosen parent.** Jest: "clears the
       chosen parent when the process changes."
 - [x] **No host object describe reaches the browser.** By construction:
-      `BulkRecordUploadPresentationV1` sends only field-name strings and a
+      `BulkRecordUploadPresentation
+` sends only field-name strings and a
       JSON-serialized filter (values and field names, never a
       `Schema.DescribeSObjectResult`). `scripts/run-large-schema-benchmark.mjs`
       re-run after this step: 100 configured fields → 17,163 serialized
@@ -132,7 +136,8 @@ deleted per the exit gate.
 - **Deploys:** Multiple iterations fixing real compiler errors caught only by
   the org: `List<String>` has no `subList` method in Apex (unlike Java) —
   replaced with a manual loop; a leftover two-argument delegating
-  constructor call in `BulkRecordUploadPresentationV1` left over from an
+  constructor call in `BulkRecordUploadPresentation
+` left over from an
   earlier disambiguation attempt; an invalid ternary mixing `String` and
   `List<String>` return types. Final deploy: 0 component errors.
 - **Class-length correction:** `BulkRecordUploadConfigProjectionTest.cls`

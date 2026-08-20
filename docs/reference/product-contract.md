@@ -1,38 +1,40 @@
 # Product contract
 
 > [!NOTE]
-> On this page, learn which Bulk Record Upload operations, limits, lifecycle states, retention rules, and subscriber environments version 1 supports.
+> On this page, look up the exact operations, limits, lifecycle states, and supported environments version 1 guarantees — the canonical numbers other pages link to rather than repeat.
+> **Reference:** the formal contract. See [Product limits](../admin/limits.md) for the same limits explained for an administrator, with what happens at each one.
 
-Version 1 supports configuration-selected insert, update, upsert, and delete for approved standard and custom objects. Each process exposes no more than 100 configured fields and uses a compact field projection.
+Version 1 supports Insert, Update, Upsert, and Delete for any standard or custom object an admin configures a process for. Each process can configure up to 100 columns — the running upload only ever reads or writes those configured columns, never every field on the object.
 
 ## Limits
 
-| Input                       |                                Limit |
-| --------------------------- | -----------------------------------: |
-| UTF-8 file size             |                      2,000,000 bytes |
-| Data rows                   |                                5,000 |
-| Columns                     |                                  100 |
-| Characters per decoded cell |                               32,000 |
-| Characters per header       |                                  255 |
-| Active uploads              | One per user/process and ten per org |
-| Batch size                  |                  25–200; default 100 |
+| Input                            | Limit                                     |
+| -------------------------------- | ----------------------------------------- |
+| File size (UTF-8)                | 2,000,000 bytes (2 MiB)                   |
+| Data rows                        | 5,000                                     |
+| Configured columns per process   | 100                                       |
+| Characters per decoded cell      | 32,000                                    |
+| Characters per column header     | 255                                       |
+| Uploads actively running at once | 1 per user per process; 10 across the org |
+| Rows per batch (chunk size)      | 25–200; default 100                       |
 
-The server enforces every limit even when browser validation has already run.
+The server enforces every one of these limits itself, even though the browser already checks most of them before submission — a request that somehow bypasses the browser check is still rejected server-side.
 
 ## Lifecycle
 
-An upload moves through `QUEUED`, `VALIDATING`, and `PROCESSING`, then reaches `COMPLETED`, `COMPLETED_WITH_ERRORS`, or `FAILED`. A status never moves backward. Version 1 does not cancel a queued job; a retry creates a new linked upload.
+An upload moves through `QUEUED`, `VALIDATING`, and `PROCESSING`, then reaches exactly one of `COMPLETED`, `COMPLETED_WITH_ERRORS`, or `FAILED`. A status never moves backward. Version 1 doesn't support cancelling a queued upload; uploading the same file again creates a new, independent upload rather than resuming or retrying the original.
 
 ## Access and retention
 
-Bulk Record Upload applies sharing plus running-user object and field access to reads and data changes. Configuration cannot authorize an object, field, handler, or group that the trusted project registry does not allow.
+Every read and every data change an upload performs applies the running user's own sharing, object, and field access — configuration can never grant access to an object, field, extension class, or merge strategy that isn't already allowed through Salesforce's own permission model.
 
-By default, input/default files remain for 30 days and logs/results remain for 90 days. An administrator may configure 7–365 days. Archiving changes ordinary history visibility, not retention.
+Retention is one setting per process (**History Retention Days**, 7–365 days, default 90) that applies to that process's upload history and its input and result Files together — there's no separate retention period for files versus history.
 
-Supported subscriber editions are Enterprise, Unlimited, Performance, and Developer Edition on API version 66.0 or later.
+Supported subscriber editions are Enterprise, Unlimited, Performance, and Developer Edition, on Salesforce API version 66.0 or later.
 
 ## Related
 
+- [Product limits](../admin/limits.md) (the same facts, admin-facing)
 - [CSV and results contract](csv-and-results-contract.md)
 - [Package and compatibility](package-and-compatibility.md)
 - [Unsupported features](unsupported-features.md)

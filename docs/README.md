@@ -3,6 +3,14 @@
 > [!NOTE]
 > On this page, choose the shortest documentation path for installing, administering, using, or extending Bulk Record Upload.
 
+Bulk Record Upload lets someone create, update, upsert, or delete many Salesforce records at once by uploading a CSV file through a Lightning component — no Data Loader, no command line, no code required to use it. An admin configures which object and fields a CSV can touch; a user then picks a file and uploads it, the same way they'd attach a file anywhere else in Salesforce.
+
+Not sure where to start?
+
+- **"I was told to go upload a CSV"** — start with [Run the first upload](get-started/first-upload.md).
+- **"I need to set this up for my team"** — start with [Install](get-started/install.md).
+- **"I'm evaluating whether this fits my org"** — read [Configuration fields](reference/configuration-fields.md) and [Limits](admin/limits.md).
+
 ## Get started
 
 1. [Install](get-started/install.md)

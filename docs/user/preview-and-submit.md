@@ -1,13 +1,21 @@
 # Preview and submit
 
 > [!NOTE]
-> On this page, validate a selected CSV, understand the capped preview, and submit one upload safely.
+> On this page, use the preview to catch a mistake before submitting, and know what happens when you click Submit.
 
-The browser validates file name, size, encoding, structure, row count, headers, and required columns before submission; Apex repeats trusted validation. The preview shows at most 10 rows and 20 source columns even when the process supports 100 configured columns.
+## What the preview shows
 
-Review the selected process, operation, row count, validation summary, and file name. Submission creates a unique request key, stores the input File, stages rows, and queues processing. Repeating the same request key returns the existing upload instead of adding another job.
+Before anything is saved, Bulk Record Upload checks your file's name, size, and structure, and shows you a preview — up to 10 rows and 20 columns, even if the process is configured for more. This is enough to confirm you picked the right file and the headers line up, without waiting to see the whole thing.
 
-When the administrator configures **Bulk Record Upload** with one resolved process, no process selector appears. The server validates that process before loading the page, scopes displayed history to it, and rejects a missing, inactive, inaccessible, or invalid configuration. The CSV and submission steps are otherwise identical to a multi-process bundle.
+You'll also see a summary above the preview: which process and operation you're running (for example, "Insert Contacts"), how many rows the file contains, and whether anything obvious is wrong.
+
+If your admin set up a page fixed to one specific process, you won't see a process picker at all — you'll go straight from opening the page to choosing a file. Everything else works the same either way.
+
+## What happens when you click Submit
+
+Click **Submit** once. The upload moves to the background — you can navigate away or close the tab, and it keeps running. Go to [Monitor an upload](monitor-upload.md) to watch its progress.
+
+If you click Submit again on the exact same file before it's picked up, Bulk Record Upload recognizes it's the same request and won't start a second, duplicate upload — you'll just see the one you already started. You don't need to worry about double-clicking.
 
 ## Next steps
 

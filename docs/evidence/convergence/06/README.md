@@ -21,7 +21,8 @@ so an org that deployed step 03 without this fix can still clean up.
 ## A material conflict with ADR-0004, found and resolved before implementing
 
 The design in this step's own spec — "`Type.forName` returns a type, the
-type instantiates, and the instance is `instanceof BulkRecordUploadExtensionV1`"
+type instantiates, and the instance is `instanceof BulkRecordUploadExtension
+`"
 — directly contradicts a sentence in the already-approved
 [ADR-0004](../../../specs/decisions/ADR-0004-security-model.md): "`Type.forName`
 on configuration text is prohibited." This surfaced as a real lint failure
@@ -127,7 +128,8 @@ so the lint rule and the security doc stay in agreement.
       party was available in this session, the same class of gap recorded
       for UI-only verification in steps 01 and 05. The mechanical claims in
       [docs/developer/custom-handler.md](../../developer/custom-handler.md)
-      (register `BulkRecordUploadTrimHandlerV1` via a `Bulk_Record_Upload_Extension__mdt`
+      (register `BulkRecordUploadTrimHandler
+` via a `Bulk_Record_Upload_Extension__mdt`
       record) are exercised by
       `examples/main/default/customMetadata/Bulk_Record_Upload_Extension.Contact_Insert_Trim.md-meta.xml`
       and by the passing extension-resolution tests above, which is the
@@ -142,7 +144,8 @@ so the lint rule and the security doc stay in agreement.
 - **Deploys:** Regular deploy clean (0 errors) after fixing two omissions
   caught only by the org compiler: missing `.cls-meta.xml` sidecar files for
   all four new extension classes, and one stale 13-argument
-  `BulkRecordUploadProjectionV1` constructor call in
+  `BulkRecordUploadProjection
+` constructor call in
   `BulkRecordUploadRequestServiceTest.cls` that still passed `null` in the
   removed `postProcessingAction` position. Destructive-changes deploy
   removing the retired classes/fields from the org: 0 errors.
