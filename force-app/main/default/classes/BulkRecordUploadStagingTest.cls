@@ -5,10 +5,10 @@ private class BulkRecordUploadStagingTest {
     Bulk_Record_Upload__c upload = BulkRecordUploadTestDataFactory.createUpload(
       'STAGING'
     );
-    List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>();
+    List<BulkRecordUploadRow> rows = new List<BulkRecordUploadRow>();
     for (Integer index = 0; index < 51; index++) {
       rows.add(
-        new BulkRecordUploadRowV1(
+        new BulkRecordUploadRow(
           index + 2,
           new Map<String, String>{ 'name' => 'Row ' + index }
         )
@@ -39,7 +39,7 @@ private class BulkRecordUploadStagingTest {
   static void stage_MissingInput_IsRejectedWithoutDml() {
     try {
       new BulkRecordUploadStagingService()
-        .stage(null, new List<BulkRecordUploadRowV1>(), 100);
+        .stage(null, new List<BulkRecordUploadRow>(), 100);
       Assert.fail('Expected staging input exception.');
     } catch (BulkRecordUploadException error) {
       Assert.areEqual('Staging input is required.', error.getMessage());

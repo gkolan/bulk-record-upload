@@ -1,23 +1,23 @@
-/** Produces the stable version 1 results CSV from approved result fields only. */
+/** Produces the stable results CSV from approved result fields only. */
 public with sharing class BulkRecordUploadResultWriter {
   public static final String HEADER = 'bru_row_number,bru_status,bru_record_id,bru_error_code,bru_error_message';
   public static final Integer MAX_STAGED_RESULT_CHARACTERS = BulkRecordUploadRuntimeContract.MAX_CHUNK_CHARACTERS;
 
   /** Builds results without configured source columns. */
-  public Blob write(List<BulkRecordUploadRowResultV1> results) {
+  public Blob write(List<BulkRecordUploadRowResult> results) {
     return write(results, null, null);
   }
 
   /** Builds results with approved configured columns in stable projection order. */
   public Blob write(
-    List<BulkRecordUploadRowResultV1> results,
-    BulkRecordUploadProjectionV1 projection,
-    List<BulkRecordUploadRowV1> sourceRows
+    List<BulkRecordUploadRowResult> results,
+    BulkRecordUploadProjection projection,
+    List<BulkRecordUploadRow> sourceRows
   ) {
     if (results == null) {
       throw new BulkRecordUploadException('Result rows are required.');
     }
-    List<BulkRecordUploadFieldProjectionV1> projectedFields = resultFields(
+    List<BulkRecordUploadFieldProjection> projectedFields = resultFields(
       projection
     );
     List<String> headers = new List<String>{
@@ -27,12 +27,12 @@ public with sharing class BulkRecordUploadResultWriter {
       'bru_error_code',
       'bru_error_message'
     };
-    for (BulkRecordUploadFieldProjectionV1 field : projectedFields) {
+    for (BulkRecordUploadFieldProjection field : projectedFields) {
       headers.add(field.columnKey);
     }
     Map<Integer, Map<String, String>> sourceByRow = indexSource(sourceRows);
     List<String> lines = new List<String>{ String.join(headers, ',') };
-    for (BulkRecordUploadRowResultV1 result : results) {
+    for (BulkRecordUploadRowResult result : results) {
       List<String> cells = new List<String>{
         escape(String.valueOf(result.rowNumber)),
         escape(
@@ -47,7 +47,7 @@ public with sharing class BulkRecordUploadResultWriter {
         escape(result.safeMessage)
       };
       Map<String, String> source = sourceByRow.get(result.rowNumber);
-      for (BulkRecordUploadFieldProjectionV1 field : projectedFields) {
+      for (BulkRecordUploadFieldProjection field : projectedFields) {
         cells.add(escape(source == null ? null : source.get(field.columnKey)));
       }
       lines.add(String.join(cells, ','));
@@ -61,12 +61,12 @@ public with sharing class BulkRecordUploadResultWriter {
     return Blob.valueOf(csv);
   }
 
-  private static List<BulkRecordUploadFieldProjectionV1> resultFields(
-    BulkRecordUploadProjectionV1 projection
+  private static List<BulkRecordUploadFieldProjection> resultFields(
+    BulkRecordUploadProjection projection
   ) {
-    List<BulkRecordUploadFieldProjectionV1> fields = new List<BulkRecordUploadFieldProjectionV1>();
+    List<BulkRecordUploadFieldProjection> fields = new List<BulkRecordUploadFieldProjection>();
     if (projection != null) {
-      for (BulkRecordUploadFieldProjectionV1 field : projection.getFields()) {
+      for (BulkRecordUploadFieldProjection field : projection.getFields()) {
         if (field.includeInResult) {
           fields.add(field);
         }
@@ -76,11 +76,11 @@ public with sharing class BulkRecordUploadResultWriter {
   }
 
   private static Map<Integer, Map<String, String>> indexSource(
-    List<BulkRecordUploadRowV1> sourceRows
+    List<BulkRecordUploadRow> sourceRows
   ) {
     Map<Integer, Map<String, String>> values = new Map<Integer, Map<String, String>>();
     if (sourceRows != null) {
-      for (BulkRecordUploadRowV1 row : sourceRows) {
+      for (BulkRecordUploadRow row : sourceRows) {
         values.put(row.rowNumber, row.getValuesByColumn());
       }
     }

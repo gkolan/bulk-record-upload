@@ -2,7 +2,7 @@
 public with sharing class BulkRecordUploadRecordContextService {
   /** Returns a visible, type-correct context ID or null when context is disabled. */
   public Id validateContext(
-    BulkRecordUploadProjectionV1 projection,
+    BulkRecordUploadProjection projection,
     String contextRecordId
   ) {
     if (projection.recordContextAction == 'NONE') {
@@ -43,14 +43,14 @@ public with sharing class BulkRecordUploadRecordContextService {
 
   /** Applies the server-verified parent after CSV mapping and merge behavior. */
   public void applyContext(
-    BulkRecordUploadProjectionV1 projection,
+    BulkRecordUploadProjection projection,
     Id contextRecordId,
-    List<BulkRecordUploadMappedRowV1> rows
+    List<BulkRecordUploadMappedRow> rows
   ) {
     if (contextRecordId == null || projection.recordContextAction == 'NONE') {
       return;
     }
-    for (BulkRecordUploadMappedRowV1 row : rows) {
+    for (BulkRecordUploadMappedRow row : rows) {
       row.record.put(projection.recordContextFieldApiName, contextRecordId);
     }
   }

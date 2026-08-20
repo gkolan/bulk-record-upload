@@ -1,5 +1,5 @@
 /**
- * Parses the bounded version 1 comma-separated input contract without record access or logging input values.
+ * Parses the bounded comma-separated input contract without record access or logging input values.
  */
 public class BulkRecordUploadCsvReader {
   private static final String UTF8_BOM = String.fromCharArray(
@@ -12,7 +12,7 @@ public class BulkRecordUploadCsvReader {
    * @return Parsed normalized headers and correlated rows.
    * @throws BulkRecordUploadException for malformed or out-of-bound input.
    */
-  public BulkRecordUploadParsedCsvV1 parse(String csvText) {
+  public BulkRecordUploadParsedCsv parse(String csvText) {
     if (String.isBlank(csvText)) {
       throw new BulkRecordUploadException('The CSV file is empty.');
     }
@@ -176,9 +176,9 @@ public class BulkRecordUploadCsvReader {
       }
     }
 
-    private BulkRecordUploadParsedCsvV1 toParsedCsv() {
+    private BulkRecordUploadParsedCsv toParsedCsv() {
       List<String> headers = normalizeHeaders(records[0]);
-      List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>();
+      List<BulkRecordUploadRow> rows = new List<BulkRecordUploadRow>();
       for (
         Integer recordIndex = 1; recordIndex < records.size(); recordIndex++
       ) {
@@ -195,13 +195,10 @@ public class BulkRecordUploadCsvReader {
           valuesByColumn.put(headers[columnIndex], values[columnIndex]);
         }
         rows.add(
-          new BulkRecordUploadRowV1(
-            recordStartLines[recordIndex],
-            valuesByColumn
-          )
+          new BulkRecordUploadRow(recordStartLines[recordIndex], valuesByColumn)
         );
       }
-      return new BulkRecordUploadParsedCsvV1(headers, rows);
+      return new BulkRecordUploadParsedCsv(headers, rows);
     }
 
     private List<String> normalizeHeaders(List<String> rawHeaders) {

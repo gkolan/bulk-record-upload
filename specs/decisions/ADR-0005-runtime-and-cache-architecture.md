@@ -18,7 +18,8 @@
 | `BulkRecordUploadCsvReader`          | Parse bounded UTF-8 CSV and preserve physical row numbers             |                     400 |
 | `BulkRecordUploadRequestValidator`   | Enforce input, header, projection, and concurrency rules              |                     300 |
 | `BulkRecordUploadExtensionRegistry`  | Resolve, validate, and order the package's one open extension seam    |                     100 |
-| `BulkRecordUploadExtensionV1`        | Narrow extension interface for projected rows and safe row results    |                      50 |
+| `BulkRecordUploadExtension           |
+| `                                    | Narrow extension interface for projected rows and safe row results    |                      50 |
 | operation strategies                 | Map/validate one Insert, Update, Upsert, or Delete operation          |                350 each |
 | `BulkRecordUploadPersistenceGateway` | Execute user-mode partial DML and correlate results                   |                     350 |
 | `BulkRecordUploadJob`                | Process one durable staged chunk and schedule the next                |                     350 |
@@ -30,11 +31,13 @@
 
 No base class owns parsing, mapping, DML, Files, logs, and orchestration together. Strategies and extensions receive immutable projections and narrow gateways.
 
-_Updated 2026-08-19 by convergence step 06: `BulkRecordUploadHandlerRegistry`/`BulkRecordUploadHandlerV1` and `BulkRecordUploadPostActionRegistry`/`BulkRecordUploadPostActionV1` (two of the original five registry-shaped concepts) are replaced by the single `BulkRecordUploadExtensionRegistry`/`BulkRecordUploadExtensionV1` seam. See [ADR-0007](ADR-0007-configuration-over-code-extension.md) and the [ADR-0004 amendment](ADR-0004-security-model.md) for the decision and its security guardrails._
+_Updated 2026-08-19 by convergence step 06: `BulkRecordUploadHandlerRegistry`/`BulkRecordUploadHandlerV1` and `BulkRecordUploadPostActionRegistry`/`BulkRecordUploadPostActionV1` (two of the original five registry-shaped concepts) are replaced by the single `BulkRecordUploadExtensionRegistry`/`BulkRecordUploadExtension
+` seam. See [ADR-0007](ADR-0007-configuration-over-code-extension.md) and the [ADR-0004 amendment](ADR-0004-security-model.md) for the decision and its security guardrails._
 
 ## Compact projection
 
-`BulkRecordUploadProjectionV1` contains the contract version, process key/hash, canonical qualified object name, operation, ordered configured fields, received header mapping, match/upsert key, required/default/result flags, field type/coercion/behavior descriptors, CRUD/FLS decisions, ordered extension class names, and stable hashes. It contains no records or CSV values.
+`BulkRecordUploadProjection
+` contains the contract version, process key/hash, canonical qualified object name, operation, ordered configured fields, received header mapping, match/upsert key, required/default/result flags, field type/coercion/behavior descriptors, CRUD/FLS decisions, ordered extension class names, and stable hashes. It contains no records or CSV values.
 
 The builder resolves at most 100 configured fields plus minimal system identifiers. An 800-field object fixture must show that serialized DTOs, SOQL, result headers, and cache values contain only the bounded projection. The service may obtain an object field map to resolve named fields when Salesforce Schema requires it, but it never serializes or returns that full map and records describe/projection counts separately.
 
@@ -48,18 +51,19 @@ At 5,000 rows and 200 rows per chunk, one upload creates at most 25 chunks. Each
 
 ## Cache contract
 
-| Attribute            | Contract                                                                                                                                  |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Key                  | `bru:projection:1:{packageVersion}:{configKey}:{configHash}:{object}:{operation}:{fieldHash}:{locale}:{accessFingerprint}`                |
-| Value                | Immutable serialized `BulkRecordUploadProjectionV1`; no records, values, usernames, or raw permissions                                    |
-| Transaction cache    | Static bounded map, maximum 50 entries, cleared by transaction end                                                                        |
-| Org Cache            | Optional, maximum 200 entries and 128 KiB per value, 900-second TTL                                                                       |
-| Miss/unavailable     | Rebuild deterministically from CMT and Schema; correctness never depends on cache                                                         |
-| Invalidation         | New config hash, package/contract version, field-set hash, operation, locale, or access fingerprint creates a new key; old entries expire |
-| Stampede control     | Per-transaction single build; Org Cache put after successful complete build; no partial values                                            |
-| Permission isolation | Access fingerprint hashes relevant object/field decisions and permission-set modification state; sensitive DTOs remain user-scoped        |
-| Metrics              | hit/miss/build/fallback/oversize/deserialize-failure counters and build time; no sensitive key material in logs                           |
-| Eviction             | Treat as miss; cache-off, eviction, corrupt-value, and unavailable-partition tests must return identical functional results               |
+| Attribute                                            | Contract                                                                                                                                  |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Key                                                  | `bru:projection:1:{packageVersion}:{configKey}:{configHash}:{object}:{operation}:{fieldHash}:{locale}:{accessFingerprint}`                |
+| Value                                                | Immutable serialized `BulkRecordUploadProjection                                                                                          |
+| `; no records, values, usernames, or raw permissions |
+| Transaction cache                                    | Static bounded map, maximum 50 entries, cleared by transaction end                                                                        |
+| Org Cache                                            | Optional, maximum 200 entries and 128 KiB per value, 900-second TTL                                                                       |
+| Miss/unavailable                                     | Rebuild deterministically from CMT and Schema; correctness never depends on cache                                                         |
+| Invalidation                                         | New config hash, package/contract version, field-set hash, operation, locale, or access fingerprint creates a new key; old entries expire |
+| Stampede control                                     | Per-transaction single build; Org Cache put after successful complete build; no partial values                                            |
+| Permission isolation                                 | Access fingerprint hashes relevant object/field decisions and permission-set modification state; sensitive DTOs remain user-scoped        |
+| Metrics                                              | hit/miss/build/fallback/oversize/deserialize-failure counters and build time; no sensitive key material in logs                           |
+| Eviction                                             | Treat as miss; cache-off, eviction, corrupt-value, and unavailable-partition tests must return identical functional results               |
 
 Client memoization stores safe immutable display models keyed by process/hash/locale and never becomes authorization. Record data is never cached.
 

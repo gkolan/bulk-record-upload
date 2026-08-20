@@ -1,13 +1,13 @@
-/** Thin Aura boundary for version 1 upload selection and submission. */
+/** Thin Aura boundary for upload selection and submission. */
 public with sharing class BulkRecordUploadController {
   @TestVisible
-  private static BulkRecordUploadProjectionV1 projectionOverride;
+  private static BulkRecordUploadProjection projectionOverride;
   @TestVisible
-  private static BulkRecordUploadPresentationV1 presentationOverride;
+  private static BulkRecordUploadPresentation presentationOverride;
 
   /** Resolves the active process choices available to the running user. */
   @AuraEnabled(cacheable=true)
-  public static BulkRecordUploadSelectionV1 getSelection(
+  public static BulkRecordUploadSelection getSelection(
     String bundleDeveloperName
   ) {
     try {
@@ -20,7 +20,7 @@ public with sharing class BulkRecordUploadController {
 
   /** Returns presentation settings for one active, authorized process. */
   @AuraEnabled(cacheable=true)
-  public static BulkRecordUploadPresentationV1 getProcessPresentation(
+  public static BulkRecordUploadPresentation getProcessPresentation(
     String processKey
   ) {
     try {
@@ -39,10 +39,10 @@ public with sharing class BulkRecordUploadController {
           'The upload process is unavailable.'
         );
       }
-      BulkRecordUploadProjectionV1 projection = projectionOverride == null
+      BulkRecordUploadProjection projection = projectionOverride == null
         ? new BulkRecordUploadProjectionService().getProjection(validatedKey)
         : projectionOverride;
-      return new BulkRecordUploadPresentationV1(
+      return new BulkRecordUploadPresentation(
         validatedKey,
         process.Subtitle__c,
         process.Instructions__c,
@@ -58,14 +58,17 @@ public with sharing class BulkRecordUploadController {
   @AuraEnabled(cacheable=true)
   public static String getTemplate(String processKey) {
     try {
-      BulkRecordUploadProjectionV1 projection = projectionOverride == null
+      BulkRecordUploadProjection projection = projectionOverride == null
         ? new BulkRecordUploadProjectionService().getProjection(processKey)
         : projectionOverride;
       if (projection.processKey != processKey?.trim()) {
         throw new BulkRecordUploadException('The upload process is invalid.');
       }
       List<String> headers = new List<String>();
-      for (BulkRecordUploadFieldProjectionV1 field : projection.getFields()) {
+      for (BulkRecordUploadFieldProjection field : projection.getFields()) {
+        if (String.isNotBlank(field.sourceTemplate)) {
+          continue;
+        }
         headers.add('"' + field.columnKey.replace('"', '""') + '"');
       }
       return String.join(headers, ',') + '\r\n';
@@ -80,7 +83,7 @@ public with sharing class BulkRecordUploadController {
    * populated processKey is validated and scopes history to that process.
    */
   @AuraEnabled
-  public static List<BulkRecordUploadHistoryItemV1> getHistory(
+  public static List<BulkRecordUploadHistoryItem> getHistory(
     String processKey
   ) {
     try {
@@ -95,7 +98,7 @@ public with sharing class BulkRecordUploadController {
   }
 
   private static String resolveProcessKey(String processKey) {
-    BulkRecordUploadProjectionV1 projection = projectionOverride == null
+    BulkRecordUploadProjection projection = projectionOverride == null
       ? new BulkRecordUploadProjectionService().getProjection(processKey)
       : projectionOverride;
     if (
@@ -107,10 +110,10 @@ public with sharing class BulkRecordUploadController {
     return projection.processKey;
   }
 
-  /** Submits one version 1 request and returns only safe operational fields. */
+  /** Submits one upload request and returns only safe operational fields. */
   @AuraEnabled
-  public static BulkRecordUploadSubmissionV1 submit(
-    BulkRecordUploadSubmitRequestV1 request
+  public static BulkRecordUploadSubmission submit(
+    BulkRecordUploadSubmitRequest request
   ) {
     try {
       return new BulkRecordUploadRequestService().submit(request);

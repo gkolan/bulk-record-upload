@@ -2,16 +2,16 @@
 private class BulkRecordUploadPersistenceTest {
   @IsTest
   static void persist_InsertPartialSuccess_PreservesRowCorrelationAndRedactsValues() {
-    List<BulkRecordUploadMappedRowV1> rows = new List<BulkRecordUploadMappedRowV1>{
-      new BulkRecordUploadMappedRowV1(
+    List<BulkRecordUploadMappedRow> rows = new List<BulkRecordUploadMappedRow>{
+      new BulkRecordUploadMappedRow(
         9,
         new Account(Name = 'Successful Account')
       ),
-      new BulkRecordUploadMappedRowV1(15, new Account())
+      new BulkRecordUploadMappedRow(15, new Account())
     };
 
     Test.startTest();
-    List<BulkRecordUploadRowResultV1> results = new BulkRecordUploadPersistenceGateway()
+    List<BulkRecordUploadRowResult> results = new BulkRecordUploadPersistenceGateway()
       .persist('INSERT', rows, null);
     Integer dmlStatements = Limits.getDmlStatements();
     Test.stopTest();
@@ -29,13 +29,10 @@ private class BulkRecordUploadPersistenceTest {
 
   @IsTest
   static void persist_OverChunkLimit_IsRejectedBeforeDml() {
-    List<BulkRecordUploadMappedRowV1> rows = new List<BulkRecordUploadMappedRowV1>();
+    List<BulkRecordUploadMappedRow> rows = new List<BulkRecordUploadMappedRow>();
     for (Integer index = 0; index < 201; index++) {
       rows.add(
-        new BulkRecordUploadMappedRowV1(
-          index + 2,
-          new Account(Name = 'Bounded')
-        )
+        new BulkRecordUploadMappedRow(index + 2, new Account(Name = 'Bounded'))
       );
     }
     try {
@@ -53,39 +50,39 @@ private class BulkRecordUploadPersistenceTest {
   @IsTest
   static void persist_UpdateUpsertDelete_SupportsApprovedOperations() {
     BulkRecordUploadPersistenceGateway gateway = new BulkRecordUploadPersistenceGateway();
-    List<BulkRecordUploadRowResultV1> inserted = gateway.persist(
+    List<BulkRecordUploadRowResult> inserted = gateway.persist(
       'INSERT',
-      new List<BulkRecordUploadMappedRowV1>{
-        new BulkRecordUploadMappedRowV1(2, new Account(Name = 'Lifecycle'))
+      new List<BulkRecordUploadMappedRow>{
+        new BulkRecordUploadMappedRow(2, new Account(Name = 'Lifecycle'))
       },
       null
     );
     Id accountId = inserted[0].recordId;
 
-    List<BulkRecordUploadRowResultV1> updated = gateway.persist(
+    List<BulkRecordUploadRowResult> updated = gateway.persist(
       'UPDATE',
-      new List<BulkRecordUploadMappedRowV1>{
-        new BulkRecordUploadMappedRowV1(
+      new List<BulkRecordUploadMappedRow>{
+        new BulkRecordUploadMappedRow(
           3,
           new Account(Id = accountId, Name = 'Updated')
         )
       },
       null
     );
-    List<BulkRecordUploadRowResultV1> upserted = gateway.persist(
+    List<BulkRecordUploadRowResult> upserted = gateway.persist(
       'UPSERT',
-      new List<BulkRecordUploadMappedRowV1>{
-        new BulkRecordUploadMappedRowV1(
+      new List<BulkRecordUploadMappedRow>{
+        new BulkRecordUploadMappedRow(
           4,
           new Account(Id = accountId, Name = 'Upserted')
         )
       },
       Account.Id
     );
-    List<BulkRecordUploadRowResultV1> deleted = gateway.persist(
+    List<BulkRecordUploadRowResult> deleted = gateway.persist(
       'DELETE',
-      new List<BulkRecordUploadMappedRowV1>{
-        new BulkRecordUploadMappedRowV1(5, new Account(Id = accountId))
+      new List<BulkRecordUploadMappedRow>{
+        new BulkRecordUploadMappedRow(5, new Account(Id = accountId))
       },
       null
     );
@@ -102,8 +99,8 @@ private class BulkRecordUploadPersistenceTest {
       new BulkRecordUploadPersistenceGateway()
         .persist(
           'MERGE',
-          new List<BulkRecordUploadMappedRowV1>{
-            new BulkRecordUploadMappedRowV1(2, new Account(Name = 'No DML'))
+          new List<BulkRecordUploadMappedRow>{
+            new BulkRecordUploadMappedRow(2, new Account(Name = 'No DML'))
           },
           null
         );

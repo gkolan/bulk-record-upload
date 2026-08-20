@@ -9,8 +9,8 @@ public class BulkRecordUploadRequestValidator {
    * @throws BulkRecordUploadException for unknown or missing required columns and empty data.
    */
   public void validate(
-    BulkRecordUploadParsedCsvV1 parsedCsv,
-    BulkRecordUploadProjectionV1 projection
+    BulkRecordUploadParsedCsv parsedCsv,
+    BulkRecordUploadProjection projection
   ) {
     if (parsedCsv == null || projection == null) {
       throw new BulkRecordUploadException(
@@ -26,10 +26,11 @@ public class BulkRecordUploadRequestValidator {
     Set<String> configuredHeaders = new Set<String>();
     Set<String> requiredHeaders = new Set<String>();
     for (
-      BulkRecordUploadFieldProjectionV1 fieldProjection : projection.getFields()
+      BulkRecordUploadFieldProjection fieldProjection : projection.getFields()
     ) {
       configuredHeaders.add(fieldProjection.columnKey);
-      if (fieldProjection.isRequired) {
+      Boolean isDerived = String.isNotBlank(fieldProjection.sourceTemplate);
+      if (fieldProjection.isRequired && !isDerived) {
         requiredHeaders.add(fieldProjection.columnKey);
       }
     }

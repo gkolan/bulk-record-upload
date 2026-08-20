@@ -12,7 +12,7 @@ private with sharing class BulkRecordUploadSelectionServiceTest {
       'INSERT' => assignment('ACCOUNT_OPERATIONS', 'ACCOUNT_INSERT', 1)
     };
     Test.startTest();
-    BulkRecordUploadSelectionV1 result = new BulkRecordUploadSelectionService()
+    BulkRecordUploadSelection result = new BulkRecordUploadSelectionService()
       .resolve('ACCOUNT_OPERATIONS');
     Test.stopTest();
     Assert.areEqual(

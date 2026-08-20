@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CustomSeparator__c</fullName><description
+  >Exact separator text used between existing and incoming text when Text Separator is Custom.</description>
+    <inlineHelpText
+  >Required only when Text Separator is Custom. Entered exactly as typed, including spaces.</inlineHelpText>
+    <label>Custom Separator</label>
+    <length>10</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

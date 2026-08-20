@@ -111,7 +111,7 @@ private class BulkRecordUploadConfigProjectionTest {
 
     System.runAs(operatorUser) {
       Test.startTest();
-      BulkRecordUploadProjectionV1 projection = service.getProjection(
+      BulkRecordUploadProjection projection = service.getProjection(
         'CONTACT_INSERT'
       );
       Test.stopTest();
@@ -131,6 +131,79 @@ private class BulkRecordUploadConfigProjectionTest {
         projection.getFields()[0].fieldApiName,
         'Projection should preserve configured order.'
       );
+    }
+  }
+
+  @IsTest
+  static void projection_SourceTemplateColumns_ComposeAndValidate() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser('template');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    Bulk_Record_Upload_Process_Field__mdt derivedField = createField(
+      'full_name',
+      'Description',
+      3
+    );
+    derivedField.SourceTemplate__c = '{first_name} {last_name}';
+    BulkRecordUploadProjectionService validService = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('first_name', 'FirstName', 1),
+        createField('last_name', 'LastName', 2),
+        derivedField
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    System.runAs(operatorUser) {
+      Test.startTest();
+      BulkRecordUploadProjection projection = validService.getProjection(
+        'CONTACT_INSERT'
+      );
+      Test.stopTest();
+
+      Assert.areEqual(
+        3,
+        projection.getFields().size(),
+        'Projection should include the derived column alongside its sources.'
+      );
+    }
+  }
+
+  @IsTest
+  static void projection_SourceTemplateUnconfiguredColumn_ThrowsAtConfigLoad() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser(
+      'badtemplate'
+    );
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    Bulk_Record_Upload_Process_Field__mdt derivedField = createField(
+      'full_name',
+      'Description',
+      2
+    );
+    derivedField.SourceTemplate__c = '{missing_column}';
+    BulkRecordUploadProjectionService invalidService = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1),
+        derivedField
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    System.runAs(operatorUser) {
+      try {
+        invalidService.getProjection('CONTACT_INSERT');
+        Assert.fail('Expected an unconfigured-column exception.');
+      } catch (BulkRecordUploadException error) {
+        Assert.isTrue(
+          error.getMessage().contains('unconfigured or derived column'),
+          'Expected message: ' + error.getMessage()
+        );
+      }
     }
   }
 
@@ -202,7 +275,7 @@ private class BulkRecordUploadConfigProjectionTest {
     BulkRecordUploadProjectionCache cacheValue = new BulkRecordUploadProjectionCache();
 
     Test.startTest();
-    BulkRecordUploadProjectionV1 projection = cacheValue.find('bru:test');
+    BulkRecordUploadProjection projection = cacheValue.find('bru:test');
     Test.stopTest();
 
     Assert.isNull(projection, 'Corrupt cache values should behave as misses.');
@@ -319,7 +392,7 @@ private class BulkRecordUploadConfigProjectionTest {
 
     Test.startTest();
     try {
-      new BulkRecordUploadProcessConfigV1(process);
+      new BulkRecordUploadProcessConfig(process);
       Assert.fail('Expected an unsupported operation to fail.');
     } catch (BulkRecordUploadException exceptionValue) {
       Assert.areEqual(

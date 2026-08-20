@@ -1,4 +1,4 @@
-/** Verifies defensive and invalid-input branches in versioned value contracts. */
+/** Verifies defensive and invalid-input branches in value-object contracts. */
 @IsTest
 private class BulkRecordUploadEdgeCoverageTest {
   @IsTest
@@ -25,7 +25,7 @@ private class BulkRecordUploadEdgeCoverageTest {
   @IsTest
   static void trimExtension_NullInputs_AreRejected() {
     Test.startTest();
-    assertExtensionFailure(new BulkRecordUploadTrimHandlerV1());
+    assertExtensionFailure(new BulkRecordUploadTrimHandler());
     Test.stopTest();
   }
 
@@ -33,7 +33,7 @@ private class BulkRecordUploadEdgeCoverageTest {
   static void operationStrategy_InvalidProjectionAndUpsertKey_AreRejected() {
     Test.startTest();
     try {
-      new BulkRecordUploadOperationStrategy('INSERT').validateProjection(null);
+      new BulkRecordUploadOperationValidator('INSERT').validateProjection(null);
       Assert.fail('Null projection should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
@@ -42,7 +42,7 @@ private class BulkRecordUploadEdgeCoverageTest {
       );
     }
     try {
-      new BulkRecordUploadOperationStrategy('UPSERT')
+      new BulkRecordUploadOperationValidator('UPSERT')
         .validateProjection(projection('UPSERT', field(false, false, 1)));
       Assert.fail('Upsert without a key should fail.');
     } catch (BulkRecordUploadException error) {
@@ -63,11 +63,11 @@ private class BulkRecordUploadEdgeCoverageTest {
     assertMappedRowFailure();
     assertResultRowFailure();
     assertRowValuesFailure();
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadParsedCsvV1(
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadParsedCsv(
       new List<String>{ 'name' },
       BulkRecordUploadTestDataFactory.createRows(1)
     );
-    List<BulkRecordUploadRowV1> rows = parsed.getRows();
+    List<BulkRecordUploadRow> rows = parsed.getRows();
     rows.clear();
     Assert.areEqual(
       1,
@@ -80,7 +80,7 @@ private class BulkRecordUploadEdgeCoverageTest {
   @IsTest
   static void processConfig_DefaultsAndBounds_AreValidated() {
     Test.startTest();
-    BulkRecordUploadProcessConfigV1 defaults = new BulkRecordUploadProcessConfigV1(
+    BulkRecordUploadProcessConfig defaults = new BulkRecordUploadProcessConfig(
       process('  DEMO  ', null, null, null, null)
     );
     Assert.areEqual(100, defaults.batchSize, 'Default batch is stable.');
@@ -109,10 +109,10 @@ private class BulkRecordUploadEdgeCoverageTest {
       fieldRecord('name', 'EXECUTE', 1),
       'not supported'
     );
-    BulkRecordUploadFieldConfigV1 beta = new BulkRecordUploadFieldConfigV1(
+    BulkRecordUploadFieldConfig beta = new BulkRecordUploadFieldConfig(
       fieldRecord('beta', 'REPLACE', 1)
     );
-    BulkRecordUploadFieldConfigV1 alpha = new BulkRecordUploadFieldConfigV1(
+    BulkRecordUploadFieldConfig alpha = new BulkRecordUploadFieldConfig(
       fieldRecord('alpha', 'REPLACE', 1)
     );
     Assert.isTrue(
@@ -147,7 +147,7 @@ private class BulkRecordUploadEdgeCoverageTest {
   }
 
   private static void assertExtensionFailure(
-    BulkRecordUploadExtensionV1 extension
+    BulkRecordUploadExtension extension
   ) {
     try {
       extension.beforeMap(null, null);
@@ -165,7 +165,7 @@ private class BulkRecordUploadEdgeCoverageTest {
     String fragment
   ) {
     try {
-      new BulkRecordUploadProjectionV1(
+      new BulkRecordUploadProjection(
         'P',
         'H',
         'Account',
@@ -173,7 +173,7 @@ private class BulkRecordUploadEdgeCoverageTest {
         new List<String>(),
         100,
         retention,
-        new List<BulkRecordUploadFieldProjectionV1>{ field(false, false, 1) }
+        new List<BulkRecordUploadFieldProjection>{ field(false, false, 1) }
       );
       Assert.fail('Projection should fail.');
     } catch (BulkRecordUploadException error) {
@@ -186,7 +186,7 @@ private class BulkRecordUploadEdgeCoverageTest {
 
   private static void assertProjectionTextFailure() {
     try {
-      new BulkRecordUploadProjectionV1(
+      new BulkRecordUploadProjection(
         ' ',
         'H',
         'Account',
@@ -194,7 +194,7 @@ private class BulkRecordUploadEdgeCoverageTest {
         new List<String>(),
         100,
         30,
-        new List<BulkRecordUploadFieldProjectionV1>{ field(false, false, 1) }
+        new List<BulkRecordUploadFieldProjection>{ field(false, false, 1) }
       );
       Assert.fail('Blank key should fail.');
     } catch (BulkRecordUploadException error) {
@@ -207,7 +207,7 @@ private class BulkRecordUploadEdgeCoverageTest {
 
   private static void assertFieldProjectionFailure() {
     try {
-      new BulkRecordUploadFieldProjectionV1(
+      new BulkRecordUploadFieldProjection(
         'name',
         'Name',
         'Name',
@@ -232,7 +232,7 @@ private class BulkRecordUploadEdgeCoverageTest {
 
   private static void assertMappedRowFailure() {
     try {
-      new BulkRecordUploadMappedRowV1(1, null);
+      new BulkRecordUploadMappedRow(1, null);
       Assert.fail('Mapped row should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
@@ -244,7 +244,7 @@ private class BulkRecordUploadEdgeCoverageTest {
 
   private static void assertResultRowFailure() {
     try {
-      new BulkRecordUploadRowResultV1(1, true, null, null, null);
+      new BulkRecordUploadRowResult(1, true, null, null, null);
       Assert.fail('Result row should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
@@ -256,7 +256,7 @@ private class BulkRecordUploadEdgeCoverageTest {
 
   private static void assertRowValuesFailure() {
     try {
-      new BulkRecordUploadRowV1(2, null);
+      new BulkRecordUploadRow(2, null);
       Assert.fail('Null values should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
@@ -271,7 +271,7 @@ private class BulkRecordUploadEdgeCoverageTest {
     String fragment
   ) {
     try {
-      new BulkRecordUploadProcessConfigV1(value);
+      new BulkRecordUploadProcessConfig(value);
       Assert.fail('Process config should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
@@ -286,7 +286,7 @@ private class BulkRecordUploadEdgeCoverageTest {
     String fragment
   ) {
     try {
-      new BulkRecordUploadFieldConfigV1(value);
+      new BulkRecordUploadFieldConfig(value);
       Assert.fail('Field config should fail.');
     } catch (BulkRecordUploadException error) {
       Assert.isTrue(
@@ -330,11 +330,11 @@ private class BulkRecordUploadEdgeCoverageTest {
     );
   }
 
-  private static BulkRecordUploadProjectionV1 projection(
+  private static BulkRecordUploadProjection projection(
     String operation,
-    BulkRecordUploadFieldProjectionV1 projectedField
+    BulkRecordUploadFieldProjection projectedField
   ) {
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'P',
       'H',
       'Account',
@@ -342,16 +342,16 @@ private class BulkRecordUploadEdgeCoverageTest {
       new List<String>(),
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ projectedField }
+      new List<BulkRecordUploadFieldProjection>{ projectedField }
     );
   }
 
-  private static BulkRecordUploadFieldProjectionV1 field(
+  private static BulkRecordUploadFieldProjection field(
     Boolean matchKey,
     Boolean upsertKey,
     Integer sequence
   ) {
-    return new BulkRecordUploadFieldProjectionV1(
+    return new BulkRecordUploadFieldProjection(
       'name',
       'Name',
       'Name',

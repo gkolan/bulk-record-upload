@@ -2,7 +2,7 @@
 private class BulkRecordUploadRegistryTest {
   @IsTest
   static void extensionRegistry_NoConfiguredExtensions_ResolvesEmptyOrderedList() {
-    List<BulkRecordUploadExtensionV1> resolved = new BulkRecordUploadExtensionRegistry()
+    List<BulkRecordUploadExtension> resolved = new BulkRecordUploadExtensionRegistry()
       .resolve(new List<String>());
 
     Assert.isTrue(resolved.isEmpty());
@@ -10,22 +10,17 @@ private class BulkRecordUploadRegistryTest {
 
   @IsTest
   static void extensionRegistry_ShippedTrimExtension_ProvesExtensionBoundary() {
-    List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>{
-      new BulkRecordUploadRowV1(
+    List<BulkRecordUploadRow> rows = new List<BulkRecordUploadRow>{
+      new BulkRecordUploadRow(
         2,
         new Map<String, String>{ 'name' => '  Acme  ' }
       )
     };
-    BulkRecordUploadProjectionV1 projection = projection(
-      'INSERT',
-      false,
-      false
-    );
+    BulkRecordUploadProjection projection = projection('INSERT', false, false);
 
-    List<BulkRecordUploadExtensionV1> resolved = new BulkRecordUploadExtensionRegistry()
-      .resolve(new List<String>{ 'BulkRecordUploadTrimHandlerV1' });
-    List<BulkRecordUploadRowV1> actual = resolved[0]
-      .beforeMap(projection, rows);
+    List<BulkRecordUploadExtension> resolved = new BulkRecordUploadExtensionRegistry()
+      .resolve(new List<String>{ 'BulkRecordUploadTrimHandler' });
+    List<BulkRecordUploadRow> actual = resolved[0].beforeMap(projection, rows);
 
     Assert.areEqual('Acme', actual[0].getValuesByColumn().get('name'));
     Assert.areEqual('  Acme  ', rows[0].getValuesByColumn().get('name'));
@@ -69,7 +64,7 @@ private class BulkRecordUploadRegistryTest {
       i < BulkRecordUploadRuntimeContract.MAX_EXTENSIONS_PER_PROCESS + 1;
       i++
     ) {
-      tooMany.add('BulkRecordUploadTrimHandlerV1');
+      tooMany.add('BulkRecordUploadTrimHandler');
     }
     try {
       new BulkRecordUploadExtensionRegistry().resolve(tooMany);
@@ -125,10 +120,8 @@ private class BulkRecordUploadRegistryTest {
 
   @IsTest
   static void processors_ResolveOnlyTrustedKeys() {
-    Assert.isNotNull(
-      new BulkRecordUploadProcessors().resolve('STANDARD_DML_V1')
-    );
-    Assert.isTrue(BulkRecordUploadProcessors.isRegistered('STANDARD_DML_V1'));
+    Assert.isNotNull(new BulkRecordUploadProcessors().resolve('STANDARD_DML'));
+    Assert.isTrue(BulkRecordUploadProcessors.isRegistered('STANDARD_DML'));
 
     try {
       new BulkRecordUploadProcessors().resolve('System.String');
@@ -141,12 +134,12 @@ private class BulkRecordUploadRegistryTest {
     }
   }
 
-  private static BulkRecordUploadProjectionV1 projection(
+  private static BulkRecordUploadProjection projection(
     String operation,
     Boolean matchKey,
     Boolean upsertKey
   ) {
-    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
       'name',
       'Name',
       'Name',
@@ -160,7 +153,7 @@ private class BulkRecordUploadRegistryTest {
       true,
       true
     );
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'TEST',
       'hash',
       'Account',
@@ -168,11 +161,11 @@ private class BulkRecordUploadRegistryTest {
       new List<String>(),
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 
-  /** Test-only class that does not implement BulkRecordUploadExtensionV1. */
+  /** Test-only class that does not implement BulkRecordUploadExtension. */
   public class NotAnExtension {
   }
 }

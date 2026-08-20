@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CaseAction__c</fullName><description
+  >Normalizes the letter case of the CSV cell before blank checks and coercion.</description>
+    <inlineHelpText
+  >Applies only to text-like columns. None leaves the value unchanged.</inlineHelpText><label
+  >Case Action</label><required>false</required><type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted
+      >false</sorted>
+        <value><fullName>NONE</fullName><default>true</default><label
+        >None</label></value>
+        <value><fullName>UPPER</fullName><default>false</default><label
+        >Upper Case</label></value>
+        <value><fullName>LOWER</fullName><default>false</default><label
+        >Lower Case</label></value>
+        <value><fullName>TITLE</fullName><default>false</default><label
+        >Title Case</label></value>
+    </valueSetDefinition></valueSet>
+</CustomField>

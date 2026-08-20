@@ -3,10 +3,14 @@
     <fullName>OverflowAction__c</fullName><description
   >Controls text that would exceed the Salesforce field length.</description>
     <inlineHelpText
-  >Version 2 rejects the row rather than silently truncating business data.</inlineHelpText><label
+  >Reject Row fails the row instead of silently truncating business data. Truncate cuts at the exact character limit; Truncate at Word Boundary backs off to the last whole word.</inlineHelpText><label
   >Text Overflow Action</label><required>false</required><type>Picklist</type>
     <valueSet><restricted>true</restricted><valueSetDefinition><sorted
       >false</sorted><value><fullName>REJECT</fullName><default
-        >true</default><label
-        >Reject Row</label></value></valueSetDefinition></valueSet>
+        >true</default><label>Reject Row</label></value>
+        <value><fullName>TRUNCATE</fullName><default>false</default><label
+        >Truncate</label></value>
+        <value><fullName>TRUNCATE_AT_WORD</fullName><default
+        >false</default><label>Truncate at Word Boundary</label></value>
+    </valueSetDefinition></valueSet>
 </CustomField>

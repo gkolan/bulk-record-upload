@@ -11,8 +11,8 @@ private with sharing class BulkRecordUploadJobTest {
     List<Bulk_Record_Upload_Chunk__c> chunks = new BulkRecordUploadStagingService()
       .stage(
         upload.Id,
-        new List<BulkRecordUploadRowV1>{
-          new BulkRecordUploadRowV1(
+        new List<BulkRecordUploadRow>{
+          new BulkRecordUploadRow(
             2,
             new Map<String, String>{ 'name' => 'Async Account' }
           )
@@ -71,8 +71,8 @@ private with sharing class BulkRecordUploadJobTest {
     new BulkRecordUploadStagingService()
       .stage(
         upload.Id,
-        new List<BulkRecordUploadRowV1>{
-          new BulkRecordUploadRowV1(
+        new List<BulkRecordUploadRow>{
+          new BulkRecordUploadRow(
             2,
             new Map<String, String>{ 'name' => 'Never logged' }
           )
@@ -97,10 +97,10 @@ private with sharing class BulkRecordUploadJobTest {
     Bulk_Record_Upload__c upload = BulkRecordUploadTestDataFactory.createUpload(
       'JOB_CHAIN'
     );
-    List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>();
+    List<BulkRecordUploadRow> rows = new List<BulkRecordUploadRow>();
     for (Integer index = 0; index < 26; index++) {
       rows.add(
-        new BulkRecordUploadRowV1(
+        new BulkRecordUploadRow(
           index + 2,
           new Map<String, String>{ 'name' => 'Chain ' + index }
         )
@@ -117,8 +117,8 @@ private with sharing class BulkRecordUploadJobTest {
     Assert.areEqual(1, queued);
   }
 
-  private static BulkRecordUploadProjectionV1 projection() {
-    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+  private static BulkRecordUploadProjection projection() {
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
       'name',
       'Name',
       'Name',
@@ -132,7 +132,7 @@ private with sharing class BulkRecordUploadJobTest {
       true,
       true
     );
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'JOB_SUCCESS',
       'hash',
       'Account',
@@ -140,15 +140,15 @@ private with sharing class BulkRecordUploadJobTest {
       new List<String>(),
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 
-  private static BulkRecordUploadProjectionV1 projectionWithExtensions(
+  private static BulkRecordUploadProjection projectionWithExtensions(
     String processKey,
     List<String> extensionClassNames
   ) {
-    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
       'name',
       'Name',
       'Name',
@@ -162,7 +162,7 @@ private with sharing class BulkRecordUploadJobTest {
       true,
       true
     );
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       processKey,
       'hash',
       'Account',
@@ -170,7 +170,7 @@ private with sharing class BulkRecordUploadJobTest {
       extensionClassNames,
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 
@@ -183,8 +183,8 @@ private with sharing class BulkRecordUploadJobTest {
     new BulkRecordUploadStagingService()
       .stage(
         upload.Id,
-        new List<BulkRecordUploadRowV1>{
-          new BulkRecordUploadRowV1(
+        new List<BulkRecordUploadRow>{
+          new BulkRecordUploadRow(
             2,
             new Map<String, String>{ 'name' => 'Ordered Account' }
           )
@@ -223,8 +223,8 @@ private with sharing class BulkRecordUploadJobTest {
     List<Bulk_Record_Upload_Chunk__c> chunks = new BulkRecordUploadStagingService()
       .stage(
         upload.Id,
-        new List<BulkRecordUploadRowV1>{
-          new BulkRecordUploadRowV1(
+        new List<BulkRecordUploadRow>{
+          new BulkRecordUploadRow(
             2,
             new Map<String, String>{ 'name' => 'Never persisted' }
           )
@@ -266,53 +266,53 @@ private with sharing class BulkRecordUploadJobTest {
   }
 
   /** Test-only extension proving configured sort order at both lifecycle phases. */
-  public class OrderExtensionA implements BulkRecordUploadExtensionV1 {
-    public List<BulkRecordUploadRowV1> beforeMap(
-      BulkRecordUploadProjectionV1 projection,
-      List<BulkRecordUploadRowV1> rows
+  public class OrderExtensionA implements BulkRecordUploadExtension {
+    public List<BulkRecordUploadRow> beforeMap(
+      BulkRecordUploadProjection projection,
+      List<BulkRecordUploadRow> rows
     ) {
       extensionCallLog.add('A-beforeMap');
       return rows;
     }
     public void afterProcess(
       Id uploadId,
-      BulkRecordUploadProjectionV1 projection,
-      List<BulkRecordUploadRowResultV1> outcomes
+      BulkRecordUploadProjection projection,
+      List<BulkRecordUploadRowResult> outcomes
     ) {
       extensionCallLog.add('A-afterProcess');
     }
   }
 
   /** Test-only extension proving configured sort order at both lifecycle phases. */
-  public class OrderExtensionB implements BulkRecordUploadExtensionV1 {
-    public List<BulkRecordUploadRowV1> beforeMap(
-      BulkRecordUploadProjectionV1 projection,
-      List<BulkRecordUploadRowV1> rows
+  public class OrderExtensionB implements BulkRecordUploadExtension {
+    public List<BulkRecordUploadRow> beforeMap(
+      BulkRecordUploadProjection projection,
+      List<BulkRecordUploadRow> rows
     ) {
       extensionCallLog.add('B-beforeMap');
       return rows;
     }
     public void afterProcess(
       Id uploadId,
-      BulkRecordUploadProjectionV1 projection,
-      List<BulkRecordUploadRowResultV1> outcomes
+      BulkRecordUploadProjection projection,
+      List<BulkRecordUploadRowResult> outcomes
     ) {
       extensionCallLog.add('B-afterProcess');
     }
   }
 
   /** Test-only extension proving a throwing extension fails the upload safely. */
-  public class ThrowingExtension implements BulkRecordUploadExtensionV1 {
-    public List<BulkRecordUploadRowV1> beforeMap(
-      BulkRecordUploadProjectionV1 projection,
-      List<BulkRecordUploadRowV1> rows
+  public class ThrowingExtension implements BulkRecordUploadExtension {
+    public List<BulkRecordUploadRow> beforeMap(
+      BulkRecordUploadProjection projection,
+      List<BulkRecordUploadRow> rows
     ) {
       throw new BulkRecordUploadException('Extension deliberately failed.');
     }
     public void afterProcess(
       Id uploadId,
-      BulkRecordUploadProjectionV1 projection,
-      List<BulkRecordUploadRowResultV1> outcomes
+      BulkRecordUploadProjection projection,
+      List<BulkRecordUploadRowResult> outcomes
     ) {
       return; // Intentionally empty: beforeMap always throws first.
     }

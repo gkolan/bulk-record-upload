@@ -14,7 +14,8 @@ fields — `BlankValueAction__c`, `ExistingValueAction__c`, `TextSeparator__c`,
 `DuplicateTextAction__c`, `OverflowAction__c` — driving
 `BulkRecordUploadFieldMergePolicy`. Both are visible to administrators.
 
-`BulkRecordUploadFieldConfigV1.cls:35-46` uses the legacy field only as a
+`BulkRecordUploadFieldConfig
+.cls:35-46` uses the legacy field only as a
 _default when the V2 field is blank_, which is correct precedence. But both V2
 picklists declare a default value in their metadata, so they are prefilled on
 every new configuration record and are effectively never blank. An administrator
@@ -53,10 +54,12 @@ Step 02 complete, so the deletion cites a recorded decision.
    caller. If any exists, stop and report.
 2. Delete those three classes and their `-meta.xml` files, and remove the unused
    `behaviors` field from `BulkRecordUploadRecordMapper`.
-3. Remove the `behavior` property from `BulkRecordUploadFieldProjectionV1`, its
+3. Remove the `behavior` property from `BulkRecordUploadFieldProjection
+`, its
    constructor parameter, and the argument passed at
    `BulkRecordUploadProjectionService.cls:268`. Demote
-   `BulkRecordUploadFieldConfigV1.behavior` from a public property to a local
+   `BulkRecordUploadFieldConfig
+.behavior` from a public property to a local
    variable used only by the translation.
 4. **The one intentional behavior change in this step.** At configuration load,
    if `ValueHandling__c` is populated _and_ the V2 field it would translate to is

@@ -6,11 +6,11 @@
  * is the package's one open extension point.
  */
 public with sharing class BulkRecordUploadProcessors {
-  public static final String STANDARD_DML_V1 = 'STANDARD_DML_V1';
+  public static final String STANDARD_DML = 'STANDARD_DML';
   /** Returns a fresh trusted processor. */
-  public BulkRecordUploadProcessorV1 resolve(String processorKey) {
-    if (String.isBlank(processorKey) || processorKey == STANDARD_DML_V1) {
-      return new BulkRecordUploadStandardProcessorV1();
+  public BulkRecordUploadProcessor resolve(String processorKey) {
+    if (String.isBlank(processorKey) || processorKey == STANDARD_DML) {
+      return new BulkRecordUploadStandardProcessor();
     }
     throw new BulkRecordUploadException(
       'The configured custom processor is not registered.'
@@ -18,6 +18,6 @@ public with sharing class BulkRecordUploadProcessors {
   }
   /** Reports whether a processor key is registered. */
   public static Boolean isRegistered(String processorKey) {
-    return String.isBlank(processorKey) || processorKey == STANDARD_DML_V1;
+    return String.isBlank(processorKey) || processorKey == STANDARD_DML;
   }
 }

@@ -2,17 +2,17 @@
 private with sharing class BulkRecordUploadRequestServiceTest {
   @IsTest
   static void submit_ValidRequest_StagesEnqueuesAndDeduplicates() {
-    BulkRecordUploadProjectionV1 projection = projection();
+    BulkRecordUploadProjection projection = projection();
     BulkRecordUploadRequestService.projectionOverride = projection;
     BulkRecordUploadJob.projectionOverride = projection;
-    BulkRecordUploadSubmitRequestV1 request = request(
+    BulkRecordUploadSubmitRequest request = request(
       'Name\r\nRequest Account\r\n'
     );
 
     Test.startTest();
-    BulkRecordUploadSubmissionV1 first = new BulkRecordUploadRequestService()
+    BulkRecordUploadSubmission first = new BulkRecordUploadRequestService()
       .submit(request);
-    BulkRecordUploadSubmissionV1 duplicate = new BulkRecordUploadRequestService()
+    BulkRecordUploadSubmission duplicate = new BulkRecordUploadRequestService()
       .submit(request);
     Test.stopTest();
 
@@ -31,7 +31,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
 
   @IsTest
   static void submit_InvalidIdempotencyKey_IsRejectedBeforeDml() {
-    BulkRecordUploadSubmitRequestV1 request = request('Name\nAcme\n');
+    BulkRecordUploadSubmitRequest request = request('Name\nAcme\n');
     request.idempotencyKey = 'not-a-key';
     try {
       new BulkRecordUploadRequestService().submit(request);
@@ -60,7 +60,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       new Set<String>{ 'Bulk_Record_Upload_User' }
     );
     System.runAs(userRecord) {
-      BulkRecordUploadProjectionV1 configuredProjection = projection();
+      BulkRecordUploadProjection configuredProjection = projection();
       BulkRecordUploadController.projectionOverride = configuredProjection;
       Bulk_Record_Upload__c matching = BulkRecordUploadTestDataFactory.createUpload(
         configuredProjection.processKey
@@ -68,7 +68,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       BulkRecordUploadTestDataFactory.createUpload('OTHER_PROCESS');
 
       Test.startTest();
-      List<BulkRecordUploadHistoryItemV1> history = BulkRecordUploadController.getHistory(
+      List<BulkRecordUploadHistoryItem> history = BulkRecordUploadController.getHistory(
         configuredProjection.processKey
       );
       Test.stopTest();
@@ -106,7 +106,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
   @IsTest
   static void controller_Presentation_ReturnsAuthorizedMetadataProjection() {
     BulkRecordUploadController.projectionOverride = projection();
-    BulkRecordUploadController.presentationOverride = new BulkRecordUploadPresentationV1(
+    BulkRecordUploadController.presentationOverride = new BulkRecordUploadPresentation(
       'REQUEST',
       'Upload account records.',
       '<p>Before uploading:</p><ul><li>Use the template.</li></ul>',
@@ -114,7 +114,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
     );
 
     Test.startTest();
-    BulkRecordUploadPresentationV1 presentation = BulkRecordUploadController.getProcessPresentation(
+    BulkRecordUploadPresentation presentation = BulkRecordUploadController.getProcessPresentation(
       'REQUEST'
     );
     Test.stopTest();
@@ -142,7 +142,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
 
   @IsTest
   static void submit_InvalidBase64_IsRejectedSafely() {
-    BulkRecordUploadSubmitRequestV1 request = request('Name\nAcme\n');
+    BulkRecordUploadSubmitRequest request = request('Name\nAcme\n');
     request.contentBase64 = '%%%invalid%%%';
     try {
       new BulkRecordUploadRequestService().submit(request);
@@ -160,10 +160,10 @@ private with sharing class BulkRecordUploadRequestServiceTest {
     Account parent = BulkRecordUploadTestDataFactory.createAccount(
       'Context Parent'
     );
-    BulkRecordUploadProjectionV1 projection = contextProjection();
+    BulkRecordUploadProjection projection = contextProjection();
     BulkRecordUploadRecordContextService service = new BulkRecordUploadRecordContextService();
-    List<BulkRecordUploadMappedRowV1> rows = new List<BulkRecordUploadMappedRowV1>{
-      new BulkRecordUploadMappedRowV1(2, new Contact(LastName = 'Child'))
+    List<BulkRecordUploadMappedRow> rows = new List<BulkRecordUploadMappedRow>{
+      new BulkRecordUploadMappedRow(2, new Contact(LastName = 'Child'))
     };
 
     Test.startTest();
@@ -200,7 +200,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       'Ineligible Parent',
       'Retail'
     );
-    BulkRecordUploadProjectionV1 projection = filteredContextProjection(
+    BulkRecordUploadProjection projection = filteredContextProjection(
       'Industry',
       '=',
       new List<String>{ 'Technology' }
@@ -233,7 +233,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
     Account nonMember = BulkRecordUploadTestDataFactory.createAccount(
       'Other Parent'
     );
-    BulkRecordUploadProjectionV1 projection = filteredContextProjection(
+    BulkRecordUploadProjection projection = filteredContextProjection(
       'Id',
       'IN',
       new List<String>{ member.Id }
@@ -252,12 +252,12 @@ private with sharing class BulkRecordUploadRequestServiceTest {
     Test.stopTest();
   }
 
-  private static BulkRecordUploadProjectionV1 filteredContextProjection(
+  private static BulkRecordUploadProjection filteredContextProjection(
     String fieldApiName,
     String operatorCode,
     List<String> values
   ) {
-    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
       'last name',
       'Last Name',
       'LastName',
@@ -271,39 +271,39 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       true,
       true
     );
-    BulkRecordUploadContextProjectionV1 contextProj = new BulkRecordUploadContextProjectionV1(
+    BulkRecordUploadContextProjection contextProj = new BulkRecordUploadContextProjection(
       'USER_CHOICE',
       'Name',
       new List<String>(),
       'Name',
       new List<String>(),
-      new List<BulkRecordUploadContextFilterConditionV1>{
-        new BulkRecordUploadContextFilterConditionV1(
+      new List<BulkRecordUploadContextFilterCondition>{
+        new BulkRecordUploadContextFilterCondition(
           fieldApiName,
           operatorCode,
           values
         )
       }
     );
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'CONTACT_FOR_ACCOUNT',
       'hash',
       'Contact',
       'INSERT',
       new List<String>(),
-      'STANDARD_DML_V1',
+      'STANDARD_DML',
       'REQUIRE_PARENT',
       'Account',
       'AccountId',
       contextProj,
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 
-  private static BulkRecordUploadSubmitRequestV1 request(String csv) {
-    BulkRecordUploadSubmitRequestV1 request = new BulkRecordUploadSubmitRequestV1();
+  private static BulkRecordUploadSubmitRequest request(String csv) {
+    BulkRecordUploadSubmitRequest request = new BulkRecordUploadSubmitRequest();
     request.processKey = 'REQUEST';
     request.fileName = 'request.csv';
     request.contentBase64 = EncodingUtil.base64Encode(Blob.valueOf(csv));
@@ -313,8 +313,8 @@ private with sharing class BulkRecordUploadRequestServiceTest {
     return request;
   }
 
-  private static BulkRecordUploadProjectionV1 projection() {
-    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+  private static BulkRecordUploadProjection projection() {
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
       'name',
       'Name',
       'Name',
@@ -328,7 +328,7 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       true,
       true
     );
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'REQUEST',
       'hash',
       'Account',
@@ -336,12 +336,12 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       new List<String>(),
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 
-  private static BulkRecordUploadProjectionV1 contextProjection() {
-    BulkRecordUploadFieldProjectionV1 field = new BulkRecordUploadFieldProjectionV1(
+  private static BulkRecordUploadProjection contextProjection() {
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
       'last name',
       'Last Name',
       'LastName',
@@ -355,20 +355,20 @@ private with sharing class BulkRecordUploadRequestServiceTest {
       true,
       true
     );
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'CONTACT_FOR_ACCOUNT',
       'hash',
       'Contact',
       'INSERT',
       new List<String>(),
-      'STANDARD_DML_V1',
+      'STANDARD_DML',
       'REQUIRE_PARENT',
       'Account',
       'AccountId',
       null,
       100,
       30,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 }

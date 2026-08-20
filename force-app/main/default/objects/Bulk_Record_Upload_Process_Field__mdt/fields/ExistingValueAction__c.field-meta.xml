@@ -3,7 +3,7 @@
     <fullName>ExistingValueAction__c</fullName><description
   >Controls how a nonblank CSV value combines with an existing Salesforce value.</description>
     <inlineHelpText
-  >Choose Replace for ordinary mapping. Append and Prepend are available only for text-like fields.</inlineHelpText><label
+  >Choose Replace for ordinary mapping. Append, Prepend, Add Values, and Remove Values are text-like or multi-select only. Add, Subtract, Use Later, and Use Earlier are numeric or date only. True If Either and True If Both are checkbox only.</inlineHelpText><label
   >Existing Value Action</label><required>false</required><type>Picklist</type>
     <valueSet><restricted>true</restricted><valueSetDefinition><sorted
       >false</sorted>
@@ -15,5 +15,23 @@
         >Append</label></value>
         <value><fullName>PREPEND</fullName><default>false</default><label
         >Prepend</label></value>
+        <value><fullName>ADD_VALUES</fullName><default>false</default><label
+        >Add Values</label></value>
+        <value><fullName>REMOVE_VALUES</fullName><default>false</default><label
+        >Remove Values</label></value>
+        <value><fullName>ADD</fullName><default>false</default><label
+        >Add</label></value>
+        <value><fullName>SUBTRACT</fullName><default>false</default><label
+        >Subtract</label></value>
+        <value><fullName>USE_LATER</fullName><default>false</default><label
+        >Use Later</label></value>
+        <value><fullName>USE_EARLIER</fullName><default>false</default><label
+        >Use Earlier</label></value>
+        <value><fullName>TRUE_IF_EITHER</fullName><default>false</default><label
+        >True If Either</label></value>
+        <value><fullName>TRUE_IF_BOTH</fullName><default>false</default><label
+        >True If Both</label></value>
+        <value><fullName>CUSTOM</fullName><default>false</default><label
+        >Custom</label></value>
     </valueSetDefinition></valueSet>
 </CustomField>

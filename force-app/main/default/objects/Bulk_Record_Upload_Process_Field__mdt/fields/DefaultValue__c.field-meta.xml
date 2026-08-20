@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DefaultValue__c</fullName><description
+  >Raw text value substituted for a blank CSV cell when Blank CSV Action is Use Default.</description>
+    <inlineHelpText
+  >Required only when Blank CSV Action is Use Default. Parsed the same way as an uploaded cell value.</inlineHelpText>
+    <label>Default Value</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

@@ -46,7 +46,8 @@ five.
 - **The DML path stays closed**, per ADR-0007. Extensions transform data; they
   never persist it. This is the containment that makes opening the seam safe:
   persistence remains in package-owned code running under user-mode enforcement.
-- **`BulkRecordUploadTrimHandlerV1` must survive** as a shipped implementation of
+- **`BulkRecordUploadTrimHandler
+` must survive** as a shipped implementation of
   the new interface. It is existing working behavior and a subscriber may be
   relying on `TRIM_TEXT_V1`. Do not drop it in the migration.
 - **The job remains the single readable lifecycle.** After this step the
@@ -60,8 +61,10 @@ One interface, two lifecycle phases matching the two points where the job alread
 calls out to reviewed code:
 
 ```
-public interface BulkRecordUploadExtensionV1 {
-  List<BulkRecordUploadRowV1> beforeMap(projection, rows);
+public interface BulkRecordUploadExtension
+ {
+  List<BulkRecordUploadRow
+> beforeMap(projection, rows);
   void afterProcess(uploadId, projection, outcomes);
 }
 ```
@@ -75,7 +78,8 @@ Multiple active extensions per process run in `SortOrder__c` order.
 
 Resolution validates at configuration load _and_ at resolve time:
 `Type.forName` returns a type, the type instantiates, and the instance is
-`instanceof BulkRecordUploadExtensionV1`. Any failure is a configuration error
+`instanceof BulkRecordUploadExtension
+`. Any failure is a configuration error
 naming the class, never a silent skip.
 
 ## Work
@@ -84,7 +88,8 @@ naming the class, never a silent skip.
    `Bulk_Record_Upload_Extension__mdt`.
 2. Add a resolver that validates and instantiates registered extensions, ordered,
    with a bounded count per process.
-3. Port `BulkRecordUploadTrimHandlerV1` and the standard handler to the new
+3. Port `BulkRecordUploadTrimHandler
+` and the standard handler to the new
    interface as shipped implementations.
 4. Replace the `HandlerRegistry` and `PostActionRegistry` calls in
    `BulkRecordUploadJob` with the single extension resolver, preserving the

@@ -26,7 +26,7 @@ private class BulkRecordUploadCsvReaderTest {
       'Lee,lee@example.test,done';
 
     Test.startTest();
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse(csvText);
     Test.stopTest();
 
@@ -55,7 +55,7 @@ private class BulkRecordUploadCsvReaderTest {
   @IsTest
   static void parse_EscapedQuote_ReturnsLiteralQuote() {
     Test.startTest();
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse('last_name,notes\nSmith,"said ""hello"""');
     Test.stopTest();
 
@@ -71,7 +71,7 @@ private class BulkRecordUploadCsvReaderTest {
     String bom = String.fromCharArray(new List<Integer>{ 65279 });
 
     Test.startTest();
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse(bom + 'Name\nAcme');
     Test.stopTest();
 
@@ -99,7 +99,7 @@ private class BulkRecordUploadCsvReaderTest {
     }
 
     Test.startTest();
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse(String.join(lines, '\n'));
     Test.stopTest();
 
@@ -141,7 +141,7 @@ private class BulkRecordUploadCsvReaderTest {
 
   @IsTest
   static void validate_RequiredConfiguredHeaders_AcceptsValidRows() {
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse('last_name,email\nSmith,smith@example.test');
 
     Test.startTest();
@@ -157,7 +157,7 @@ private class BulkRecordUploadCsvReaderTest {
 
   @IsTest
   static void validate_UnknownHeader_ThrowsSafeException() {
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse('last_name,unknown\nSmith,value');
     assertValidationFailure(
       parsed,
@@ -167,7 +167,7 @@ private class BulkRecordUploadCsvReaderTest {
 
   @IsTest
   static void validate_MissingRequiredHeader_ThrowsSafeException() {
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse('email\nsmith@example.test');
     assertValidationFailure(
       parsed,
@@ -177,7 +177,7 @@ private class BulkRecordUploadCsvReaderTest {
 
   @IsTest
   static void validate_HeaderOnly_ThrowsSafeException() {
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse('last_name,email');
     assertValidationFailure(
       parsed,
@@ -204,7 +204,7 @@ private class BulkRecordUploadCsvReaderTest {
   }
 
   private static void assertValidationFailure(
-    BulkRecordUploadParsedCsvV1 parsed,
+    BulkRecordUploadParsedCsv parsed,
     String expectedMessage
   ) {
     Test.startTest();
@@ -222,8 +222,8 @@ private class BulkRecordUploadCsvReaderTest {
     Test.stopTest();
   }
 
-  private static BulkRecordUploadProjectionV1 createProjection() {
-    return new BulkRecordUploadProjectionV1(
+  private static BulkRecordUploadProjection createProjection() {
+    return new BulkRecordUploadProjection(
       'CONTACT_INSERT',
       'hash',
       'Contact',
@@ -231,20 +231,20 @@ private class BulkRecordUploadCsvReaderTest {
       new List<String>(),
       100,
       90,
-      new List<BulkRecordUploadFieldProjectionV1>{
+      new List<BulkRecordUploadFieldProjection>{
         createField('last_name', 'LastName', 1, true),
         createField('email', 'Email', 2, false)
       }
     );
   }
 
-  private static BulkRecordUploadFieldProjectionV1 createField(
+  private static BulkRecordUploadFieldProjection createField(
     String columnKey,
     String fieldApiName,
     Integer sequence,
     Boolean isRequired
   ) {
-    return new BulkRecordUploadFieldProjectionV1(
+    return new BulkRecordUploadFieldProjection(
       columnKey,
       columnKey,
       fieldApiName,

@@ -3,7 +3,7 @@
     <fullName>BlankValueAction__c</fullName><description
   >Defines what a blank CSV cell means without overloading the existing-value rule.</description>
     <inlineHelpText
-  >Ignore keeps the Salesforce value, Clear removes it, and Reject Row returns a safe row error.</inlineHelpText><label
+  >Ignore keeps the Salesforce value, Clear removes it, Reject Row returns a safe row error, and Use Default substitutes the configured default value.</inlineHelpText><label
   >Blank CSV Action</label><required>false</required><type>Picklist</type>
     <valueSet><restricted>true</restricted><valueSetDefinition><sorted
       >false</sorted>
@@ -13,5 +13,7 @@
         >Clear Field</label></value>
         <value><fullName>REJECT</fullName><default>false</default><label
         >Reject Row</label></value>
+        <value><fullName>DEFAULT</fullName><default>false</default><label
+        >Use Default</label></value>
     </valueSetDefinition></valueSet>
 </CustomField>

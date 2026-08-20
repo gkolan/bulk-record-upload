@@ -1,5 +1,5 @@
 /**
- * Resolves the four version 1 operation strategies from an explicit
+ * Resolves the four supported operation strategies from an explicit
  * allowlist. Closed set, per ADR-0007: insert/update/upsert/delete are
  * package-owned code constants a subscriber selects by configuration, not an
  * extension point. Not named `Registry` for that reason.
@@ -13,7 +13,7 @@ public with sharing class BulkRecordUploadOperations {
   };
 
   /** Returns a strategy for an approved operation code. */
-  public BulkRecordUploadOperationStrategyV1 resolve(String operation) {
+  public BulkRecordUploadOperationStrategy resolve(String operation) {
     String canonical = operation == null
       ? null
       : operation.trim().toUpperCase();
@@ -22,6 +22,6 @@ public with sharing class BulkRecordUploadOperations {
         'The configured operation is not supported.'
       );
     }
-    return new BulkRecordUploadOperationStrategy(canonical);
+    return new BulkRecordUploadOperationValidator(canonical);
   }
 }

@@ -2,7 +2,7 @@
 private class BulkRecordUploadContextSourceServiceTest {
   @IsTest
   static void buildContextProjection_BlankFieldLists_DefaultToNameField() {
-    BulkRecordUploadContextProjectionV1 projection = new BulkRecordUploadContextSourceService()
+    BulkRecordUploadContextProjection projection = new BulkRecordUploadContextSourceService()
       .buildContextProjection('USER_CHOICE', 'Account', null, null, null);
 
     Assert.areEqual(
@@ -22,7 +22,7 @@ private class BulkRecordUploadContextSourceServiceTest {
 
   @IsTest
   static void buildContextProjection_ConfiguredLists_SeparatesPrimaryFromAdditional() {
-    BulkRecordUploadContextProjectionV1 projection = new BulkRecordUploadContextSourceService()
+    BulkRecordUploadContextProjection projection = new BulkRecordUploadContextSourceService()
       .buildContextProjection(
         'USER_CHOICE',
         'Account',
@@ -108,7 +108,7 @@ private class BulkRecordUploadContextSourceServiceTest {
   static void buildContextProjection_FilterCriteria_ParsesEqualsNotEqualsAndIn() {
     Account first = BulkRecordUploadTestDataFactory.createAccount('First');
     Account second = BulkRecordUploadTestDataFactory.createAccount('Second');
-    BulkRecordUploadContextProjectionV1 projection = new BulkRecordUploadContextSourceService()
+    BulkRecordUploadContextProjection projection = new BulkRecordUploadContextSourceService()
       .buildContextProjection(
         'USER_CHOICE',
         'Account',
@@ -176,8 +176,8 @@ private class BulkRecordUploadContextSourceServiceTest {
       .isEligible(
         'Account',
         matching.Id,
-        new List<BulkRecordUploadContextFilterConditionV1>{
-          new BulkRecordUploadContextFilterConditionV1(
+        new List<BulkRecordUploadContextFilterCondition>{
+          new BulkRecordUploadContextFilterCondition(
             'Industry',
             '=',
             new List<String>{ 'Technology' }
@@ -199,8 +199,8 @@ private class BulkRecordUploadContextSourceServiceTest {
       .isEligible(
         'Account',
         nonMatching.Id,
-        new List<BulkRecordUploadContextFilterConditionV1>{
-          new BulkRecordUploadContextFilterConditionV1(
+        new List<BulkRecordUploadContextFilterCondition>{
+          new BulkRecordUploadContextFilterCondition(
             'Industry',
             '=',
             new List<String>{ 'Technology' }
@@ -222,8 +222,8 @@ private class BulkRecordUploadContextSourceServiceTest {
       .isEligible(
         'Account',
         member.Id,
-        new List<BulkRecordUploadContextFilterConditionV1>{
-          new BulkRecordUploadContextFilterConditionV1(
+        new List<BulkRecordUploadContextFilterCondition>{
+          new BulkRecordUploadContextFilterCondition(
             'Id',
             'IN',
             new List<String>{ member.Id }
@@ -234,8 +234,8 @@ private class BulkRecordUploadContextSourceServiceTest {
       .isEligible(
         'Account',
         nonMember.Id,
-        new List<BulkRecordUploadContextFilterConditionV1>{
-          new BulkRecordUploadContextFilterConditionV1(
+        new List<BulkRecordUploadContextFilterCondition>{
+          new BulkRecordUploadContextFilterCondition(
             'Id',
             'IN',
             new List<String>{ member.Id }

@@ -56,7 +56,8 @@
       xsi:type="xsd:string"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >STANDARD_DML_V1</value>
+    >STANDARD_DML
+</value>
     </values>
     <values>
         <field>IsActive__c</field>

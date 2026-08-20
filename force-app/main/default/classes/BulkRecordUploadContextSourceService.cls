@@ -19,7 +19,7 @@ public with sharing class BulkRecordUploadContextSourceService {
    * @param rawFilterCriteria One FieldApiName:Operator:Value condition per line.
    * @throws BulkRecordUploadException naming the field, operator, or count that failed.
    */
-  public BulkRecordUploadContextProjectionV1 buildContextProjection(
+  public BulkRecordUploadContextProjection buildContextProjection(
     String recordContextSource,
     String hostObjectApiName,
     String rawSearchFields,
@@ -36,12 +36,12 @@ public with sharing class BulkRecordUploadContextSourceService {
     List<String> displayFields = parseFieldList(rawDisplayFields, nameField);
     validateFieldList(displayFields, fieldsByName, false);
 
-    List<BulkRecordUploadContextFilterConditionV1> conditions = parseFilterCriteria(
+    List<BulkRecordUploadContextFilterCondition> conditions = parseFilterCriteria(
       rawFilterCriteria,
       fieldsByName
     );
 
-    return new BulkRecordUploadContextProjectionV1(
+    return new BulkRecordUploadContextProjection(
       recordContextSource,
       searchFields[0],
       additionalFields(searchFields),
@@ -66,14 +66,14 @@ public with sharing class BulkRecordUploadContextSourceService {
   public Boolean isEligible(
     String hostObjectApiName,
     Id candidateId,
-    List<BulkRecordUploadContextFilterConditionV1> conditions
+    List<BulkRecordUploadContextFilterCondition> conditions
   ) {
     List<String> whereClauses = new List<String>{ 'Id = :candidateId' };
     Map<String, Object> binds = new Map<String, Object>{
       'candidateId' => candidateId
     };
     Integer bindIndex = 0;
-    for (BulkRecordUploadContextFilterConditionV1 condition : conditions) {
+    for (BulkRecordUploadContextFilterCondition condition : conditions) {
       String bindName = 'v' + bindIndex;
       bindIndex++;
       if (condition.operatorCode == 'IN') {
@@ -185,11 +185,11 @@ public with sharing class BulkRecordUploadContextSourceService {
     }
   }
 
-  private static List<BulkRecordUploadContextFilterConditionV1> parseFilterCriteria(
+  private static List<BulkRecordUploadContextFilterCondition> parseFilterCriteria(
     String rawFilterCriteria,
     Map<String, Schema.SObjectField> fieldsByName
   ) {
-    List<BulkRecordUploadContextFilterConditionV1> conditions = new List<BulkRecordUploadContextFilterConditionV1>();
+    List<BulkRecordUploadContextFilterCondition> conditions = new List<BulkRecordUploadContextFilterCondition>();
     if (String.isBlank(rawFilterCriteria)) {
       return conditions;
     }
@@ -243,7 +243,7 @@ public with sharing class BulkRecordUploadContextSourceService {
         );
       }
       conditions.add(
-        new BulkRecordUploadContextFilterConditionV1(
+        new BulkRecordUploadContextFilterCondition(
           fieldApiName,
           operatorCode,
           values

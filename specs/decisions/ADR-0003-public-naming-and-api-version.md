@@ -12,7 +12,7 @@ The unlocked package has no namespace. Use these project-owned forms:
 
 | Surface                                                       | Required form                                                              | Example pattern                  |
 | ------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------- |
-| Apex classes and interfaces                                   | `BulkRecordUpload` prefix                                                  | `BulkRecordUploadHandlerV1`      |
+| Apex classes and interfaces                                   | `BulkRecordUpload` prefix; no version-number suffix                        | `BulkRecordUploadExtension`      |
 | LWC folders                                                   | `bru` prefix followed by a task                                            | `bruUploadWorkspace`             |
 | Custom objects and Custom Metadata Types                      | `BulkRecordUpload_` label/API prefix                                       | `Bulk_Record_Upload__c`          |
 | Custom fields on project objects                              | Descriptive API name; object already supplies `BulkRecordUpload_` boundary | `Status__c`                      |
@@ -37,6 +37,8 @@ Every release validates fresh install on the current supported release, upgrade 
 ## Collision and compatibility consequences
 
 No-namespace global metadata names are subscriber-org commitments. Renaming Apex, LWC, objects, fields, permissions, or stored machine values requires the compatibility process and usually a major version. Labels may change when API identity and meaning remain stable and documentation records the new label.
+
+**2026-08-19 amendment:** the `V1` suffix originally required above (and applied to ~22 Apex classes/interfaces) is dropped. Nothing has shipped to a subscriber org, so no compatibility commitment exists yet; the suffix implied a legacy/successor relationship this pre-release product does not have. Public names carry no version number. The compatibility process above still governs any rename after first release.
 
 ## Related
 

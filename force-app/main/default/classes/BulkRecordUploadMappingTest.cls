@@ -2,12 +2,12 @@
 private class BulkRecordUploadMappingTest {
   @IsTest
   static void mapper_ConfiguredFieldsOnly_CoercesAndCorrelates() {
-    List<BulkRecordUploadFieldProjectionV1> fields = new List<BulkRecordUploadFieldProjectionV1>{
+    List<BulkRecordUploadFieldProjection> fields = new List<BulkRecordUploadFieldProjection>{
       field('name', 'Name', 'STRING', 'REPLACE', 1),
       field('employees', 'NumberOfEmployees', 'INTEGER', 'REPLACE', 2)
     };
-    BulkRecordUploadProjectionV1 projection = projection(fields);
-    BulkRecordUploadRowV1 row = new BulkRecordUploadRowV1(
+    BulkRecordUploadProjection projection = projection(fields);
+    BulkRecordUploadRow row = new BulkRecordUploadRow(
       7,
       new Map<String, String>{
         'name' => 'Acme',
@@ -16,8 +16,8 @@ private class BulkRecordUploadMappingTest {
       }
     );
 
-    List<BulkRecordUploadMappedRowV1> mapped = new BulkRecordUploadRecordMapper()
-      .mapRows(projection, new List<BulkRecordUploadRowV1>{ row });
+    List<BulkRecordUploadMappedRow> mapped = new BulkRecordUploadRecordMapper()
+      .mapRows(projection, new List<BulkRecordUploadRow>{ row });
 
     Assert.areEqual(7, mapped[0].rowNumber);
     Assert.areEqual('Acme', mapped[0].record.get('Name'));
@@ -29,7 +29,7 @@ private class BulkRecordUploadMappingTest {
 
   @IsTest
   static void mergePolicy_AppendSeparatorDuplicateAndOverflow_AreSafe() {
-    BulkRecordUploadFieldProjectionV1 appendField = new BulkRecordUploadFieldProjectionV1(
+    BulkRecordUploadFieldProjection appendField = new BulkRecordUploadFieldProjection(
       'description',
       'Description',
       'Description',
@@ -71,7 +71,7 @@ private class BulkRecordUploadMappingTest {
 
   @IsTest
   static void mergePolicy_BlankActions_AreIndependent() {
-    BulkRecordUploadFieldProjectionV1 clearField = new BulkRecordUploadFieldProjectionV1(
+    BulkRecordUploadFieldProjection clearField = new BulkRecordUploadFieldProjection(
       'description',
       'Description',
       'Description',
@@ -96,34 +96,290 @@ private class BulkRecordUploadMappingTest {
   }
 
   @IsTest
-  static void coercer_SupportedScalarTypes_ReturnTypedValues() {
-    BulkRecordUploadValueCoercer coercer = new BulkRecordUploadValueCoercer();
-    Assert.areEqual(true, coercer.coerce('yes', 'BOOLEAN'));
-    Assert.areEqual(12.5, coercer.coerce('12.5', 'CURRENCY'));
+  static void mergePolicy_NumericAddSubtract_AppliesArithmetic() {
+    BulkRecordUploadFieldProjection addField = numericField('ADD', 'CURRENCY');
+    BulkRecordUploadFieldProjection subtractField = numericField(
+      'SUBTRACT',
+      'INTEGER'
+    );
+    BulkRecordUploadFieldMergePolicy policy = new BulkRecordUploadFieldMergePolicy();
+    Assert.areEqual(15.0, policy.applyPolicy(addField, 10.0, 5.0, null));
+    Assert.areEqual(7, policy.applyPolicy(subtractField, 10, 3, null));
+  }
+
+  @IsTest
+  static void mergePolicy_DateUseLaterEarlier_PicksCorrectDate() {
+    BulkRecordUploadFieldProjection laterField = dateField('USE_LATER');
+    BulkRecordUploadFieldProjection earlierField = dateField('USE_EARLIER');
+    BulkRecordUploadFieldMergePolicy policy = new BulkRecordUploadFieldMergePolicy();
+    Date existingDate = Date.newInstance(2026, 1, 1);
+    Date incomingDate = Date.newInstance(2026, 6, 1);
     Assert.areEqual(
-      Date.newInstance(2026, 8, 12),
-      coercer.coerce('2026-08-12', 'DATE')
+      incomingDate,
+      policy.applyPolicy(laterField, existingDate, incomingDate, null)
+    );
+    Assert.areEqual(
+      existingDate,
+      policy.applyPolicy(earlierField, existingDate, incomingDate, null)
     );
   }
 
   @IsTest
-  static void coercer_InvalidValue_RedactsRawInput() {
+  static void mergePolicy_BooleanEitherBoth_AppliesLogic() {
+    BulkRecordUploadFieldProjection eitherField = booleanField(
+      'TRUE_IF_EITHER'
+    );
+    BulkRecordUploadFieldProjection bothField = booleanField('TRUE_IF_BOTH');
+    BulkRecordUploadFieldMergePolicy policy = new BulkRecordUploadFieldMergePolicy();
+    Assert.areEqual(true, policy.applyPolicy(eitherField, false, true, null));
+    Assert.areEqual(false, policy.applyPolicy(bothField, false, true, null));
+  }
+
+  @IsTest
+  static void mergePolicy_MultiPicklistAddRemoveValues_AppliesSetSemantics() {
+    BulkRecordUploadFieldProjection addValuesField = multiPicklistField(
+      'ADD_VALUES'
+    );
+    BulkRecordUploadFieldProjection removeValuesField = multiPicklistField(
+      'REMOVE_VALUES'
+    );
+    BulkRecordUploadFieldMergePolicy policy = new BulkRecordUploadFieldMergePolicy();
+    Assert.areEqual(
+      'A;B;C',
+      policy.applyPolicy(addValuesField, 'A;B', 'B;C', null)
+    );
+    Assert.areEqual(
+      'A',
+      policy.applyPolicy(removeValuesField, 'A;B', 'B', null)
+    );
+  }
+
+  @IsTest
+  static void mergePolicy_CustomSeparator_UsesConfiguredText() {
+    BulkRecordUploadFieldProjection customField = new BulkRecordUploadFieldProjection(
+      'description',
+      'Description',
+      'Description',
+      'TEXTAREA',
+      'APPEND',
+      'IGNORE',
+      'CUSTOM',
+      ' | ',
+      'SKIP',
+      'REJECT',
+      null,
+      false,
+      'NONE',
+      new Set<String>(),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    Assert.areEqual(
+      'Existing | Incoming',
+      new BulkRecordUploadFieldMergePolicy()
+        .applyPolicy(customField, 'Existing', 'Incoming', 100)
+    );
+  }
+
+  @IsTest
+  static void mergePolicy_UnsupportedActionForType_ThrowsDomainException() {
+    BulkRecordUploadFieldProjection invalidField = numericField(
+      'ADD',
+      'STRING'
+    );
     try {
-      new BulkRecordUploadValueCoercer().coerce('sensitive-value', 'INTEGER');
-      Assert.fail('Expected invalid-format exception.');
+      new BulkRecordUploadFieldMergePolicy()
+        .applyPolicy(invalidField, 'Existing', 'Incoming', null);
+      Assert.fail('Expected an unsupported-action exception.');
     } catch (BulkRecordUploadException error) {
-      Assert.areEqual(
-        'A field value has an invalid format.',
-        error.getMessage()
-      );
-      Assert.isFalse(error.getMessage().contains('sensitive-value'));
+      Assert.isTrue(error.getMessage().contains('not supported'));
     }
   }
 
-  private static BulkRecordUploadProjectionV1 projection(
-    List<BulkRecordUploadFieldProjectionV1> fields
+  @IsTest
+  static void mergePolicy_CustomStrategy_DispatchesToRegisteredClass() {
+    BulkRecordUploadFieldProjection customField = new BulkRecordUploadFieldProjection(
+      'description',
+      'Description',
+      'Description',
+      'TEXTAREA',
+      'CUSTOM',
+      'IGNORE',
+      'SPACE',
+      null,
+      'SKIP',
+      'REJECT',
+      null,
+      false,
+      'NONE',
+      new Set<String>(),
+      'BulkRecordUploadLongerTextStrategy',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    Assert.areEqual(
+      'Existing Longer',
+      new BulkRecordUploadFieldMergePolicy()
+        .applyPolicy(customField, 'Short', 'Existing Longer', null)
+    );
+  }
+
+  @IsTest
+  static void mergePolicy_CustomStrategyUnregistered_ThrowsDomainException() {
+    BulkRecordUploadFieldProjection customField = new BulkRecordUploadFieldProjection(
+      'description',
+      'Description',
+      'Description',
+      'TEXTAREA',
+      'CUSTOM',
+      'IGNORE',
+      'SPACE',
+      null,
+      'SKIP',
+      'REJECT',
+      null,
+      false,
+      'NONE',
+      new Set<String>(),
+      'NotARealClass',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    try {
+      new BulkRecordUploadFieldMergePolicy()
+        .applyPolicy(customField, 'Existing', 'Incoming', null);
+      Assert.fail('Expected an unregistered custom strategy exception.');
+    } catch (BulkRecordUploadException error) {
+      Assert.isTrue(error.getMessage().contains('is not registered'));
+    }
+  }
+
+  @IsTest
+  static void mergeStrategyRegistry_ValidAndInvalidClassNames_ResolveOrThrow() {
+    BulkRecordUploadMergeStrategyRegistry registry = new BulkRecordUploadMergeStrategyRegistry();
+    Assert.isInstanceOfType(
+      registry.resolve('BulkRecordUploadLongerTextStrategy'),
+      BulkRecordUploadFieldMergeStrategy.class
+    );
+    try {
+      registry.resolve('BulkRecordUploadFieldConfig');
+      Assert.fail('Expected a non-implementing class to be rejected.');
+    } catch (BulkRecordUploadException error) {
+      Assert.isTrue(error.getMessage().contains('is not registered'));
+    }
+  }
+
+  @IsTest
+  static void mergePolicy_OverflowTruncateAndTruncateAtWord_ShortensText() {
+    BulkRecordUploadFieldProjection truncateField = new BulkRecordUploadFieldProjection(
+      'description',
+      'Description',
+      'Description',
+      'TEXTAREA',
+      'APPEND',
+      'IGNORE',
+      'SPACE',
+      null,
+      'SKIP',
+      'TRUNCATE',
+      null,
+      false,
+      'NONE',
+      new Set<String>(),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    BulkRecordUploadFieldProjection truncateAtWordField = new BulkRecordUploadFieldProjection(
+      'description',
+      'Description',
+      'Description',
+      'TEXTAREA',
+      'APPEND',
+      'IGNORE',
+      'SPACE',
+      null,
+      'SKIP',
+      'TRUNCATE_AT_WORD',
+      null,
+      false,
+      'NONE',
+      new Set<String>(),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    BulkRecordUploadFieldMergePolicy policy = new BulkRecordUploadFieldMergePolicy();
+    Assert.areEqual(
+      'Existin g Ov',
+      policy.applyPolicy(truncateField, 'Existin', 'g Overflow', 12)
+    );
+    Assert.areEqual(
+      'Existin g',
+      policy.applyPolicy(truncateAtWordField, 'Existin', 'g Overflow', 12)
+    );
+  }
+
+  private static BulkRecordUploadProjection projection(
+    List<BulkRecordUploadFieldProjection> fields
   ) {
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       'ACCOUNT_INSERT',
       'hash',
       'Account',
@@ -135,14 +391,14 @@ private class BulkRecordUploadMappingTest {
     );
   }
 
-  private static BulkRecordUploadFieldProjectionV1 field(
+  private static BulkRecordUploadFieldProjection field(
     String columnKey,
     String apiName,
     String fieldType,
     String existingValueAction,
     Integer sequence
   ) {
-    return new BulkRecordUploadFieldProjectionV1(
+    return new BulkRecordUploadFieldProjection(
       columnKey,
       columnKey,
       apiName,
@@ -150,6 +406,83 @@ private class BulkRecordUploadMappingTest {
       existingValueAction,
       sequence,
       true,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+  }
+
+  private static BulkRecordUploadFieldProjection numericField(
+    String existingValueAction,
+    String fieldType
+  ) {
+    return new BulkRecordUploadFieldProjection(
+      'amount',
+      'Amount',
+      'Amount',
+      fieldType,
+      existingValueAction,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+  }
+
+  private static BulkRecordUploadFieldProjection dateField(
+    String existingValueAction
+  ) {
+    return new BulkRecordUploadFieldProjection(
+      'closeDate',
+      'Close Date',
+      'CloseDate',
+      'DATE',
+      existingValueAction,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+  }
+
+  private static BulkRecordUploadFieldProjection booleanField(
+    String existingValueAction
+  ) {
+    return new BulkRecordUploadFieldProjection(
+      'active',
+      'Active',
+      'IsActive',
+      'BOOLEAN',
+      existingValueAction,
+      1,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+  }
+
+  private static BulkRecordUploadFieldProjection multiPicklistField(
+    String existingValueAction
+  ) {
+    return new BulkRecordUploadFieldProjection(
+      'tags',
+      'Tags',
+      'Tags',
+      'MULTIPICKLIST',
+      existingValueAction,
+      1,
+      false,
       false,
       false,
       true,

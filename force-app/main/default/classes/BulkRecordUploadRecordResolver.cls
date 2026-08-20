@@ -2,12 +2,12 @@
 public with sharing class BulkRecordUploadRecordResolver {
   /** Assigns matching record Ids to mapped rows while preserving rows with no match for safe partial failure. */
   public void assignRecordIds(
-    BulkRecordUploadProjectionV1 projection,
-    List<BulkRecordUploadMappedRowV1> rows
+    BulkRecordUploadProjection projection,
+    List<BulkRecordUploadMappedRow> rows
   ) {
-    BulkRecordUploadFieldProjectionV1 matchField = findMatchField(projection);
+    BulkRecordUploadFieldProjection matchField = findMatchField(projection);
     Set<String> matchValues = new Set<String>();
-    for (BulkRecordUploadMappedRowV1 row : rows) {
+    for (BulkRecordUploadMappedRow row : rows) {
       Object value = row.record.get(matchField.fieldApiName);
       if (value != null) {
         matchValues.add(String.valueOf(value));
@@ -36,7 +36,7 @@ public with sharing class BulkRecordUploadRecordResolver {
         (Id) match.get('Id')
       );
     }
-    for (BulkRecordUploadMappedRowV1 row : rows) {
+    for (BulkRecordUploadMappedRow row : rows) {
       String value = String.valueOf(row.record.get(matchField.fieldApiName));
       if (idsByValue.containsKey(value)) {
         row.record.put('Id', idsByValue.get(value));
@@ -44,10 +44,10 @@ public with sharing class BulkRecordUploadRecordResolver {
     }
   }
 
-  private static BulkRecordUploadFieldProjectionV1 findMatchField(
-    BulkRecordUploadProjectionV1 projection
+  private static BulkRecordUploadFieldProjection findMatchField(
+    BulkRecordUploadProjection projection
   ) {
-    for (BulkRecordUploadFieldProjectionV1 field : projection.getFields()) {
+    for (BulkRecordUploadFieldProjection field : projection.getFields()) {
       if (field.isMatchKey) {
         return field;
       }

@@ -12,7 +12,7 @@ public with sharing class BulkRecordUploadSelectionService {
    * @param bundleDeveloperName Developer Name of the configured bundle.
    * @return Bundle-scoped process choices in configured display order.
    */
-  public BulkRecordUploadSelectionV1 resolve(String bundleDeveloperName) {
+  public BulkRecordUploadSelection resolve(String bundleDeveloperName) {
     new BulkRecordUploadAccessPolicy().requireRunPermission();
     String bundleName = bundleDeveloperName?.trim();
     Bulk_Record_Upload_Bundle__mdt bundle = bundles().get(bundleName);
@@ -21,7 +21,7 @@ public with sharing class BulkRecordUploadSelectionService {
         'The configured upload bundle is unavailable.'
       );
     }
-    List<BulkRecordUploadProcessOptionV1> options = new List<BulkRecordUploadProcessOptionV1>();
+    List<BulkRecordUploadProcessOption> options = new List<BulkRecordUploadProcessOption>();
     List<AssignmentOption> orderedAssignments = new List<AssignmentOption>();
     for (
       Bulk_Record_Upload_Bundle_Process__mdt assignment : assignments().values()
@@ -50,7 +50,7 @@ public with sharing class BulkRecordUploadSelectionService {
         'No active upload process is available.'
       );
     }
-    return new BulkRecordUploadSelectionV1('AVAILABLE', null, options);
+    return new BulkRecordUploadSelection('AVAILABLE', null, options);
   }
 
   private static Boolean isActive(Bulk_Record_Upload_Process__mdt process) {
@@ -60,10 +60,10 @@ public with sharing class BulkRecordUploadSelectionService {
       process.ConfigurationVersion__c == 2);
   }
 
-  private static BulkRecordUploadProcessOptionV1 option(
+  private static BulkRecordUploadProcessOption option(
     Bulk_Record_Upload_Process__mdt process
   ) {
-    return new BulkRecordUploadProcessOptionV1(
+    return new BulkRecordUploadProcessOption(
       displayLabel(process.MasterLabel, process.DeveloperName),
       process.DeveloperName
     );

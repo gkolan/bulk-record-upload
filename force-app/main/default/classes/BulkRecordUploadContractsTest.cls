@@ -1,14 +1,14 @@
 /**
- * Verifies version 1 value-object invariants and defensive collection copies.
+ * Verifies value-object invariants and defensive collection copies.
  */
 @IsTest
 private class BulkRecordUploadContractsTest {
   @IsTest
   static void projection_ValidInput_PreservesBoundedContract() {
-    BulkRecordUploadFieldProjectionV1 field = createField(1);
+    BulkRecordUploadFieldProjection field = createField(1);
 
     Test.startTest();
-    BulkRecordUploadProjectionV1 projection = new BulkRecordUploadProjectionV1(
+    BulkRecordUploadProjection projection = new BulkRecordUploadProjection(
       'CONTACT_INSERT',
       'hash-1',
       'Contact',
@@ -16,7 +16,7 @@ private class BulkRecordUploadContractsTest {
       new List<String>(),
       100,
       90,
-      new List<BulkRecordUploadFieldProjectionV1>{ field }
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
     Test.stopTest();
 
@@ -41,7 +41,7 @@ private class BulkRecordUploadContractsTest {
   static void projection_BatchBelowMinimum_ThrowsDomainException() {
     Test.startTest();
     try {
-      new BulkRecordUploadProjectionV1(
+      new BulkRecordUploadProjection(
         'CONTACT_INSERT',
         'hash-1',
         'Contact',
@@ -49,7 +49,7 @@ private class BulkRecordUploadContractsTest {
         new List<String>(),
         24,
         90,
-        new List<BulkRecordUploadFieldProjectionV1>{ createField(1) }
+        new List<BulkRecordUploadFieldProjection>{ createField(1) }
       );
       Assert.fail('Expected an invalid batch size to fail.');
     } catch (BulkRecordUploadException exceptionValue) {
@@ -63,14 +63,14 @@ private class BulkRecordUploadContractsTest {
 
   @IsTest
   static void projection_MoreThanOneHundredFields_ThrowsDomainException() {
-    List<BulkRecordUploadFieldProjectionV1> fields = new List<BulkRecordUploadFieldProjectionV1>();
+    List<BulkRecordUploadFieldProjection> fields = new List<BulkRecordUploadFieldProjection>();
     for (Integer sequence = 1; sequence <= 101; sequence++) {
       fields.add(createField(sequence));
     }
 
     Test.startTest();
     try {
-      new BulkRecordUploadProjectionV1(
+      new BulkRecordUploadProjection(
         'CONTACT_INSERT',
         'hash-1',
         'Contact',
@@ -97,7 +97,7 @@ private class BulkRecordUploadContractsTest {
     };
 
     Test.startTest();
-    BulkRecordUploadRowV1 row = new BulkRecordUploadRowV1(2, originalValues);
+    BulkRecordUploadRow row = new BulkRecordUploadRow(2, originalValues);
     originalValues.put('email', 'changed@example.test');
     Map<String, String> returnedValues = row.getValuesByColumn();
     returnedValues.put('email', 'also-changed@example.test');
@@ -114,7 +114,7 @@ private class BulkRecordUploadContractsTest {
   static void row_HeaderRowNumber_ThrowsDomainException() {
     Test.startTest();
     try {
-      new BulkRecordUploadRowV1(1, new Map<String, String>());
+      new BulkRecordUploadRow(1, new Map<String, String>());
       Assert.fail('Expected the header row number to fail.');
     } catch (BulkRecordUploadException exceptionValue) {
       Assert.isTrue(
@@ -129,7 +129,7 @@ private class BulkRecordUploadContractsTest {
   static void rowResult_FailureWithoutCode_ThrowsDomainException() {
     Test.startTest();
     try {
-      new BulkRecordUploadRowResultV1(2, false, null, null, 'Safe guidance');
+      new BulkRecordUploadRowResult(2, false, null, null, 'Safe guidance');
       Assert.fail('Expected a failed result without a code to fail.');
     } catch (BulkRecordUploadException exceptionValue) {
       Assert.isTrue(
@@ -143,7 +143,7 @@ private class BulkRecordUploadContractsTest {
   @IsTest
   static void rowResult_Success_PreservesSafeOutcome() {
     Test.startTest();
-    BulkRecordUploadRowResultV1 result = new BulkRecordUploadRowResultV1(
+    BulkRecordUploadRowResult result = new BulkRecordUploadRowResult(
       2,
       true,
       UserInfo.getUserId(),
@@ -175,7 +175,7 @@ private class BulkRecordUploadContractsTest {
   @IsTest
   static void rowResult_ValidFailure_TrimsSafeDetails() {
     Test.startTest();
-    BulkRecordUploadRowResultV1 result = new BulkRecordUploadRowResultV1(
+    BulkRecordUploadRowResult result = new BulkRecordUploadRowResult(
       3,
       false,
       null,
@@ -236,10 +236,8 @@ private class BulkRecordUploadContractsTest {
     );
   }
 
-  private static BulkRecordUploadFieldProjectionV1 createField(
-    Integer sequence
-  ) {
-    return new BulkRecordUploadFieldProjectionV1(
+  private static BulkRecordUploadFieldProjection createField(Integer sequence) {
+    return new BulkRecordUploadFieldProjection(
       'email_' + sequence,
       'Email ' + sequence,
       'Email',

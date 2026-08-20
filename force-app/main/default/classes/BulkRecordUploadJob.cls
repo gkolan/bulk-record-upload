@@ -7,7 +7,7 @@
 @SuppressWarnings('PMD.QueueableWithoutFinalizer')
 public with sharing class BulkRecordUploadJob implements Queueable, Database.Batchable<Bulk_Record_Upload_Chunk__c> {
   @TestVisible
-  private static BulkRecordUploadProjectionV1 projectionOverride;
+  private static BulkRecordUploadProjection projectionOverride;
   private final Id uploadId;
   private final Decimal sequence;
 
@@ -93,24 +93,26 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
       verifyChecksum(chunk);
       chunk.Status__c = BulkRecordUploadRuntimeContract.CHUNK_PROCESSING;
       update as system chunk;
-      BulkRecordUploadProjectionV1 projection = projectionOverride == null
+      BulkRecordUploadProjection projection = projectionOverride == null
         ? new BulkRecordUploadProjectionService()
             .getProjection(upload.ProcessDeveloperName__c)
         : projectionOverride;
       new BulkRecordUploadOperations()
         .resolve(projection.operation)
         .validateProjection(projection);
-      List<BulkRecordUploadRowV1> rows = (List<BulkRecordUploadRowV1>) JSON.deserialize(
+      List<BulkRecordUploadRow> rows = (List<BulkRecordUploadRow>) JSON.deserialize(
         chunk.StagedRowData__c,
-        List<BulkRecordUploadRowV1>.class
+        List<BulkRecordUploadRow>.class
       );
-      List<BulkRecordUploadExtensionV1> extensions = new BulkRecordUploadExtensionRegistry()
+      List<BulkRecordUploadExtension> extensions = new BulkRecordUploadExtensionRegistry()
         .resolve(projection.extensionClassNames);
-      for (BulkRecordUploadExtensionV1 extension : extensions) {
+      for (BulkRecordUploadExtension extension : extensions) {
         rows = extension.beforeMap(projection, rows);
       }
-      List<BulkRecordUploadMappedRowV1> mapped = new BulkRecordUploadRecordMapper()
-        .mapRows(projection, rows);
+      Map<String, Map<String, Id>> lookupResolutions = new BulkRecordUploadLookupResolver()
+        .resolve(projection, rows);
+      List<BulkRecordUploadMappedRow> mapped = new BulkRecordUploadRecordMapper()
+        .mapRows(projection, rows, lookupResolutions);
       if (
         projection.operation == 'UPDATE' ||
         projection.operation == 'UPSERT' ||
@@ -129,11 +131,11 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
       new BulkRecordUploadRecordContextService()
         .applyContext(projection, upload.ContextRecordId__c, mapped);
       Schema.SObjectField upsertField = resolveUpsertField(projection);
-      List<BulkRecordUploadRowResultV1> outcomes = new BulkRecordUploadProcessors()
+      List<BulkRecordUploadRowResult> outcomes = new BulkRecordUploadProcessors()
         .resolve(projection.processorKey)
         .process(projection, mapped, upsertField);
       persistenceCompleted = true;
-      for (BulkRecordUploadExtensionV1 extension : extensions) {
+      for (BulkRecordUploadExtension extension : extensions) {
         extension.afterProcess(uploadId, projection, outcomes);
       }
       chunk.StagedRowData__c = new BulkRecordUploadResultWriter()
@@ -163,11 +165,11 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
   }
 
   private static Integer countOutcomes(
-    List<BulkRecordUploadRowResultV1> outcomes,
+    List<BulkRecordUploadRowResult> outcomes,
     Boolean successes
   ) {
     Integer countValue = 0;
-    for (BulkRecordUploadRowResultV1 outcome : outcomes) {
+    for (BulkRecordUploadRowResult outcome : outcomes) {
       if (outcome.isSuccess == successes) {
         countValue++;
       }
@@ -220,13 +222,13 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
   }
 
   private static Schema.SObjectField resolveUpsertField(
-    BulkRecordUploadProjectionV1 projection
+    BulkRecordUploadProjection projection
   ) {
     if (projection.operation != 'UPSERT') {
       return null;
     }
     String upsertFieldName;
-    for (BulkRecordUploadFieldProjectionV1 field : projection.getFields()) {
+    for (BulkRecordUploadFieldProjection field : projection.getFields()) {
       if (field.isUpsertKey) {
         upsertFieldName = field.fieldApiName;
         break;

@@ -1,9 +1,9 @@
 /** Performs partial user-mode DML and preserves mapped-row correlation. */
 public with sharing class BulkRecordUploadPersistenceGateway {
   /** Persists one bounded collection using its approved operation and optional upsert field. */
-  public List<BulkRecordUploadRowResultV1> persist(
+  public List<BulkRecordUploadRowResult> persist(
     String operation,
-    List<BulkRecordUploadMappedRowV1> rows,
+    List<BulkRecordUploadMappedRow> rows,
     Schema.SObjectField upsertField
   ) {
     if (
@@ -16,7 +16,7 @@ public with sharing class BulkRecordUploadPersistenceGateway {
       );
     }
     List<SObject> records = new List<SObject>();
-    for (BulkRecordUploadMappedRowV1 row : rows) {
+    for (BulkRecordUploadMappedRow row : rows) {
       records.add(row.record);
     }
     String canonical = operation == null ? '' : operation.toUpperCase();
@@ -49,11 +49,11 @@ public with sharing class BulkRecordUploadPersistenceGateway {
     );
   }
 
-  private static List<BulkRecordUploadRowResultV1> correlateSave(
-    List<BulkRecordUploadMappedRowV1> rows,
+  private static List<BulkRecordUploadRowResult> correlateSave(
+    List<BulkRecordUploadMappedRow> rows,
     List<Database.SaveResult> outcomes
   ) {
-    List<BulkRecordUploadRowResultV1> results = new List<BulkRecordUploadRowResultV1>();
+    List<BulkRecordUploadRowResult> results = new List<BulkRecordUploadRowResult>();
     for (Integer index = 0; index < outcomes.size(); index++) {
       Database.SaveResult outcome = outcomes[index];
       results.add(
@@ -68,11 +68,11 @@ public with sharing class BulkRecordUploadPersistenceGateway {
     return results;
   }
 
-  private static List<BulkRecordUploadRowResultV1> correlateUpsert(
-    List<BulkRecordUploadMappedRowV1> rows,
+  private static List<BulkRecordUploadRowResult> correlateUpsert(
+    List<BulkRecordUploadMappedRow> rows,
     List<Database.UpsertResult> outcomes
   ) {
-    List<BulkRecordUploadRowResultV1> results = new List<BulkRecordUploadRowResultV1>();
+    List<BulkRecordUploadRowResult> results = new List<BulkRecordUploadRowResult>();
     for (Integer index = 0; index < outcomes.size(); index++) {
       Database.UpsertResult outcome = outcomes[index];
       results.add(
@@ -87,11 +87,11 @@ public with sharing class BulkRecordUploadPersistenceGateway {
     return results;
   }
 
-  private static List<BulkRecordUploadRowResultV1> correlateDelete(
-    List<BulkRecordUploadMappedRowV1> rows,
+  private static List<BulkRecordUploadRowResult> correlateDelete(
+    List<BulkRecordUploadMappedRow> rows,
     List<Database.DeleteResult> outcomes
   ) {
-    List<BulkRecordUploadRowResultV1> results = new List<BulkRecordUploadRowResultV1>();
+    List<BulkRecordUploadRowResult> results = new List<BulkRecordUploadRowResult>();
     for (Integer index = 0; index < outcomes.size(); index++) {
       Database.DeleteResult outcome = outcomes[index];
       results.add(
@@ -106,14 +106,14 @@ public with sharing class BulkRecordUploadPersistenceGateway {
     return results;
   }
 
-  private static BulkRecordUploadRowResultV1 toSafeResult(
+  private static BulkRecordUploadRowResult toSafeResult(
     Integer rowNumber,
     Boolean success,
     Id recordId,
     List<Database.Error> errors
   ) {
     if (success) {
-      return new BulkRecordUploadRowResultV1(
+      return new BulkRecordUploadRowResult(
         rowNumber,
         true,
         recordId,
@@ -124,7 +124,7 @@ public with sharing class BulkRecordUploadPersistenceGateway {
     String code = errors.isEmpty()
       ? BulkRecordUploadRuntimeContract.REASON_DML_ERROR
       : String.valueOf(errors[0].getStatusCode());
-    return new BulkRecordUploadRowResultV1(
+    return new BulkRecordUploadRowResult(
       rowNumber,
       false,
       null,

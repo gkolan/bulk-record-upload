@@ -162,11 +162,11 @@ public with sharing class BulkRecordUploadTestDataFactory {
    * @param count Exact number of rows to construct.
    * @return Ordered rows beginning at CSV row number two.
    */
-  public static List<BulkRecordUploadRowV1> createRows(Integer count) {
-    List<BulkRecordUploadRowV1> rows = new List<BulkRecordUploadRowV1>();
+  public static List<BulkRecordUploadRow> createRows(Integer count) {
+    List<BulkRecordUploadRow> rows = new List<BulkRecordUploadRow>();
     for (Integer index = 0; index < count; index++) {
       rows.add(
-        new BulkRecordUploadRowV1(
+        new BulkRecordUploadRow(
           index + 2,
           new Map<String, String>{ 'name' => 'Row ' + index }
         )

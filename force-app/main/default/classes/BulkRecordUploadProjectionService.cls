@@ -38,7 +38,7 @@ public with sharing class BulkRecordUploadProjectionService {
    * @return Immutable compact projection containing at most 100 fields.
    * @throws BulkRecordUploadException for invalid, unsupported, or inaccessible configuration.
    */
-  public BulkRecordUploadProjectionV1 getProjection(String processKey) {
+  public BulkRecordUploadProjection getProjection(String processKey) {
     accessPolicy.requireRunPermission();
     BulkRecordUploadConfigRepository.Configuration configuration = repository.findActive(
       processKey
@@ -55,7 +55,7 @@ public with sharing class BulkRecordUploadProjectionService {
     );
     List<String> extensionClassNames = extensionClassNames(configuration);
     new BulkRecordUploadExtensionRegistry().resolve(extensionClassNames);
-    BulkRecordUploadContextProjectionV1 contextProjection = buildContextProjection(
+    BulkRecordUploadContextProjection contextProjection = buildContextProjection(
       configuration.process
     );
 
@@ -69,12 +69,12 @@ public with sharing class BulkRecordUploadProjectionService {
       configHash,
       objectDescribe
     );
-    BulkRecordUploadProjectionV1 cached = projectionCache.find(cacheKey);
+    BulkRecordUploadProjection cached = projectionCache.find(cacheKey);
     if (cached != null) {
       return cached;
     }
 
-    BulkRecordUploadProjectionV1 projection = buildProjection(
+    BulkRecordUploadProjection projection = buildProjection(
       configuration,
       objectDescribe,
       configHash,
@@ -85,8 +85,8 @@ public with sharing class BulkRecordUploadProjectionService {
     return projection;
   }
 
-  private static BulkRecordUploadContextProjectionV1 buildContextProjection(
-    BulkRecordUploadProcessConfigV1 process
+  private static BulkRecordUploadContextProjection buildContextProjection(
+    BulkRecordUploadProcessConfig process
   ) {
     if (
       process.recordContextAction == 'NONE' ||
@@ -104,25 +104,29 @@ public with sharing class BulkRecordUploadProjectionService {
       );
   }
 
-  private BulkRecordUploadProjectionV1 buildProjection(
+  private BulkRecordUploadProjection buildProjection(
     BulkRecordUploadConfigRepository.Configuration configuration,
     Schema.DescribeSObjectResult objectDescribe,
     String configHash,
     List<String> extensionClassNames,
-    BulkRecordUploadContextProjectionV1 contextProjection
+    BulkRecordUploadContextProjection contextProjection
   ) {
-    List<BulkRecordUploadFieldConfigV1> fieldConfigs = configuration.getFields();
+    List<BulkRecordUploadFieldConfig> fieldConfigs = configuration.getFields();
     if (fieldConfigs.isEmpty() || fieldConfigs.size() > 100) {
       throw new BulkRecordUploadException(
         'Process must configure between 1 and 100 active fields.'
       );
     }
     Map<String, Schema.SObjectField> fieldsByName = objectDescribe.fields.getMap();
-    List<BulkRecordUploadFieldProjectionV1> projectedFields = new List<BulkRecordUploadFieldProjectionV1>();
+    List<BulkRecordUploadFieldProjection> projectedFields = new List<BulkRecordUploadFieldProjection>();
     Set<String> columnKeys = new Set<String>();
+    Set<String> rawColumnKeys = new Set<String>();
     Set<Integer> sequences = new Set<Integer>();
-    for (BulkRecordUploadFieldConfigV1 fieldConfig : fieldConfigs) {
+    for (BulkRecordUploadFieldConfig fieldConfig : fieldConfigs) {
       validateUnique(fieldConfig, columnKeys, sequences);
+      if (String.isBlank(fieldConfig.sourceTemplate)) {
+        rawColumnKeys.add(fieldConfig.columnKey);
+      }
       Schema.SObjectField fieldToken = fieldsByName.get(
         fieldConfig.fieldApiName
       );
@@ -133,10 +137,13 @@ public with sharing class BulkRecordUploadProjectionService {
       }
       Schema.DescribeFieldResult fieldDescribe = fieldToken.getDescribe();
       validateFieldAccess(fieldDescribe, configuration.process.operation);
+      validateRange(fieldConfig, fieldDescribe);
       projectedFields.add(createFieldProjection(fieldConfig, fieldDescribe));
     }
+    validateSourceTemplates(projectedFields, rawColumnKeys);
+    validateCustomMergeStrategies(projectedFields);
     validateRecordContext(configuration.process, objectDescribe);
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       configuration.process.processKey,
       configHash,
       objectDescribe.getName(),
@@ -158,15 +165,59 @@ public with sharing class BulkRecordUploadProjectionService {
   ) {
     List<String> classNames = new List<String>();
     for (
-      BulkRecordUploadExtensionConfigV1 extensionConfig : configuration.getExtensions()
+      BulkRecordUploadExtensionConfig extensionConfig : configuration.getExtensions()
     ) {
       classNames.add(extensionConfig.className);
     }
     return classNames;
   }
 
+  /**
+   * A Custom existing-value action's class is resolved eagerly here, the
+   * same way row-extension classes are resolved in getProjection, so a
+   * missing or misconfigured class fails at config load instead of mid-
+   * chunk during row merging.
+   */
+  private static void validateCustomMergeStrategies(
+    List<BulkRecordUploadFieldProjection> projectedFields
+  ) {
+    BulkRecordUploadMergeStrategyRegistry registry = new BulkRecordUploadMergeStrategyRegistry();
+    for (BulkRecordUploadFieldProjection field : projectedFields) {
+      if (field.existingValueAction == 'CUSTOM') {
+        registry.resolve(field.customMergeStrategyClass);
+      }
+    }
+  }
+
+  private static final Set<Schema.DisplayType> NUMERIC_DISPLAY_TYPES = new Set<Schema.DisplayType>{
+    Schema.DisplayType.INTEGER,
+    Schema.DisplayType.LONG,
+    Schema.DisplayType.DOUBLE,
+    Schema.DisplayType.CURRENCY,
+    Schema.DisplayType.PERCENT
+  };
+
+  /**
+   * A Minimum/Maximum Value config error is detected here, at config load,
+   * rather than only at row time in BulkRecordUploadRecordMapper, since the
+   * field's Schema type is already resolved here.
+   */
+  private static void validateRange(
+    BulkRecordUploadFieldConfig config,
+    Schema.DescribeFieldResult fieldDescribe
+  ) {
+    if (
+      (config.minValue != null || config.maxValue != null) &&
+      !NUMERIC_DISPLAY_TYPES.contains(fieldDescribe.getType())
+    ) {
+      throw new BulkRecordUploadException(
+        'Minimum Value and Maximum Value require a number, currency, or percent field.'
+      );
+    }
+  }
+
   private static void validateRecordContext(
-    BulkRecordUploadProcessConfigV1 process,
+    BulkRecordUploadProcessConfig process,
     Schema.DescribeSObjectResult targetDescribe
   ) {
     if (process.recordContextAction == 'NONE') {
@@ -196,11 +247,11 @@ public with sharing class BulkRecordUploadProjectionService {
     }
   }
 
-  private static BulkRecordUploadFieldProjectionV1 createFieldProjection(
-    BulkRecordUploadFieldConfigV1 config,
+  private static BulkRecordUploadFieldProjection createFieldProjection(
+    BulkRecordUploadFieldConfig config,
     Schema.DescribeFieldResult fieldDescribe
   ) {
-    return new BulkRecordUploadFieldProjectionV1(
+    return new BulkRecordUploadFieldProjection(
       config.columnKey,
       config.displayLabel,
       fieldDescribe.getName(),
@@ -208,8 +259,23 @@ public with sharing class BulkRecordUploadProjectionService {
       config.existingValueAction,
       config.blankValueAction,
       config.textSeparator,
+      config.customSeparator,
       config.duplicateTextAction,
       config.overflowAction,
+      config.defaultValue,
+      config.trimValue,
+      config.caseAction,
+      config.blankTokens,
+      config.customMergeStrategyClass,
+      config.validationPattern,
+      config.minValue,
+      config.maxValue,
+      config.sourceTemplate,
+      config.lookupMatchField,
+      BulkRecordUploadLookupResolver.resolveLookupTargetObject(
+        config,
+        fieldDescribe
+      ),
       config.sequence,
       config.isRequired,
       config.isMatchKey,
@@ -260,7 +326,7 @@ public with sharing class BulkRecordUploadProjectionService {
   }
 
   private static void validateUnique(
-    BulkRecordUploadFieldConfigV1 config,
+    BulkRecordUploadFieldConfig config,
     Set<String> columnKeys,
     Set<Integer> sequences
   ) {
@@ -276,10 +342,40 @@ public with sharing class BulkRecordUploadProjectionService {
     sequences.add(config.sequence);
   }
 
+  /**
+   * A Source Template token must reference a raw uploaded column, not
+   * another derived column: BulkRecordUploadRecordMapper composes derived
+   * columns from the CSV row alone, so a token referencing another derived
+   * column would silently resolve to an empty string at upload time.
+   */
+  private static void validateSourceTemplates(
+    List<BulkRecordUploadFieldProjection> projectedFields,
+    Set<String> rawColumnKeys
+  ) {
+    for (BulkRecordUploadFieldProjection field : projectedFields) {
+      if (String.isBlank(field.sourceTemplate)) {
+        continue;
+      }
+      for (
+        String token : BulkRecordUploadSourceTemplate.tokens(
+          field.sourceTemplate
+        )
+      ) {
+        if (!rawColumnKeys.contains(token)) {
+          throw new BulkRecordUploadException(
+            'Source Template for "' +
+              field.displayLabel +
+              '" references an unconfigured or derived column.'
+          );
+        }
+      }
+    }
+  }
+
   private static String createConfigHash(
     BulkRecordUploadConfigRepository.Configuration configuration,
     List<String> extensionClassNames,
-    BulkRecordUploadContextProjectionV1 contextProjection
+    BulkRecordUploadContextProjection contextProjection
   ) {
     List<String> parts = new List<String>{
       configuration.process.processKey,
@@ -306,9 +402,11 @@ public with sharing class BulkRecordUploadProjectionService {
       String.valueOf(configuration.process.batchSize),
       String.valueOf(configuration.process.retentionDays)
     };
-    for (
-      BulkRecordUploadFieldConfigV1 fieldConfig : configuration.getFields()
-    ) {
+    for (BulkRecordUploadFieldConfig fieldConfig : configuration.getFields()) {
+      List<String> sortedBlankTokens = new List<String>(
+        fieldConfig.blankTokens
+      );
+      sortedBlankTokens.sort();
       parts.add(
         String.join(
           new List<String>{
@@ -317,8 +415,31 @@ public with sharing class BulkRecordUploadProjectionService {
             fieldConfig.existingValueAction,
             fieldConfig.blankValueAction,
             fieldConfig.textSeparator,
+            String.isBlank(fieldConfig.customSeparator)
+              ? ''
+              : fieldConfig.customSeparator,
             fieldConfig.duplicateTextAction,
             fieldConfig.overflowAction,
+            String.isBlank(fieldConfig.defaultValue)
+              ? ''
+              : fieldConfig.defaultValue,
+            String.valueOf(fieldConfig.trimValue),
+            fieldConfig.caseAction,
+            String.join(sortedBlankTokens, ','),
+            String.isBlank(fieldConfig.customMergeStrategyClass)
+              ? ''
+              : fieldConfig.customMergeStrategyClass,
+            String.isBlank(fieldConfig.validationPattern)
+              ? ''
+              : fieldConfig.validationPattern,
+            String.valueOf(fieldConfig.minValue),
+            String.valueOf(fieldConfig.maxValue),
+            String.isBlank(fieldConfig.sourceTemplate)
+              ? ''
+              : fieldConfig.sourceTemplate,
+            String.isBlank(fieldConfig.lookupMatchField)
+              ? ''
+              : fieldConfig.lookupMatchField,
             String.valueOf(fieldConfig.sequence)
           },
           ':'
@@ -329,7 +450,7 @@ public with sharing class BulkRecordUploadProjectionService {
   }
 
   private static String createCacheKey(
-    BulkRecordUploadProcessConfigV1 process,
+    BulkRecordUploadProcessConfig process,
     String configHash,
     Schema.DescribeSObjectResult objectDescribe
   ) {
@@ -359,10 +480,10 @@ public with sharing class BulkRecordUploadProjectionService {
   }
 
   private static String contextFilterHashPart(
-    List<BulkRecordUploadContextFilterConditionV1> conditions
+    List<BulkRecordUploadContextFilterCondition> conditions
   ) {
     List<String> parts = new List<String>();
-    for (BulkRecordUploadContextFilterConditionV1 condition : conditions) {
+    for (BulkRecordUploadContextFilterCondition condition : conditions) {
       parts.add(
         condition.fieldApiName +
           condition.operatorCode +

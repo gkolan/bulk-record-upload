@@ -8,17 +8,17 @@ public class BulkRecordUploadProjectionCache {
 
   /**
    * Finds and safely deserializes a projection.
-   * @param key Versioned non-sensitive cache key.
+   * @param key Hash-qualified non-sensitive cache key.
    * @return Cached projection or null on miss/corruption.
    */
-  public BulkRecordUploadProjectionV1 find(String key) {
+  public BulkRecordUploadProjection find(String key) {
     if (String.isBlank(key) || !serializedByKey.containsKey(key)) {
       return null;
     }
     try {
-      return (BulkRecordUploadProjectionV1) JSON.deserialize(
+      return (BulkRecordUploadProjection) JSON.deserialize(
         serializedByKey.get(key),
-        BulkRecordUploadProjectionV1.class
+        BulkRecordUploadProjection.class
       );
     } catch (JSONException exceptionValue) {
       remove(key);
@@ -28,10 +28,10 @@ public class BulkRecordUploadProjectionCache {
 
   /**
    * Stores a complete projection and evicts the oldest key at the size boundary.
-   * @param key Versioned non-sensitive cache key.
+   * @param key Hash-qualified non-sensitive cache key.
    * @param projection Complete immutable projection.
    */
-  public void put(String key, BulkRecordUploadProjectionV1 projection) {
+  public void put(String key, BulkRecordUploadProjection projection) {
     if (String.isBlank(key) || projection == null) {
       return;
     }

@@ -1,11 +1,11 @@
 /** Validates a submission and coordinates log, Files, staging, and one async enqueue. */
 public with sharing class BulkRecordUploadRequestService {
   @TestVisible
-  private static BulkRecordUploadProjectionV1 projectionOverride;
+  private static BulkRecordUploadProjection projectionOverride;
 
   /** Submits one bounded CSV or returns its 24-hour idempotent upload identity. */
-  public BulkRecordUploadSubmissionV1 submit(
-    BulkRecordUploadSubmitRequestV1 request
+  public BulkRecordUploadSubmission submit(
+    BulkRecordUploadSubmitRequest request
   ) {
     requireRequest(request);
     Blob csvBlob;
@@ -16,11 +16,11 @@ public with sharing class BulkRecordUploadRequestService {
         'The uploaded file encoding is invalid.'
       );
     }
-    BulkRecordUploadProjectionV1 projection = projectionOverride == null
+    BulkRecordUploadProjection projection = projectionOverride == null
       ? new BulkRecordUploadProjectionService()
           .getProjection(request.processKey)
       : projectionOverride;
-    BulkRecordUploadParsedCsvV1 parsed = new BulkRecordUploadCsvReader()
+    BulkRecordUploadParsedCsv parsed = new BulkRecordUploadCsvReader()
       .parse(csvBlob.toString());
     new BulkRecordUploadRequestValidator().validate(parsed, projection);
     Id contextRecordId = new BulkRecordUploadRecordContextService()
@@ -34,7 +34,7 @@ public with sharing class BulkRecordUploadRequestService {
         contextRecordId
       );
     if (!creation.wasCreated) {
-      return new BulkRecordUploadSubmissionV1(
+      return new BulkRecordUploadSubmission(
         creation.upload.Id,
         creation.upload.Status__c,
         true
@@ -46,14 +46,10 @@ public with sharing class BulkRecordUploadRequestService {
     new BulkRecordUploadStagingService()
       .stage(creation.upload.Id, parsed.rows, projection.batchSize);
     new BulkRecordUploadOrchestrator().start(creation.upload.Id);
-    return new BulkRecordUploadSubmissionV1(
-      creation.upload.Id,
-      'QUEUED',
-      false
-    );
+    return new BulkRecordUploadSubmission(creation.upload.Id, 'QUEUED', false);
   }
 
-  private static void requireRequest(BulkRecordUploadSubmitRequestV1 request) {
+  private static void requireRequest(BulkRecordUploadSubmitRequest request) {
     if (
       request == null ||
       String.isBlank(request.processKey) ||

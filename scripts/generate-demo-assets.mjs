@@ -117,7 +117,7 @@ for (const [objectApi, config] of Object.entries(objects)) {
       value("RetentionDays__c", "double", 30),
       value("ConfigurationVersion__c", "double", 2),
       value("ProcessingMode__c", "string", "STANDARD_DML"),
-      value("ProcessorKey__c", "string", "STANDARD_DML_V1"),
+      value("ProcessorKey__c", "string", "STANDARD_DML"),
       value("IsActive__c", "boolean", true)
     ];
     if (objectApi === "Contact" && operation === "INSERT") {

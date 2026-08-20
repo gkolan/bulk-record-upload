@@ -42,7 +42,8 @@ design:
   a reviewed Custom Metadata record. It is never read from CSV content, a
   component property, or any other administrator-editable free-text
   surface at request time.
-- The resolved type must instantiate and pass an `instanceof BulkRecordUploadExtensionV1`
+- The resolved type must instantiate and pass an `instanceof BulkRecordUploadExtension
+`
   check before it is ever invoked. A name that resolves to an unrelated
   type, or that does not resolve at all, is rejected with a configuration
   error naming the class — never silently skipped, never invoked

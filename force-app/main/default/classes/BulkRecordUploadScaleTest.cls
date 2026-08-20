@@ -6,7 +6,7 @@ private with sharing class BulkRecordUploadScaleTest {
     Bulk_Record_Upload__c upload = BulkRecordUploadTestDataFactory.createUpload(
       'MAXIMUM_ROWS'
     );
-    List<BulkRecordUploadRowV1> rows = BulkRecordUploadTestDataFactory.createRows(
+    List<BulkRecordUploadRow> rows = BulkRecordUploadTestDataFactory.createRows(
       BulkRecordUploadRuntimeContract.MAX_CSV_ROWS
     );
 
@@ -36,11 +36,11 @@ private with sharing class BulkRecordUploadScaleTest {
 
   @IsTest
   static void projection_MaximumFields_IsCompactAndDefensive() {
-    BulkRecordUploadProjectionV1 projection = projection(100, 'maximum');
+    BulkRecordUploadProjection projection = projection(100, 'maximum');
 
     Test.startTest();
     Integer serializedBytes = Blob.valueOf(JSON.serialize(projection)).size();
-    List<BulkRecordUploadFieldProjectionV1> fields = projection.getFields();
+    List<BulkRecordUploadFieldProjection> fields = projection.getFields();
     fields.clear();
     Test.stopTest();
 
@@ -59,21 +59,24 @@ private with sharing class BulkRecordUploadScaleTest {
   static void cache_EvictionVersionAndFingerprint_IsolateResults() {
     BulkRecordUploadProjectionCache.clear();
     BulkRecordUploadProjectionCache cacheValue = new BulkRecordUploadProjectionCache();
-    BulkRecordUploadProjectionV1 expected = projection(5, 'expected');
+    BulkRecordUploadProjection expected = projection(5, 'expected');
 
     Test.startTest();
-    cacheValue.put('bru:projection:1:0.1:process:v1:fingerprint-a', expected);
+    cacheValue.put(
+      'bru:projection:1:0.1:process:example:fingerprint-a',
+      expected
+    );
     for (Integer index = 0; index < 50; index++) {
       cacheValue.put('bru:filler:' + index, projection(1, 'filler' + index));
     }
-    BulkRecordUploadProjectionV1 evicted = cacheValue.find(
-      'bru:projection:1:0.1:process:v1:fingerprint-a'
+    BulkRecordUploadProjection evicted = cacheValue.find(
+      'bru:projection:1:0.1:process:example:fingerprint-a'
     );
-    BulkRecordUploadProjectionV1 wrongVersion = cacheValue.find(
-      'bru:projection:2:0.1:process:v1:fingerprint-a'
+    BulkRecordUploadProjection wrongVersion = cacheValue.find(
+      'bru:projection:2:0.1:process:example:fingerprint-a'
     );
-    BulkRecordUploadProjectionV1 wrongFingerprint = cacheValue.find(
-      'bru:projection:1:0.1:process:v1:fingerprint-b'
+    BulkRecordUploadProjection wrongFingerprint = cacheValue.find(
+      'bru:projection:1:0.1:process:example:fingerprint-b'
     );
     Test.stopTest();
 
@@ -89,11 +92,11 @@ private with sharing class BulkRecordUploadScaleTest {
   static void cache_WarmAndCold_ReturnEquivalentProjection() {
     BulkRecordUploadProjectionCache.clear();
     BulkRecordUploadProjectionCache cacheValue = new BulkRecordUploadProjectionCache();
-    BulkRecordUploadProjectionV1 cold = projection(50, 'equivalent');
+    BulkRecordUploadProjection cold = projection(50, 'equivalent');
 
     Test.startTest();
     cacheValue.put('bru:equivalent', cold);
-    BulkRecordUploadProjectionV1 warm = cacheValue.find('bru:equivalent');
+    BulkRecordUploadProjection warm = cacheValue.find('bru:equivalent');
     Test.stopTest();
 
     Assert.areEqual(
@@ -119,14 +122,14 @@ private with sharing class BulkRecordUploadScaleTest {
     Test.stopTest();
   }
 
-  private static BulkRecordUploadProjectionV1 projection(
+  private static BulkRecordUploadProjection projection(
     Integer count,
     String key
   ) {
-    List<BulkRecordUploadFieldProjectionV1> fields = new List<BulkRecordUploadFieldProjectionV1>();
+    List<BulkRecordUploadFieldProjection> fields = new List<BulkRecordUploadFieldProjection>();
     for (Integer index = 0; index < count; index++) {
       fields.add(
-        new BulkRecordUploadFieldProjectionV1(
+        new BulkRecordUploadFieldProjection(
           'column_' + index,
           'Column ' + index,
           'Field_' + index + '__c',
@@ -142,7 +145,7 @@ private with sharing class BulkRecordUploadScaleTest {
         )
       );
     }
-    return new BulkRecordUploadProjectionV1(
+    return new BulkRecordUploadProjection(
       key,
       'hash-' + key,
       'Synthetic__c',

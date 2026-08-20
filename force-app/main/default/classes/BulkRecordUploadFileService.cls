@@ -26,7 +26,7 @@ public with sharing class BulkRecordUploadFileService {
       uploadId,
       body,
       'Bulk Record Upload Results',
-      'bulk-record-upload-results-v1.csv'
+      'bulk-record-upload-results.csv'
     );
     update as system new Bulk_Record_Upload__c(
       Id = uploadId,

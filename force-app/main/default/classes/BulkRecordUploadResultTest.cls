@@ -1,16 +1,10 @@
 @IsTest
 private with sharing class BulkRecordUploadResultTest {
   @IsTest
-  static void writer_SuccessAndFailure_UsesVersionedSafeSchema() {
-    List<BulkRecordUploadRowResultV1> results = new List<BulkRecordUploadRowResultV1>{
-      new BulkRecordUploadRowResultV1(2, true, null, null, null),
-      new BulkRecordUploadRowResultV1(
-        3,
-        false,
-        null,
-        'INVALID_VALUE',
-        '=formula'
-      )
+  static void writer_SuccessAndFailure_UsesStableSafeSchema() {
+    List<BulkRecordUploadRowResult> results = new List<BulkRecordUploadRowResult>{
+      new BulkRecordUploadRowResult(2, true, null, null, null),
+      new BulkRecordUploadRowResult(3, false, null, 'INVALID_VALUE', '=formula')
     };
     String csv = new BulkRecordUploadResultWriter().write(results).toString();
     Assert.isTrue(csv.startsWith(BulkRecordUploadResultWriter.HEADER + '\r\n'));
@@ -21,8 +15,8 @@ private with sharing class BulkRecordUploadResultTest {
 
   @IsTest
   static void writer_NegativeNumber_DoesNotChangeRoundTripValue() {
-    List<BulkRecordUploadRowResultV1> results = new List<BulkRecordUploadRowResultV1>{
-      new BulkRecordUploadRowResultV1(2, false, null, 'INVALID_VALUE', '-5')
+    List<BulkRecordUploadRowResult> results = new List<BulkRecordUploadRowResult>{
+      new BulkRecordUploadRowResult(2, false, null, 'INVALID_VALUE', '-5')
     };
 
     Test.startTest();

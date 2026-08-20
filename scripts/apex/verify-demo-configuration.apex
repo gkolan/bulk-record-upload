@@ -11,7 +11,7 @@ BulkRecordUploadProjectionService service = new BulkRecordUploadProjectionServic
 List<String> processKeys = new List<String>(expectedFieldCounts.keySet());
 processKeys.sort();
 for (String processKey : processKeys) {
-  BulkRecordUploadProjectionV1 projection;
+  BulkRecordUploadProjection projection;
   try {
     projection = service.getProjection(processKey);
   } catch (Exception error) {

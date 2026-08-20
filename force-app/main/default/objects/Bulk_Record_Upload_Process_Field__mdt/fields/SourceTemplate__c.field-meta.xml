@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SourceTemplate__c</fullName><description
+  >Computes this column's value from other configured columns instead of its own CSV Column Header, using {columnKey} tokens.</description>
+    <inlineHelpText
+  >Optional. Example: {first_name} {last_name}. Each {token} must match another active column's CSV Column Header for this process. A missing referenced value becomes blank text.</inlineHelpText>
+    <label>Source Template</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

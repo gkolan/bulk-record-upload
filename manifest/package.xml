@@ -7,53 +7,87 @@
         <members>BulkRecordUploadConfigRepository</members>
         <members>BulkRecordUploadController</members>
         <members>BulkRecordUploadContractsTest</members>
-        <members>BulkRecordUploadContextFilterConditionV1</members>
+        <members>BulkRecordUploadContextFilterCondition
+</members>
         <members>BulkRecordUploadContextHashTest</members>
-        <members>BulkRecordUploadContextProjectionV1</members>
+        <members>BulkRecordUploadContextProjection
+</members>
         <members>BulkRecordUploadContextSourceService</members>
         <members>BulkRecordUploadContextSourceServiceTest</members>
         <members>BulkRecordUploadCsvReader</members>
         <members>BulkRecordUploadCsvReaderTest</members>
         <members>BulkRecordUploadEdgeCoverageTest</members>
         <members>BulkRecordUploadException</members>
-        <members>BulkRecordUploadFieldConfigV1</members>
+        <members>BulkRecordUploadFieldConfig
+</members>
+        <members>BulkRecordUploadFieldConfigTest
+</members>
+        <members>BulkRecordUploadFieldMappingTest</members>
+        <members>BulkRecordUploadLookupMappingTest</members>
         <members>BulkRecordUploadFieldMergePolicy</members>
+        <members>BulkRecordUploadFieldMergeStrategy</members>
+        <members>BulkRecordUploadMergeStrategyRegistry</members>
+        <members>BulkRecordUploadLongerTextStrategy</members>
+        <members>BulkRecordUploadTextJoinStrategy</members>
+        <members>BulkRecordUploadMultiPicklistSetStrategy</members>
+        <members>BulkRecordUploadNumericMathStrategy</members>
+        <members>BulkRecordUploadDateCompareStrategy</members>
+        <members>BulkRecordUploadBooleanLogicStrategy</members>
         <members>BulkRecordUploadExistingValueMerger</members>
-        <members>BulkRecordUploadFieldProjectionV1</members>
+        <members>BulkRecordUploadFieldProjection
+</members>
         <members>BulkRecordUploadFileService</members>
         <members>BulkRecordUploadFinalizer</members>
-        <members>BulkRecordUploadExtensionV1</members>
-        <members>BulkRecordUploadExtensionAdapterV1</members>
-        <members>BulkRecordUploadExtensionConfigV1</members>
+        <members>BulkRecordUploadExtension
+</members>
+        <members>BulkRecordUploadExtensionAdapter
+</members>
+        <members>BulkRecordUploadExtensionConfig
+</members>
         <members>BulkRecordUploadExtensionRegistry</members>
-        <members>BulkRecordUploadHistoryItemV1</members>
+        <members>BulkRecordUploadHistoryItem
+</members>
         <members>BulkRecordUploadJob</members>
         <members>BulkRecordUploadJobTest</members>
         <members>BulkRecordUploadOperations</members>
+        <members>BulkRecordUploadOperationValidator</members>
         <members>BulkRecordUploadOperationStrategy</members>
-        <members>BulkRecordUploadOperationStrategyV1</members>
-        <members>BulkRecordUploadProcessorV1</members>
+        <members>BulkRecordUploadProcessor
+</members>
         <members>BulkRecordUploadProcessors</members>
-        <members>BulkRecordUploadStandardProcessorV1</members>
+        <members>BulkRecordUploadStandardProcessor
+</members>
         <members>BulkRecordUploadOrchestrator</members>
-        <members>BulkRecordUploadParsedCsvV1</members>
+        <members>BulkRecordUploadParsedCsv
+</members>
         <members>BulkRecordUploadPersistenceGateway</members>
         <members>BulkRecordUploadPersistenceTest</members>
-        <members>BulkRecordUploadMappedRowV1</members>
+        <members>BulkRecordUploadMappedRow
+</members>
         <members>BulkRecordUploadMappingTest</members>
         <members>BulkRecordUploadLogService</members>
         <members>BulkRecordUploadLogTest</members>
-        <members>BulkRecordUploadProcessConfigV1</members>
-        <members>BulkRecordUploadProcessOptionV1</members>
-        <members>BulkRecordUploadSelectionV1</members>
+        <members>BulkRecordUploadProcessConfig
+</members>
+        <members>BulkRecordUploadProcessOption
+</members>
+        <members>BulkRecordUploadSelection
+</members>
         <members>BulkRecordUploadSelectionService</members>
+        <members>BulkRecordUploadSourceTemplate</members>
+        <members>BulkRecordUploadLookupResolver</members>
+        <members>BulkRecordUploadLookupResolverTest</members>
         <members>BulkRecordUploadSelectionServiceTest</members>
-        <members>BulkRecordUploadPresentationV1</members>
+        <members>BulkRecordUploadPresentation
+</members>
         <members>BulkRecordUploadProjectionCache</members>
-        <members>BulkRecordUploadProjectionV1</members>
+        <members>BulkRecordUploadProjection
+</members>
         <members>BulkRecordUploadProjectionService</members>
-        <members>BulkRecordUploadRowResultV1</members>
-        <members>BulkRecordUploadRowV1</members>
+        <members>BulkRecordUploadRowResult
+</members>
+        <members>BulkRecordUploadRow
+</members>
         <members>BulkRecordUploadScaleTest</members>
         <members>BulkRecordUploadRequestValidator</members>
         <members>BulkRecordUploadRequestService</members>
@@ -71,9 +105,12 @@
         <members>BulkRecordUploadTestDataFactory</members>
         <members>BulkRecordUploadStagingService</members>
         <members>BulkRecordUploadStagingTest</members>
-        <members>BulkRecordUploadSubmissionV1</members>
-        <members>BulkRecordUploadSubmitRequestV1</members>
-        <members>BulkRecordUploadTrimHandlerV1</members>
+        <members>BulkRecordUploadSubmission
+</members>
+        <members>BulkRecordUploadSubmitRequest
+</members>
+        <members>BulkRecordUploadTrimHandler
+</members>
         <members>BulkRecordUploadValueCoercer</members>
         <name>ApexClass</name>
     </types>

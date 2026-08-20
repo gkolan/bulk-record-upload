@@ -1,5 +1,5 @@
 /**
- * Loads active version 1 process and field configuration without querying subscriber data.
+ * Loads active process and field configuration without querying subscriber data.
  */
 public with sharing class BulkRecordUploadConfigRepository {
   private final Map<String, Bulk_Record_Upload_Process__mdt> processesByKey;
@@ -56,30 +56,30 @@ public with sharing class BulkRecordUploadConfigRepository {
         'The requested upload process is unavailable.'
       );
     }
-    List<BulkRecordUploadFieldConfigV1> matchingFields = new List<BulkRecordUploadFieldConfigV1>();
+    List<BulkRecordUploadFieldConfig> matchingFields = new List<BulkRecordUploadFieldConfig>();
     for (Bulk_Record_Upload_Process_Field__mdt fieldRecord : fieldRecords) {
       if (
         fieldRecord.IsActive__c == true &&
         fieldRecord.ProcessDeveloperName__c == processRecord.DeveloperName
       ) {
-        matchingFields.add(new BulkRecordUploadFieldConfigV1(fieldRecord));
+        matchingFields.add(new BulkRecordUploadFieldConfig(fieldRecord));
       }
     }
     matchingFields.sort();
-    List<BulkRecordUploadExtensionConfigV1> matchingExtensions = new List<BulkRecordUploadExtensionConfigV1>();
+    List<BulkRecordUploadExtensionConfig> matchingExtensions = new List<BulkRecordUploadExtensionConfig>();
     for (Bulk_Record_Upload_Extension__mdt extensionRecord : extensionRecords) {
       if (
         extensionRecord.IsActive__c == true &&
         extensionRecord.ProcessDeveloperName__c == processRecord.DeveloperName
       ) {
         matchingExtensions.add(
-          new BulkRecordUploadExtensionConfigV1(extensionRecord)
+          new BulkRecordUploadExtensionConfig(extensionRecord)
         );
       }
     }
     matchingExtensions.sort();
     return new Configuration(
-      new BulkRecordUploadProcessConfigV1(processRecord),
+      new BulkRecordUploadProcessConfig(processRecord),
       matchingFields,
       matchingExtensions
     );
@@ -87,31 +87,31 @@ public with sharing class BulkRecordUploadConfigRepository {
 
   /** Holds one immutable configuration snapshot. */
   public class Configuration {
-    public BulkRecordUploadProcessConfigV1 process { get; private set; }
-    public List<BulkRecordUploadFieldConfigV1> fields { get; private set; }
-    public List<BulkRecordUploadExtensionConfigV1> extensions {
+    public BulkRecordUploadProcessConfig process { get; private set; }
+    public List<BulkRecordUploadFieldConfig> fields { get; private set; }
+    public List<BulkRecordUploadExtensionConfig> extensions {
       get;
       private set;
     }
 
     private Configuration(
-      BulkRecordUploadProcessConfigV1 process,
-      List<BulkRecordUploadFieldConfigV1> fields,
-      List<BulkRecordUploadExtensionConfigV1> extensions
+      BulkRecordUploadProcessConfig process,
+      List<BulkRecordUploadFieldConfig> fields,
+      List<BulkRecordUploadExtensionConfig> extensions
     ) {
       this.process = process;
-      this.fields = new List<BulkRecordUploadFieldConfigV1>(fields);
-      this.extensions = new List<BulkRecordUploadExtensionConfigV1>(extensions);
+      this.fields = new List<BulkRecordUploadFieldConfig>(fields);
+      this.extensions = new List<BulkRecordUploadExtensionConfig>(extensions);
     }
 
     /** @return A defensive copy of ordered field configuration. */
-    public List<BulkRecordUploadFieldConfigV1> getFields() {
-      return new List<BulkRecordUploadFieldConfigV1>(fields);
+    public List<BulkRecordUploadFieldConfig> getFields() {
+      return new List<BulkRecordUploadFieldConfig>(fields);
     }
 
     /** @return A defensive copy of ordered extension configuration. */
-    public List<BulkRecordUploadExtensionConfigV1> getExtensions() {
-      return new List<BulkRecordUploadExtensionConfigV1>(extensions);
+    public List<BulkRecordUploadExtensionConfig> getExtensions() {
+      return new List<BulkRecordUploadExtensionConfig>(extensions);
     }
   }
 }

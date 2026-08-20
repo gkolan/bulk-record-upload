@@ -7,7 +7,7 @@ public with sharing class BulkRecordUploadStagingService {
   /** Serializes rows into ordered package-owned chunks using one system-mode DML statement. */
   public List<Bulk_Record_Upload_Chunk__c> stage(
     Id uploadId,
-    List<BulkRecordUploadRowV1> rows,
+    List<BulkRecordUploadRow> rows,
     Integer requestedSize
   ) {
     if (uploadId == null || rows == null || rows.isEmpty()) {
@@ -41,7 +41,7 @@ public with sharing class BulkRecordUploadStagingService {
   private static void appendBounded(
     List<Bulk_Record_Upload_Chunk__c> chunks,
     Id uploadId,
-    List<BulkRecordUploadRowV1> rows
+    List<BulkRecordUploadRow> rows
   ) {
     String payload = JSON.serialize(rows);
     if (
@@ -72,12 +72,12 @@ public with sharing class BulkRecordUploadStagingService {
     );
   }
 
-  private static List<BulkRecordUploadRowV1> slice(
-    List<BulkRecordUploadRowV1> rows,
+  private static List<BulkRecordUploadRow> slice(
+    List<BulkRecordUploadRow> rows,
     Integer startIndex,
     Integer endIndex
   ) {
-    List<BulkRecordUploadRowV1> result = new List<BulkRecordUploadRowV1>();
+    List<BulkRecordUploadRow> result = new List<BulkRecordUploadRow>();
     for (Integer index = startIndex; index < endIndex; index++) {
       result.add(rows[index]);
     }

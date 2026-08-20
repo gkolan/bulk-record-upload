@@ -25,10 +25,10 @@ private class BulkRecordUploadContextHashTest {
 
     System.runAs(operatorUser) {
       Test.startTest();
-      BulkRecordUploadProjectionV1 original = originalService.getProjection(
+      BulkRecordUploadProjection original = originalService.getProjection(
         'CONTACT_INSERT'
       );
-      BulkRecordUploadProjectionV1 changed = changedService.getProjection(
+      BulkRecordUploadProjection changed = changedService.getProjection(
         'CONTACT_INSERT'
       );
       Test.stopTest();

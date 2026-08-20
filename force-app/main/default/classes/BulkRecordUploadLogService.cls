@@ -3,7 +3,7 @@ public with sharing class BulkRecordUploadLogService {
   private static final Map<String, Set<String>> TRANSITIONS = BulkRecordUploadRuntimeContract.uploadTransitions();
 
   /** Returns at most 50 non-archived uploads visible to the running user. */
-  public List<BulkRecordUploadHistoryItemV1> getHistory() {
+  public List<BulkRecordUploadHistoryItem> getHistory() {
     new BulkRecordUploadAccessPolicy().requireRunPermission();
     Integer historyLimit = BulkRecordUploadRuntimeContract.MAX_HISTORY_ROWS;
     return toHistoryItems(
@@ -27,7 +27,7 @@ public with sharing class BulkRecordUploadLogService {
   }
 
   /** Returns at most 50 visible non-archived uploads for one validated process. */
-  public List<BulkRecordUploadHistoryItemV1> getHistory(String processKey) {
+  public List<BulkRecordUploadHistoryItem> getHistory(String processKey) {
     new BulkRecordUploadAccessPolicy().requireRunPermission();
     if (String.isBlank(processKey)) {
       throw new BulkRecordUploadException('The upload process is invalid.');
@@ -53,12 +53,12 @@ public with sharing class BulkRecordUploadLogService {
     );
   }
 
-  private static List<BulkRecordUploadHistoryItemV1> toHistoryItems(
+  private static List<BulkRecordUploadHistoryItem> toHistoryItems(
     List<Bulk_Record_Upload__c> uploads
   ) {
-    List<BulkRecordUploadHistoryItemV1> items = new List<BulkRecordUploadHistoryItemV1>();
+    List<BulkRecordUploadHistoryItem> items = new List<BulkRecordUploadHistoryItem>();
     for (Bulk_Record_Upload__c upload : uploads) {
-      items.add(new BulkRecordUploadHistoryItemV1(upload));
+      items.add(new BulkRecordUploadHistoryItem(upload));
     }
     return items;
   }

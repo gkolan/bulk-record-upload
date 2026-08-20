@@ -121,13 +121,15 @@ properties, and Step 7's "no App Builder override" contract stands unamended.
 
 ### Carrying context through the projection
 
-`BulkRecordUploadProjectionV1` already has two telescoping constructors, the
+`BulkRecordUploadProjection
+` already has two telescoping constructors, the
 second taking thirteen positional arguments. Threading four more settings through
 that chain makes the most-touched configuration type in the package harder to
 read with every future setting.
 
 Context configuration is therefore a single
-`BulkRecordUploadContextProjectionV1` value object held as one property. A later
+`BulkRecordUploadContextProjection
+` value object held as one property. A later
 picker setting becomes a field on a small focused type, not another overload.
 `configHash` continues to version the cached projection and the new settings
 participate in it.
@@ -136,7 +138,8 @@ participate in it.
 
 1. Add `RecordContextSource__c`, `ContextSearchFields__c`,
    `ContextDisplayFields__c`, and `ContextFilterCriteria__c`.
-2. Add `BulkRecordUploadContextProjectionV1`, attach it to the projection as one
+2. Add `BulkRecordUploadContextProjection
+`, attach it to the projection as one
    property, and include the new settings in `configHash`.
 3. Add `BulkRecordUploadContextSourceService` for field-list parsing,
    describe-based validation, and filter parsing.

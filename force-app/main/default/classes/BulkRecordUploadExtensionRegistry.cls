@@ -2,7 +2,7 @@
  * The package's one open extension point. Resolves subscriber-registered
  * extension class names into validated, ordered instances. A class name is
  * never trusted as-is: it must resolve through Type.forName, instantiate,
- * and be assignable to BulkRecordUploadExtensionV1. Any failure is a
+ * and be assignable to BulkRecordUploadExtension. Any failure is a
  * configuration error naming the class, never a silent skip. Called both at
  * configuration load and at every run, so a class removed or broken after
  * configuration is caught before it can run.
@@ -16,7 +16,7 @@ public with sharing class BulkRecordUploadExtensionRegistry {
    *   resolve, does not instantiate, or does not implement the required
    *   interface, or when the count exceeds the bounded maximum.
    */
-  public List<BulkRecordUploadExtensionV1> resolve(
+  public List<BulkRecordUploadExtension> resolve(
     List<String> orderedClassNames
   ) {
     List<String> classNames = orderedClassNames == null
@@ -30,14 +30,14 @@ public with sharing class BulkRecordUploadExtensionRegistry {
         'Too many extensions are registered for this process.'
       );
     }
-    List<BulkRecordUploadExtensionV1> extensions = new List<BulkRecordUploadExtensionV1>();
+    List<BulkRecordUploadExtension> extensions = new List<BulkRecordUploadExtension>();
     for (String className : classNames) {
       extensions.add(resolveOne(className));
     }
     return extensions;
   }
 
-  private static BulkRecordUploadExtensionV1 resolveOne(String className) {
+  private static BulkRecordUploadExtension resolveOne(String className) {
     String trimmedName = String.isBlank(className) ? null : className.trim();
     Object instance;
     try {
@@ -48,13 +48,13 @@ public with sharing class BulkRecordUploadExtensionRegistry {
     } catch (Exception error) {
       instance = null;
     }
-    if (!(instance instanceof BulkRecordUploadExtensionV1)) {
+    if (!(instance instanceof BulkRecordUploadExtension)) {
       throw new BulkRecordUploadException(
         'The configured extension class "' +
           String.valueOf(trimmedName) +
           '" is not registered.'
       );
     }
-    return (BulkRecordUploadExtensionV1) instance;
+    return (BulkRecordUploadExtension) instance;
   }
 }
