@@ -30,6 +30,14 @@ for (const file of coreFiles) {
   }
   if (/bulkRecordUploadGuide/i.test(file))
     errors.push(`Long-form guide component in Core: ${file}`);
+  if (
+    (file.endsWith(".flexipage-meta.xml") || file.endsWith(".app-meta.xml")) &&
+    /(?:Account|Contact|Opportunity)_[A-Za-z_]*Demo/.test(contents)
+  ) {
+    errors.push(
+      `Core page or application depends on optional demo metadata: ${file}`
+    );
+  }
 }
 
 if (manifest.includes("<members>*</members>"))

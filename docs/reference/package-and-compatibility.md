@@ -5,7 +5,7 @@
 
 ## What ships
 
-The current project installs from source; no promoted package version is available. The planned distribution is a no-namespace second-generation unlocked package. Production metadata lives under `force-app/`; the demo configuration in `examples/` is a separate optional deployment. The supplied Account demo page requires those examples to offer its demo processes. Follow [Install from source](../get-started/install.md) for the current installation path.
+The current project installs from source; no promoted package version is available. The planned distribution is a no-namespace second-generation unlocked package. Production metadata lives under `force-app/`; demo configuration in `examples/main/default` is a separate optional deployment. Deploy the supplied Account demo page from `examples/pages/main/default` after that configuration exists, then activate it in App Builder. Follow [Install from source](../get-started/install.md) for the current installation path.
 
 ## Versioning
 

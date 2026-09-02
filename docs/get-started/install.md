@@ -80,6 +80,8 @@ Deployment installs the application and components. Your users still need permis
 
 ## Troubleshooting
 
+If you previously installed a development revision that exposed `bulkRecordUpload` as a Lightning Component Tab, Salesforce can reject deployment with **You can't remove the lightning__Tab target**. In Setup, review **Tabs** and the applications using that old tab. Remove the obsolete tab from their navigation and delete that tab before retrying. The current component supports Record Pages and App Pages. Do not delete upload records or Files to resolve a tab dependency. A fresh installation has no such legacy tab.
+
 | Problem                             | Next action                                                                                                                    |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `sf` or `npm` is not recognized     | Install the prerequisite and open a new terminal.                                                                              |

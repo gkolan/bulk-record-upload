@@ -39,7 +39,7 @@ On a Lightning Record Page, Salesforce supplies the current Record ID and object
 5. Save the page, click **Activation**, and assign it to the intended application, profiles, record types, and form factors.
 6. Open a real record and confirm each heading and process list.
 
-The supplied Account demo page contains these three instances on the same Details tab:
+The optional Account demo page in `examples/pages/main/default` contains these three instances on the same Details tab. [Deploy its configuration first, then deploy and activate the page](../get-started/quick-start.md). Core installation includes the upload-history page and does not assign an Account demo page.
 
 | Heading                                 | Processes to Show       | Additional value                                        |
 | --------------------------------------- | ----------------------- | ------------------------------------------------------- |

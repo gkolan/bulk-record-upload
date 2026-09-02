@@ -11,7 +11,10 @@ permissions:
 
 jobs:
   local:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,15 +24,16 @@ jobs:
       - run: npm ci
       - run: npm run check:all
       - run: npm audit --omit=dev
-      - run: npm run sbom > bulk-record-upload.cdx.json
+      - run: npm sbom --sbom-format cyclonedx > bulk-record-upload.cdx.json
       - uses: actions/upload-artifact@v4
         with:
-          name: sbom
+          name: sbom-${{ matrix.os }}
           path: bulk-record-upload.cdx.json
           retention-days: 30
 
   salesforce:
     if: github.event_name == 'workflow_dispatch'
+    needs: local
     runs-on: ubuntu-latest
     environment: salesforce-release
     steps:
@@ -39,11 +43,29 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli@2.146.3
       - name: Require an explicitly approved target
         run: test "$SF_TARGET_URL" = "https://sfdo-gk-dev-ed.develop.my.salesforce.com"
         env:
           SF_TARGET_URL: ${{ vars.SF_TARGET_URL }}
       - name: Authenticate approved org
-        run: echo "${{ secrets.SFDX_AUTH_URL }}" | sf org login sfdx-url --sfdx-url-stdin --alias release-target
-      - name: Validate manifest
-        run: sf project deploy start --dry-run --manifest manifest/package.xml --target-org release-target --test-level RunSpecifiedTests --tests BulkRecordUploadConfigProjectionTest --wait 30
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: printf '%s' "$SFDX_AUTH_URL" | sf org login sfdx-url --sfdx-url-stdin --alias release-target
+      - name: Verify authenticated target and validate all project tests
+        shell: bash
+        run: |
+          sf org display --target-org release-target --json | node -e '
+            let input = "";
+            process.stdin.on("data", chunk => input += chunk);
+            process.stdin.on("end", () => {
+              const org = JSON.parse(input);
+              if (org.status !== 0 || org.result.instanceUrl !== "https://sfdo-gk-dev-ed.develop.my.salesforce.com") {
+                throw new Error("Authenticated org does not match the approved target");
+              }
+            });
+          '
+          mapfile -t tests < <(node scripts/list-apex-tests.mjs)
+          test "${#tests[@]}" -gt 0
+          sf project deploy start --dry-run --manifest manifest/package.xml --target-org release-target --test-level RunSpecifiedTests --tests "${tests[@]}" --wait 60

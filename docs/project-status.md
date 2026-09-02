@@ -12,6 +12,8 @@ dedicated development org with synthetic data.
 
 ## Before a production release
 
+The current project-only deployment check runs all 28 project test classes successfully (175 tests), but `RunSpecifiedTests` still rejects the deployment because 11 production classes have less than its required 75% coverage per class. The aggregate coverage reported for the project classes in that run is 82.4%; that aggregate does not satisfy the per-class check. The manual Salesforce CI job retains this gate. A successful `RunLocalTests` run in an existing org is separate evidence and can include tests outside this repository.
+
 These checks remain required; this page does not certify that they have passed:
 
 - Run local checks, Salesforce Code Analyzer, deployment validation, and the complete project

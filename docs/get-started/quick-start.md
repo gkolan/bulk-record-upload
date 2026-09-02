@@ -43,14 +43,27 @@ In Salesforce, open **Setup → Permission Sets**. For each set below, select **
 
 The demo target set grants object access for all three example objects and selected demo fields. Your profile or another permission set must also allow the mapped Account fields: Name, Description, Phone, Website, Number of Employees, and Annual Revenue. Use [permissions](permissions.md) to configure access for regular users.
 
-## 4. Open the demo page
+## 4. Deploy and open the demo page
+
+After the sample configuration is installed, validate and deploy its page separately:
+
+```bash
+sf org display --target-org bru-demo
+sf project deploy start --dry-run --source-dir examples/pages/main/default --target-org bru-demo --test-level NoTestRun --wait 30
+sf org display --target-org bru-demo
+sf project deploy start --source-dir examples/pages/main/default --target-org bru-demo --test-level NoTestRun --wait 30
+```
+
+Continue only when both commands report **Succeeded**. The page's process and bundle picklists require the sample configuration to exist already; deploying the page before it can produce an invalid-property error.
+
+In **Setup → Lightning App Builder**, edit **Account Bulk Record Upload Demo**. Click **Activation**, choose **App Default → Assign as App Default**, select **Bulk Record Upload** and the desktop form factor, and save the assignment. Keep the assignment limited to this application.
 
 1. In the **App Launcher**, open **Bulk Record Upload**.
 2. Select **Accounts** in the app navigation.
 3. Create an Account named **Upload Demo Workspace**, then open that record.
 4. On **Details**, find **1. Selected Process**, which uses `Account_Insert_Demo`.
 
-The source includes an Account record page assigned inside this application. The other two upload components demonstrate process selection; use the first component for this walkthrough. The sample Insert creates separate Accounts; the open Account is only where the component is displayed.
+The optional Account record page contains three upload components. The other two demonstrate process selection; use the first component for this walkthrough. The sample Insert creates separate Accounts; the open Account is only where the component is displayed.
 
 If the component is missing, open **Setup → Lightning App Builder → Account Bulk Record Upload Demo**, then check its activation for Account in the **Bulk Record Upload** application. See [page configuration](../admin/configure-lightning-pages.md) for the assignment steps.
 

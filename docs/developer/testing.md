@@ -42,7 +42,9 @@ npm run sbom
    sf project deploy start --source-dir force-app --target-org <your-org-alias> --test-level RunLocalTests --wait 30
    ```
 
-   `RunLocalTests` runs every test class deployed to the org, not only this package's — in an org with other unmanaged code installed, that can include tests this package doesn't own. The package's own test classes are the ones listed in `manifest/package.xml` ending in `Test` — that list is the authoritative one to check coverage against, not a fixed number written down here (it changes as classes are added or split).
+   `RunLocalTests` runs every test class deployed to the org, not only this package's — use it in a dedicated evaluation org. For shared-org validation, run `node scripts/list-apex-tests.mjs` and pass every returned class to `RunSpecifiedTests` as space-separated names after `--tests`. The script reads `manifest/package.xml`, so the list stays current as classes are added or split. The manual Salesforce CI job uses this complete list and validates the authenticated instance URL before deployment validation.
+
+   `RunSpecifiedTests` requires at least 75% coverage for each deployed production class. Passing test methods and aggregate coverage above 75% do not establish that this deployment gate passed. Check coverage warnings in the deployment report and see [Project status](../project-status.md) for current blockers. Focused tests are useful for diagnosis; use the full project list when validating the complete manifest.
 
 5. **Run Code Analyzer last**, after tests pass. Follow the [release process](../../RELEASING.md)
    and coordinate shared-org verification according to [CONTRIBUTING.md](../../CONTRIBUTING.md).
@@ -58,5 +60,7 @@ Start with the [two-Account quick start](../get-started/quick-start.md), which n
 For Update, Upsert, and Delete fixtures, follow the [three-object demonstration kit](../examples/demo/README.md): deploy the optional example metadata before running its seed script in an isolated development org. The seed deletes Accounts whose names begin with `Bulk Upload Demo ` or `Bulk Upload CSV ` and recreates Account, Contact, and Opportunity fixtures. Review those names and related records before resetting demo data.
 
 ## Related
+
+The automatic GitHub job checks local source only. The manual Salesforce job additionally needs the `salesforce-release` environment, its `SF_TARGET_URL` variable set to the approved URL in [CONTRIBUTING.md](../../CONTRIBUTING.md), and an `SFDX_AUTH_URL` secret for that same org. A green automatic build does not establish an org deployment or first-upload pass.
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) and [RELEASING.md](../../RELEASING.md).

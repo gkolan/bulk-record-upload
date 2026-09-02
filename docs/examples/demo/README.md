@@ -51,7 +51,7 @@ Assign **Bulk Record Upload User**, the optional Preview/Delete/Admin Permission
 
 ## Account page scenarios
 
-The supplied **Account Bulk Record Upload Demo** page is activated for Account inside the **Bulk Record Upload** application. It contains three labeled component instances:
+After the example configuration succeeds, deploy the optional page from `examples/pages/main/default` and assign it to Account inside the **Bulk Record Upload** application. Follow [Deploy and open the demo page](../../get-started/quick-start.md#4-deploy-and-open-the-demo-page) for the commands and App Builder activation. This separate deployment is required because the page validates its process and bundle choices against configuration already installed in the org. It contains three labeled component instances:
 
 1. **Selected Process** uses `Account_Insert_Demo`.
 2. **Configured Processes** uses `Account_Save_Operations_Demo` for Insert, Update, and Upsert.
