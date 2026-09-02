@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CustomMergeStrategyClass__c</fullName><description
+  >Exact Apex class name implementing BulkRecordUploadFieldMergeStrategy, used only when Existing Value Action is Custom.</description>
+    <inlineHelpText
+  >Required only when Existing Value Action is Custom. Validated at configuration load and at every run; an unresolvable or non-implementing name fails safely and never runs.</inlineHelpText>
+    <label>Custom Merge Strategy Class</label>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

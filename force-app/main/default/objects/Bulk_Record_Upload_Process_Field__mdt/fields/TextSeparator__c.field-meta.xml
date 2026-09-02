@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TextSeparator__c</fullName><description
+  >Separator inserted between existing and incoming text for Append or Prepend.</description>
+    <inlineHelpText
+  >Choose how existing and incoming text are joined. This applies only to Append and Prepend. Choose Custom to enter your own separator in Custom Separator.</inlineHelpText><label
+  >Text Separator</label><required>false</required><type>Picklist</type>
+    <valueSet><restricted>true</restricted><valueSetDefinition><sorted
+      >false</sorted>
+        <value><fullName>SPACE</fullName><default>true</default><label
+        >Space</label></value>
+        <value><fullName>NEW_LINE</fullName><default>false</default><label
+        >New Line</label></value>
+        <value><fullName>COMMA_SPACE</fullName><default>false</default><label
+        >Comma and Space</label></value>
+        <value><fullName>SEMICOLON_SPACE</fullName><default
+        >false</default><label>Semicolon and Space</label></value>
+        <value><fullName>NONE</fullName><default>false</default><label
+        >None</label></value>
+        <value><fullName>CUSTOM</fullName><default>false</default><label
+        >Custom</label></value>
+    </valueSetDefinition></valueSet>
+</CustomField>

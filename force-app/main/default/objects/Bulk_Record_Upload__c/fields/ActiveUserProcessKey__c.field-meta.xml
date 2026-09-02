@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ActiveUserProcessKey__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description
+  >Atomically reserves the single active-upload slot for one running user and process. Terminal transitions clear the value.</description>
+    <inlineHelpText
+  >Managed internally while an upload is queued, validating, or processing.</inlineHelpText>
+    <label>Active User Process Key</label>
+    <length>64</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

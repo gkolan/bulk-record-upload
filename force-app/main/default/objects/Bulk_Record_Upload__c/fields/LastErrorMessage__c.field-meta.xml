@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >LastErrorMessage__c</fullName><description
+  >Stores a bounded, non-sensitive administrator message for the most recent fatal processing failure.</description><inlineHelpText
+  >This message excludes CSV values and internal exception details.</inlineHelpText><label
+  >Last Error Message</label><length>255</length><type>Text</type></CustomField>

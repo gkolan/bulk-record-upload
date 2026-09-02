@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IntegrityChecksum__c</fullName>
+  <description
+  >Stores the SHA-256 checksum used to detect staging corruption before processing.</description>
+  <inlineHelpText
+  >System-managed integrity value for this chunk.</inlineHelpText>
+  <label>Integrity Checksum</label>
+  <length>64</length>
+  <required>true</required>
+  <type>Text</type>
+</CustomField>

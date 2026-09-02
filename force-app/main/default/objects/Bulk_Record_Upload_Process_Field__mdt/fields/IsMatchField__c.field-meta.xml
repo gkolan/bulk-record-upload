@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IsMatchField__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description
+  >Marks the field used to find records for update or delete.</description>
+  <inlineHelpText
+  >Select exactly one suitable field for an Update or Delete process.</inlineHelpText>
+  <label>Update/Delete Match Field</label>
+  <type>Checkbox</type>
+</CustomField>

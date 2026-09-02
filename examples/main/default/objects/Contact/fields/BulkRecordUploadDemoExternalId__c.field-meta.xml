@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BulkRecordUploadDemoExternalId__c</fullName>
+    <description
+  >Stable synthetic key used only by the optional Bulk Record Upload demo processes.</description>
+    <externalId>true</externalId>
+    <inlineHelpText
+  >Enter the synthetic key from the matching demo CSV file.</inlineHelpText>
+    <label>Bulk Record Upload Demo External ID</label>
+    <length>80</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

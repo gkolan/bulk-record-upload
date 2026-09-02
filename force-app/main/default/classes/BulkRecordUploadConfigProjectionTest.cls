@@ -1,0 +1,378 @@
+/**
+ * Verifies active configuration loading, access decisions, compact projection, and cache recovery.
+ */
+@IsTest
+private class BulkRecordUploadConfigProjectionTest {
+  @IsTest
+  static void repository_ActiveProcess_ReturnsOrderedFields() {
+    BulkRecordUploadConfigRepository repository = createRepository(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 2),
+        createField('email', 'Email', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    Test.startTest();
+    BulkRecordUploadConfigRepository.Configuration result = repository.findActive(
+      'CONTACT_INSERT'
+    );
+    Test.stopTest();
+
+    Assert.areEqual(
+      2,
+      result.getFields().size(),
+      'Repository should return both active fields.'
+    );
+    Assert.areEqual(
+      'email',
+      result.getFields()[0].columnKey,
+      'Fields should be sorted by sequence.'
+    );
+    Assert.areEqual(
+      'last_name',
+      result.getFields()[1].columnKey,
+      'Second sequence should follow first.'
+    );
+  }
+
+  @IsTest
+  static void repository_MultipleExtensions_ReturnsSortedBySortOrder() {
+    BulkRecordUploadConfigRepository repository = createRepository(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>{
+        extensionRecord('SecondExtension', 20),
+        extensionRecord('FirstExtension', 10)
+      }
+    );
+
+    Test.startTest();
+    BulkRecordUploadConfigRepository.Configuration result = repository.findActive(
+      'CONTACT_INSERT'
+    );
+    Test.stopTest();
+
+    Assert.areEqual(
+      2,
+      result.getExtensions().size(),
+      'Repository should return both active extensions.'
+    );
+    Assert.areEqual(
+      'FirstExtension',
+      result.getExtensions()[0].className,
+      'Extensions should be sorted by sort order.'
+    );
+    Assert.areEqual(
+      'SecondExtension',
+      result.getExtensions()[1].className,
+      'Higher sort order should follow lower.'
+    );
+  }
+
+  @IsTest
+  static void repository_MissingProcess_ThrowsSafeException() {
+    BulkRecordUploadConfigRepository repository = createRepository(
+      new List<Bulk_Record_Upload_Process_Field__mdt>(),
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    Test.startTest();
+    try {
+      repository.findActive('UNKNOWN');
+      Assert.fail('Expected an unknown process to fail.');
+    } catch (BulkRecordUploadException exceptionValue) {
+      Assert.areEqual(
+        'The requested upload process is unavailable.',
+        exceptionValue.getMessage(),
+        'Failure should not reveal subscriber configuration.'
+      );
+    }
+    Test.stopTest();
+  }
+
+  @IsTest
+  static void projection_ValidContactConfig_ReturnsOnlyConfiguredFields() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser(
+      'projection'
+    );
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    BulkRecordUploadProjectionService service = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1),
+        createField('email', 'Email', 2)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    System.runAs(operatorUser) {
+      Test.startTest();
+      BulkRecordUploadProjection projection = service.getProjection(
+        'CONTACT_INSERT'
+      );
+      Test.stopTest();
+
+      Assert.areEqual(
+        'Contact',
+        projection.objectApiName,
+        'Projection should resolve the exact object API name.'
+      );
+      Assert.areEqual(
+        2,
+        projection.getFields().size(),
+        'Projection should contain only configured fields.'
+      );
+      Assert.areEqual(
+        'LastName',
+        projection.getFields()[0].fieldApiName,
+        'Projection should preserve configured order.'
+      );
+    }
+  }
+
+  @IsTest
+  static void projection_SourceTemplateColumns_ComposeAndValidate() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser('template');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    Bulk_Record_Upload_Process_Field__mdt derivedField = createField(
+      'full_name',
+      'Description',
+      3
+    );
+    derivedField.SourceTemplate__c = '{first_name} {last_name}';
+    BulkRecordUploadProjectionService validService = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('first_name', 'FirstName', 1),
+        createField('last_name', 'LastName', 2),
+        derivedField
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    System.runAs(operatorUser) {
+      Test.startTest();
+      BulkRecordUploadProjection projection = validService.getProjection(
+        'CONTACT_INSERT'
+      );
+      Test.stopTest();
+
+      Assert.areEqual(
+        3,
+        projection.getFields().size(),
+        'Projection should include the derived column alongside its sources.'
+      );
+    }
+  }
+
+  @IsTest
+  static void projection_SourceTemplateUnconfiguredColumn_ThrowsAtConfigLoad() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser(
+      'badtemplate'
+    );
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    Bulk_Record_Upload_Process_Field__mdt derivedField = createField(
+      'full_name',
+      'Description',
+      2
+    );
+    derivedField.SourceTemplate__c = '{missing_column}';
+    BulkRecordUploadProjectionService invalidService = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1),
+        derivedField
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    System.runAs(operatorUser) {
+      try {
+        invalidService.getProjection('CONTACT_INSERT');
+        Assert.fail('Expected an unconfigured-column exception.');
+      } catch (BulkRecordUploadException error) {
+        Assert.isTrue(
+          error.getMessage().contains('unconfigured or derived column'),
+          'Expected message: ' + error.getMessage()
+        );
+      }
+    }
+  }
+
+  @IsTest
+  static void projection_UnregisteredExtension_ThrowsSafeExceptionAtConfigLoad() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser('handler');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    BulkRecordUploadProjectionService service = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>{
+        extensionRecord('Subscriber_Arbitrary_Class', 1)
+      }
+    );
+
+    System.runAs(operatorUser) {
+      Test.startTest();
+      try {
+        service.getProjection('CONTACT_INSERT');
+        Assert.fail('Expected an unregistered extension to fail.');
+      } catch (BulkRecordUploadException exceptionValue) {
+        Assert.isTrue(
+          exceptionValue.getMessage().contains('is not registered'),
+          'Failure should name the class and enforce the trusted boundary.'
+        );
+      }
+      Test.stopTest();
+    }
+  }
+
+  @IsTest
+  static void projection_UnknownField_ThrowsSafeException() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser('field');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    BulkRecordUploadProjectionService service = createService(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('unknown', 'NotAField__c', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>()
+    );
+
+    System.runAs(operatorUser) {
+      Test.startTest();
+      try {
+        service.getProjection('CONTACT_INSERT');
+        Assert.fail('Expected an unknown field to fail.');
+      } catch (BulkRecordUploadException exceptionValue) {
+        Assert.areEqual(
+          'A configured target field is unavailable.',
+          exceptionValue.getMessage(),
+          'Failure should not echo untrusted field text.'
+        );
+      }
+      Test.stopTest();
+    }
+  }
+
+  @IsTest
+  static void cache_CorruptEntry_RemovesAndReturnsMiss() {
+    BulkRecordUploadProjectionCache.clear();
+    BulkRecordUploadProjectionCache.putCorrupt('bru:test');
+    BulkRecordUploadProjectionCache cacheValue = new BulkRecordUploadProjectionCache();
+
+    Test.startTest();
+    BulkRecordUploadProjection projection = cacheValue.find('bru:test');
+    Test.stopTest();
+
+    Assert.isNull(projection, 'Corrupt cache values should behave as misses.');
+    Assert.isNull(
+      cacheValue.find('bru:test'),
+      'Corrupt value should be removed after recovery.'
+    );
+  }
+
+  @IsTest
+  static void processConfig_UnsupportedOperation_ThrowsSafeException() {
+    Bulk_Record_Upload_Process__mdt process = new Bulk_Record_Upload_Process__mdt(
+      DeveloperName = 'INVALID_PROCESS',
+      ObjectApiName__c = 'Contact',
+      Operation__c = 'MERGE',
+      RowsPerBatch__c = 100,
+      RetentionDays__c = 90,
+      IsActive__c = true,
+      ConfigurationVersion__c = 1
+    );
+
+    Test.startTest();
+    try {
+      new BulkRecordUploadProcessConfig(process);
+      Assert.fail('Expected an unsupported operation to fail.');
+    } catch (BulkRecordUploadException exceptionValue) {
+      Assert.areEqual(
+        'Process operation is not supported.',
+        exceptionValue.getMessage(),
+        'Configuration error should not echo arbitrary operation text.'
+      );
+    }
+    Test.stopTest();
+  }
+
+  private static BulkRecordUploadProjectionService createService(
+    List<Bulk_Record_Upload_Process_Field__mdt> fields,
+    List<Bulk_Record_Upload_Extension__mdt> extensions
+  ) {
+    return new BulkRecordUploadProjectionService(
+      createRepository(fields, extensions),
+      new BulkRecordUploadAccessPolicy(),
+      new BulkRecordUploadProjectionCache()
+    );
+  }
+
+  private static BulkRecordUploadConfigRepository createRepository(
+    List<Bulk_Record_Upload_Process_Field__mdt> fields,
+    List<Bulk_Record_Upload_Extension__mdt> extensions
+  ) {
+    Bulk_Record_Upload_Process__mdt process = new Bulk_Record_Upload_Process__mdt(
+      DeveloperName = 'CONTACT_INSERT',
+      ObjectApiName__c = 'Contact',
+      Operation__c = 'INSERT',
+      RowsPerBatch__c = 100,
+      RetentionDays__c = 90,
+      IsActive__c = true,
+      ConfigurationVersion__c = 1
+    );
+    return new BulkRecordUploadConfigRepository(
+      new Map<String, Bulk_Record_Upload_Process__mdt>{
+        process.DeveloperName => process
+      },
+      fields,
+      extensions
+    );
+  }
+
+  private static Bulk_Record_Upload_Process_Field__mdt createField(
+    String columnKey,
+    String fieldApiName,
+    Integer sequence
+  ) {
+    return new Bulk_Record_Upload_Process_Field__mdt(
+      DeveloperName = 'FIELD_' + sequence,
+      ProcessDeveloperName__c = 'CONTACT_INSERT',
+      FieldApiName__c = fieldApiName,
+      CsvColumnHeader__c = columnKey,
+      DisplayLabel__c = columnKey,
+      ColumnOrder__c = sequence,
+      ExistingValueAction__c = 'REPLACE',
+      IsRequired__c = fieldApiName == 'LastName',
+      IncludeInResult__c = true,
+      IsActive__c = true
+    );
+  }
+
+  private static Bulk_Record_Upload_Extension__mdt extensionRecord(
+    String className,
+    Integer sortOrder
+  ) {
+    return new Bulk_Record_Upload_Extension__mdt(
+      DeveloperName = 'EXT_' + sortOrder,
+      ProcessDeveloperName__c = 'CONTACT_INSERT',
+      ClassName__c = className,
+      SortOrder__c = sortOrder,
+      IsActive__c = true
+    );
+  }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IsUpsertExternalId__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description
+  >Marks the External ID field used to create or update records.</description>
+  <inlineHelpText
+  >Select exactly one accessible External ID field for an Upsert process.</inlineHelpText>
+  <label>Upsert External ID</label>
+  <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IsActive__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description
+  >Controls whether this extension runs for its process.</description>
+  <inlineHelpText
+  >Clear to stop running this extension without deleting its configuration history.</inlineHelpText>
+  <label>Used by Process</label>
+  <type>Checkbox</type>
+</CustomField>

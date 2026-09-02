@@ -1,0 +1,172 @@
+<template>
+  <article class="bru-shell" aria-busy={isBusy}>
+    <template lwc:if={isComponentConfigured}>
+      <template lwc:if={showsProcessSelector}>
+        <div class="bru-selection">
+          <c-bulk-record-upload-process-selector
+            process-options={processOptions}
+            value={processKey}
+            disabled={processSelectorDisabled}
+            help-text="The process controls the target object, operation, and allowed CSV columns."
+            onprocesschange={handleProcessChange}
+          ></c-bulk-record-upload-process-selector>
+        </div>
+      </template>
+
+      <header class="bru-header">
+        <div class="bru-title-group">
+          <div class="bru-title-row">
+            <lightning-icon
+              icon-name={iconName}
+              size="xx-small"
+              alternative-text=""
+            ></lightning-icon>
+            <h1 class="bru-card-title">{displayTitle}</h1>
+          </div>
+          <p class="bru-subtitle">{displaySubtitle}</p>
+        </div>
+        <div class="bru-actions">
+          <lightning-button
+            label="Template"
+            icon-name="utility:download"
+            disabled={templateDisabled}
+            onclick={handleDownloadTemplate}
+          ></lightning-button>
+          <lightning-button-group>
+            <lightning-button
+              label="Upload File"
+              variant={uploadTabVariant}
+              onclick={handleUploadTab}
+            ></lightning-button>
+            <lightning-button
+              label="View Status"
+              variant={statusTabVariant}
+              onclick={handleStatusTab}
+            ></lightning-button>
+          </lightning-button-group>
+        </div>
+      </header>
+
+      <template lwc:if={showInstructions}>
+        <section class="bru-instructions" aria-label="Upload instructions">
+          <lightning-formatted-rich-text
+            value={instructions}
+          ></lightning-formatted-rich-text>
+        </section>
+      </template>
+
+      <div class="bru-body">
+        <div class="slds-assistive-text" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </div>
+
+        <template lwc:if={isOffline}>
+          <div
+            class="slds-notify slds-notify_alert slds-alert_warning bru-message"
+            role="alert"
+          >
+            <span class="slds-assistive-text">{label.Offline}</span>
+            {label.OfflineMessage}
+          </div>
+        </template>
+        <template lwc:if={errorMessage}>
+          <div
+            class="slds-notify slds-notify_alert slds-alert_error bru-message"
+            role="alert"
+          >
+            <span class="slds-assistive-text">{label.ErrorLabel}</span>
+            {errorMessage}
+          </div>
+        </template>
+        <template lwc:if={isLoading}>
+          <lightning-spinner
+            alternative-text={label.LoadingProcesses}
+          ></lightning-spinner>
+        </template>
+
+        <template lwc:if={showForm}>
+          <template lwc:if={showRecordPicker}>
+            <div class="bru-record-picker">
+              <lightning-record-picker
+                label={label.ParentRecordLabel}
+                object-api-name={hostObjectApiName}
+                matching-info={matchingInfo}
+                display-info={displayInfo}
+                filter={pickerFilter}
+                disabled={pickerDisabled}
+                value={pickedRecordId}
+                onchange={handleParentChange}
+              ></lightning-record-picker>
+            </div>
+          </template>
+
+          <template lwc:if={contextBlockMessage}>
+            <div
+              class="slds-notify slds-notify_alert slds-alert_warning bru-message"
+              role="alert"
+            >
+              <span class="slds-assistive-text">{label.ErrorLabel}</span>
+              {contextBlockMessage}
+            </div>
+          </template>
+          <template lwc:else>
+            <c-bulk-record-upload-file-input
+              disabled={fileInputDisabled}
+              onfileready={handleFileReady}
+              onfileerror={handleFileError}
+            ></c-bulk-record-upload-file-input>
+          </template>
+
+          <template lwc:if={preview}>
+            <div class="bru-review">
+              <c-bulk-record-upload-validation
+                process-key={processKey}
+                file-name={fileName}
+                row-count={preview.totalRows}
+              ></c-bulk-record-upload-validation>
+              <c-bulk-record-upload-preview
+                preview={preview}
+              ></c-bulk-record-upload-preview>
+            </div>
+            <div class="bru-submit">
+              <c-bulk-record-upload-confirmation
+                disabled={submitDisabled}
+                onuploadconfirm={handleSubmit}
+              ></c-bulk-record-upload-confirmation>
+            </div>
+          </template>
+        </template>
+
+        <template lwc:if={showProgress}>
+          <c-bulk-record-upload-progress
+            status={currentStatus}
+            onreset={handleReset}
+          ></c-bulk-record-upload-progress>
+        </template>
+
+        <template lwc:if={showHistory}>
+          <c-bulk-record-upload-history
+            rows={historyRows}
+            is-loading={historyLoading}
+            error-message={historyError}
+            onrefresh={refreshHistory}
+            ondownload={handleDownload}
+          ></c-bulk-record-upload-history>
+        </template>
+      </div>
+    </template>
+    <template lwc:else>
+      <div class="bru-configuration-message" role="status">
+        <lightning-icon
+          icon-name="utility:settings"
+          size="small"
+          alternative-text=""
+        ></lightning-icon>
+        <div>
+          <h2 class="bru-card-title">{label.BundleConfigurationTitle}</h2>
+          <p>{label.BundleNotConfigured}</p>
+        </div>
+      </div>
+    </template>
+  </article>
+</template>

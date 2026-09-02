@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description
+  >Stores one bounded, ordered staging fragment as a child of an upload. It supports durable row correlation, guarded asynchronous processing, recovery, and cleanup without carrying a complete CSV in asynchronous job state.</description>
+    <label>Bulk Record Upload Chunk</label>
+    <nameField>
+        <displayFormat>CHUNK-{000000}</displayFormat>
+        <label>Chunk Number</label>
+        <startingNumber>1</startingNumber>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Bulk Record Upload Chunks</pluralLabel>
+    <sharingModel>ControlledByParent</sharingModel>
+    <visibility>Public</visibility>
+</CustomObject>

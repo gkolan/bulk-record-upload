@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>PreviewPermissionApiName__c</fullName>
+  <description
+  >Optionally requires another approved Custom Permission before users can preview this process.</description>
+  <inlineHelpText
+  >Leave blank for standard preview access, or enter an approved Custom Permission API name.</inlineHelpText>
+  <label>Additional Preview Permission</label>
+  <length>80</length>
+  <type>Text</type>
+</CustomField>

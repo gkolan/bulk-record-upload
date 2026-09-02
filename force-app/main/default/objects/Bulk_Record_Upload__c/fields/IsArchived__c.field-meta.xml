@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IsArchived__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description
+  >Hides this upload from ordinary history without changing its retention deadline or security.</description>
+  <inlineHelpText
+  >Select to hide this upload from ordinary history. Archiving does not extend retention.</inlineHelpText>
+  <label>Hidden from Upload History</label>
+  <type>Checkbox</type>
+</CustomField>

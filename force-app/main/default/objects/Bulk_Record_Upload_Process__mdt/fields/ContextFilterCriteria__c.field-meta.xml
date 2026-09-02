@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ContextFilterCriteria__c</fullName>
+    <description
+  >Structured eligibility filter for the parent record, enforced both in the picker and server-side. One condition per line: FieldApiName:Operator:Value. Operators are =, !=, or IN. Lines combine with AND.</description>
+    <inlineHelpText
+  >Enter one condition per line as FieldApiName:Operator:Value. Operators are =, !=, and IN (comma-separated values). Example: Industry:=:Technology</inlineHelpText>
+    <label>Context Filter Criteria</label>
+    <length>4000</length>
+    <required>false</required>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

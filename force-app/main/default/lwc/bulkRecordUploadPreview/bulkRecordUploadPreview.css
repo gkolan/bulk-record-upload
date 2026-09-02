@@ -1,0 +1,4 @@
+.c-preview-table {
+  max-height: var(--slds-g-sizing-15, 20rem);
+  overflow: auto;
+}

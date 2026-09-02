@@ -1,0 +1,78 @@
+<template>
+  <section aria-labelledby="history-heading">
+    <div
+      class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-m-bottom_small"
+    >
+      <h2 id="history-heading" class="slds-text-heading_small">
+        {label.HistoryTitle}
+      </h2>
+      <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text={label.RefreshHistory}
+        title={label.RefreshHistory}
+        onclick={handleRefresh}
+        disabled={isLoading}
+      ></lightning-button-icon>
+    </div>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text={label.LoadingHistory}
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:elseif={hasRows}>
+      <div class="slds-scrollable_x">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+          <caption class="slds-assistive-text">
+            {label.HistoryCaption}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">{label.Process}</th>
+              <th scope="col">{label.Status}</th>
+              <th scope="col">{label.Rows}</th>
+              <th scope="col">{label.Submitted}</th>
+              <th scope="col">{label.Result}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.uploadId}>
+                <td>{row.processKey}</td>
+                <td>
+                  <div>{row.status}</div>
+                  <template lwc:if={row.errorMessage}>
+                    <div class="slds-text-color_error slds-text-body_small">
+                      {row.errorCode}: {row.errorMessage}
+                    </div>
+                  </template>
+                </td>
+                <td>{row.rowCount}</td>
+                <td>
+                  <lightning-formatted-date-time
+                    value={row.submittedAt}
+                  ></lightning-formatted-date-time>
+                </td>
+                <td>
+                  <c-bulk-record-upload-result-download
+                    document-id={row.resultFileId}
+                    expired={row.resultExpired}
+                    ondownload={handleDownload}
+                  ></c-bulk-record-upload-result-download>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template lwc:else>
+      <p class="slds-text-color_weak">{label.NoHistory}</p>
+    </template>
+    <template lwc:if={errorMessage}>
+      <p class="slds-text-color_error slds-m-top_small" role="alert">
+        {errorMessage}
+      </p>
+    </template>
+  </section>
+</template>

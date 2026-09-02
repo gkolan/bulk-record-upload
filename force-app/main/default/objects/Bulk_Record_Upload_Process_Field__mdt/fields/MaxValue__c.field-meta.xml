@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MaxValue__c</fullName><description
+  >Largest accepted coerced value for a number, currency, or percent column. Rows above it are rejected.</description>
+    <inlineHelpText
+  >Optional. Applies to number, currency, and percent columns only.</inlineHelpText>
+    <label>Maximum Value</label>
+    <precision>18</precision>
+    <scale>6</scale>
+    <required>false</required>
+    <type>Number</type>
+</CustomField>

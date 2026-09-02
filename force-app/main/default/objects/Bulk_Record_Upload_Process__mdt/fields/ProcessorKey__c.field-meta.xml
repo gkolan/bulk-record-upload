@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >ProcessorKey__c</fullName><description
+  >Trusted registry key for the Apex processor that owns persistence for one bounded chunk.</description><inlineHelpText
+  >Enter only a processor key registered in package or reviewed subscriber Apex. Never enter a class name.</inlineHelpText><label
+  >Custom Processor Key</label><length>80</length><required
+  >false</required><type>Text</type></CustomField>

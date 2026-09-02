@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>ProcessingOrder__c</fullName>
+  <description
+  >Stores the zero-based processing order for this bounded staging fragment.</description>
+  <inlineHelpText
+  >Shows this chunk's processing order within its upload.</inlineHelpText>
+  <label>Processing Order</label>
+  <precision>3</precision>
+  <required>true</required>
+  <scale>0</scale>
+  <type>Number</type>
+</CustomField>

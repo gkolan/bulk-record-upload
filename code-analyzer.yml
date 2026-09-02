@@ -1,0 +1,31 @@
+engines:
+  eslint:
+    auto_discover_eslint_config: true
+
+rules:
+  pmd:
+    ApexDoc:
+      disabled: true
+    ApexUnitTestClassShouldHaveRunAs:
+      disabled: true
+    ApexUnitTestClassShouldHaveAsserts:
+      disabled: true
+    MethodNamingConventions:
+      disabled: true
+    AvoidBooleanMethodParameters:
+      disabled: true
+    ExcessiveParameterList:
+      disabled: true
+    CyclomaticComplexity:
+      disabled: true
+    CognitiveComplexity:
+      disabled: true
+    NcssCount:
+      disabled: true
+    AvoidDeeplyNestedIfStmts:
+      disabled: true
+  cpd:
+    DetectCopyPasteForApex:
+      disabled: true
+    DetectCopyPasteForJavascript:
+      disabled: true

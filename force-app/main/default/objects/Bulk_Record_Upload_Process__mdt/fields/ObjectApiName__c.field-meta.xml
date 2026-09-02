@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>ObjectApiName__c</fullName>
+  <description
+  >Identifies the Salesforce object whose records this process creates, updates, upserts, or deletes.</description>
+  <inlineHelpText
+  >Enter an allowed object API name, such as Account or Project__c.</inlineHelpText>
+  <label>Salesforce Object API Name</label>
+  <length>255</length>
+  <required>true</required>
+  <type>Text</type>
+</CustomField>

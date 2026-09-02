@@ -1,0 +1,16 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "Bulk Record Upload",
+      "versionName": "Initial Development",
+      "versionNumber": "0.1.0.NEXT",
+      "versionDescription": "Initial development line for a secure, configuration-driven CSV upload package."
+    }
+  ],
+  "name": "bulk-record-upload",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "67.0"
+}

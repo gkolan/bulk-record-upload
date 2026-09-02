@@ -1,0 +1,15 @@
+name: Bug report
+description: Report reproducible Bulk Record Upload behavior.
+title: "[Bug]: "
+body:
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Include safe sample data, expected behavior, and actual behavior. Remove org IDs and sensitive field values.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Salesforce release and edition
+    validations:
+      required: true

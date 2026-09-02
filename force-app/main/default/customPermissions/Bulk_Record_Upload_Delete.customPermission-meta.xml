@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Allows a user to run an approved delete process when target object, match-field, sharing, and configuration access also permit deletion.</description>
+    <label>Delete Records Through Bulk Upload</label>
+    <requiredPermission>
+        <customPermission>Bulk_Record_Upload_Run</customPermission>
+        <dependency>true</dependency>
+    </requiredPermission>
+</CustomPermission>

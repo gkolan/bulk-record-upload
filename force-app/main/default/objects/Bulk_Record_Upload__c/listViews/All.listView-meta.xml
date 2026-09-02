@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>ProcessDeveloperName__c</columns>
+    <columns>Status__c</columns>
+    <columns>SubmittedAt__c</columns>
+    <columns>RowCount__c</columns>
+    <columns>SuccessCount__c</columns>
+    <columns>FailureCount__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Uploads</label>
+</ListView>

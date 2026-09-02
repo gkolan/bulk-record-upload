@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Bulk Record Upload</masterLabel>
+    <description
+  >Runs active upload processes available to the current user.</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property
+        name="componentLabel"
+        type="String"
+        label="Component Heading"
+        description="Visible heading that distinguishes this configured component instance."
+        default="Bulk Record Upload"
+        required="true"
+      />
+            <property
+        name="processSelectionMode"
+        type="String"
+        label="Processes to Show"
+        description="Show one selected process, a configured group of processes, or every active process compatible with this record's object."
+        datasource="SELECTED_PROCESS,CONFIGURED_PROCESSES,ALL_ACTIVE_FOR_OBJECT"
+        default="ALL_ACTIVE_FOR_OBJECT"
+        required="true"
+      />
+            <property
+        name="selectedProcessDeveloperName"
+        type="String"
+        label="Selected Process"
+        description="Used when Processes to Show is SELECTED_PROCESS."
+        datasource="apex://BulkRecordUploadProcessPicklist"
+        required="false"
+      />
+            <property
+        name="bundleDeveloperName"
+        type="String"
+        label="Upload Bundle"
+        description="Used when Processes to Show is CONFIGURED_PROCESSES."
+        datasource="apex://BulkRecordUploadBundlePicklist"
+        required="false"
+      />
+        </targetConfig>
+        <targetConfig targets="lightning__AppPage">
+            <property
+        name="componentLabel"
+        type="String"
+        label="Component Heading"
+        description="Visible heading that distinguishes this configured component instance."
+        default="Bulk Record Upload"
+        required="true"
+      />
+            <property
+        name="processSelectionMode"
+        type="String"
+        label="Processes to Show"
+        description="Show one selected process, a configured group of processes, or every active process compatible with the configured object."
+        datasource="SELECTED_PROCESS,CONFIGURED_PROCESSES,ALL_ACTIVE_FOR_OBJECT"
+        default="ALL_ACTIVE_FOR_OBJECT"
+        required="true"
+      />
+            <property
+        name="selectedProcessDeveloperName"
+        type="String"
+        label="Selected Process"
+        description="Used when Processes to Show is SELECTED_PROCESS."
+        datasource="apex://BulkRecordUploadProcessPicklist"
+        required="false"
+      />
+            <property
+        name="bundleDeveloperName"
+        type="String"
+        label="Upload Bundle"
+        description="Used when Processes to Show is CONFIGURED_PROCESSES."
+        datasource="apex://BulkRecordUploadBundlePicklist"
+        required="false"
+      />
+            <property
+        name="contextObjectApiName"
+        type="String"
+        label="Object API Name"
+        description="Object used to filter compatible processes and parent records, for example Account."
+        required="false"
+      />
+            <property
+        name="recordSelectionMode"
+        type="String"
+        label="Records"
+        description="Use one supplied record, upload multiple records without parent context, or let the user select a parent record."
+        datasource="ONE_RECORD,MULTIPLE_RECORDS,SELECT_RECORD"
+        default="MULTIPLE_RECORDS"
+        required="true"
+      />
+            <property
+        name="contextRecordId"
+        type="String"
+        label="Record Id"
+        description="Record Id used when Records is ONE_RECORD."
+        required="false"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

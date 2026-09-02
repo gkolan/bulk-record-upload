@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Allows a user to preview approved Bulk Record Upload processes when target object, field, sharing, and configuration access also permit it.</description>
+    <label>Preview Bulk Record Uploads</label>
+    <requiredPermission>
+        <customPermission>Bulk_Record_Upload_Run</customPermission>
+        <dependency>true</dependency>
+    </requiredPermission>
+</CustomPermission>

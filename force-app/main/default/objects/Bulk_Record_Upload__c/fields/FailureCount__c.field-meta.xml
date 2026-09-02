@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>FailureCount__c</fullName>
+  <description
+  >Stores the number of rows that returned a redacted failure result.</description>
+  <inlineHelpText
+  >Shows rows that failed and require review in the results file.</inlineHelpText>
+  <label>Failed Rows</label>
+  <precision>5</precision>
+  <scale>0</scale>
+  <type>Number</type>
+</CustomField>

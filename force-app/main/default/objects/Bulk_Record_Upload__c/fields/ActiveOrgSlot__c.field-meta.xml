@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ActiveOrgSlot__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description
+  >Atomically reserves one of the ten organization-wide active upload slots. Terminal transitions clear the value.</description>
+    <inlineHelpText
+  >Managed internally while an upload is queued, validating, or processing.</inlineHelpText>
+    <label>Active Organization Slot</label>
+    <length>16</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

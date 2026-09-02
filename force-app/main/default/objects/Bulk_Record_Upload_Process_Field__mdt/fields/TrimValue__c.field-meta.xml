@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>TrimValue__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description
+  >Removes leading and trailing whitespace from the CSV cell before blank checks, defaulting, and coercion.</description>
+  <inlineHelpText
+  >Select to trim surrounding whitespace before this column's value is evaluated.</inlineHelpText>
+  <label>Trim Value</label>
+  <type>Checkbox</type>
+</CustomField>

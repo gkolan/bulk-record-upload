@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>ClassName__c</fullName>
+  <description
+  >Exact Apex class name implementing BulkRecordUploadExtension. Validated at configuration load and at every run; an unresolvable or non-implementing name fails safely and never runs.</description>
+  <inlineHelpText
+  >Enter the exact global Apex class name. The class must implement BulkRecordUploadExtension.</inlineHelpText>
+  <label>Extension Class Name</label>
+  <length>255</length>
+  <required>true</required>
+  <type>Text</type>
+</CustomField>

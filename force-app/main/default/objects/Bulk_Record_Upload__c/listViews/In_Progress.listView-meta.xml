@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>In_Progress</fullName>
+    <columns>NAME</columns>
+    <columns>ProcessDeveloperName__c</columns>
+    <columns>Status__c</columns>
+    <columns>SubmittedAt__c</columns>
+    <columns>RowCount__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>QUEUED,VALIDATING,PROCESSING</value>
+    </filters>
+    <label>Uploads in Progress</label>
+</ListView>

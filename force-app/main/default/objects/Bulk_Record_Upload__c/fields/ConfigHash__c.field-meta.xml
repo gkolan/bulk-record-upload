@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ConfigHash__c</fullName>
+    <description
+  >Stores the immutable configuration fingerprint accepted when the upload was submitted so asynchronous processing can reject configuration drift.</description>
+    <inlineHelpText
+  >Used internally to verify that staged rows are processed with the same configuration that validated them.</inlineHelpText>
+    <label>Submitted Configuration Hash</label>
+    <length>64</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

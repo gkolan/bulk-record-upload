@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Defines one administrator-approved CSV upload, including its Salesforce object, operation, security requirements, processing limits, and retention.</description>
+    <label>Bulk Record Upload Process</label>
+    <pluralLabel>Bulk Record Upload Processes</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

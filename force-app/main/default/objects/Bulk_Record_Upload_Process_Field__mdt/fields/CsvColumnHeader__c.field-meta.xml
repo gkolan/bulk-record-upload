@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>CsvColumnHeader__c</fullName>
+  <caseSensitive>false</caseSensitive>
+  <description
+  >Defines the stable CSV header mapped by this field configuration.</description>
+  <inlineHelpText
+  >Enter the header users place in the CSV file. Matching ignores case and surrounding spaces.</inlineHelpText>
+  <label>CSV Column Header</label>
+  <length>255</length>
+  <required>true</required>
+  <type>Text</type>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LookupMatchField__c</fullName><description
+  >API name of a field on the lookup's target object used to resolve the CSV cell to a record Id, instead of requiring the literal Id.</description>
+    <inlineHelpText
+  >Optional; applies only to non-polymorphic lookup and master-detail columns. Leave blank to require the exact 15 or 18-character record Id in the CSV cell. A value that resolves to zero or more than one record fails the row.</inlineHelpText>
+    <length>255</length>
+    <label>Lookup Match Field</label>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

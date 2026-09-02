@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IconName__c</fullName>
+    <description>SLDS icon displayed beside the upload title.</description>
+    <inlineHelpText
+  >Use category:name format, for example utility:upload or standard:contact.</inlineHelpText>
+    <label>Title Icon Name</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status__c</fullName>
+  <description
+  >Stores the internal bounded chunk processing state used for recovery and cleanup.</description>
+  <inlineHelpText>System-managed staging status.</inlineHelpText>
+  <label>Processing Status</label>
+  <required>true</required>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>READY</fullName>
+        <default>true</default>
+        <label>Ready</label>
+      </value>
+      <value>
+        <fullName>PROCESSING</fullName>
+        <default>false</default>
+        <label>Processing</label>
+      </value>
+      <value>
+        <fullName>COMPLETED</fullName>
+        <default>false</default>
+        <label>Completed</label>
+      </value>
+      <value>
+        <fullName>FAILED</fullName>
+        <default>false</default>
+        <label>Failed</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

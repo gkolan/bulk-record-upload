@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>IncludeInResult__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description
+  >Controls whether this field appears in the result CSV.</description>
+  <inlineHelpText
+  >Select to include this field when the running user has field access.</inlineHelpText>
+  <label>Include in Result File</label>
+  <type>Checkbox</type>
+</CustomField>

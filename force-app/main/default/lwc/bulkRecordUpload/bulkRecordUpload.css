@@ -1,0 +1,112 @@
+.bru-shell {
+  overflow: hidden;
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+  background: var(--slds-g-color-surface-1, #ffffff);
+  border: var(--slds-g-sizing-border-1, 1px) solid
+    var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
+}
+
+.bru-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--slds-g-spacing-4, 1rem);
+  padding: var(--slds-g-spacing-4, 1rem);
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
+    var(--slds-g-color-border-1, #c9c9c9);
+}
+
+.bru-title-row,
+.bru-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.bru-title-group {
+  min-width: 0;
+}
+
+.bru-subtitle,
+.bru-instructions {
+  font-family: var(--slds-g-font-family-base, sans-serif);
+  font-size: var(--slds-g-font-scale-1, 0.875rem);
+  line-height: var(--slds-g-font-line-height-base, 1.5);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.bru-subtitle {
+  margin-top: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.bru-instructions {
+  padding: var(--slds-g-spacing-4, 1rem);
+}
+
+.bru-selection {
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--slds-g-color-surface-2, #f3f3f3);
+}
+
+.bru-card-title {
+  color: var(--slds-g-color-on-surface-3, #03234d);
+  font-family: var(--slds-g-font-family-base, sans-serif);
+  font-size: var(--slds-g-font-scale-3, 1.25rem);
+  font-weight: var(--slds-g-font-weight-4, 400);
+  line-height: var(--slds-g-font-line-height-2, 1.25);
+}
+
+.bru-selection c-bulk-record-upload-process-selector {
+  max-width: var(--slds-g-sizing-16, 30rem);
+}
+
+.bru-actions {
+  flex-shrink: 0;
+}
+
+.bru-body {
+  position: relative;
+  padding: var(--slds-g-spacing-4, 1rem);
+}
+
+.bru-configuration-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  padding: var(--slds-g-spacing-4, 1rem);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+  background: var(--slds-g-color-surface-2, #f3f3f3);
+}
+
+.bru-message,
+.bru-review {
+  margin-bottom: var(--slds-g-spacing-4, 1rem);
+}
+
+.bru-process {
+  max-width: var(--slds-g-sizing-16, 30rem);
+}
+
+.bru-review {
+  display: grid;
+  gap: var(--slds-g-spacing-4, 1rem);
+  margin-top: var(--slds-g-spacing-4, 1rem);
+}
+
+.bru-submit {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--slds-g-spacing-5, 1.5rem);
+}
+
+@media (max-width: 48rem) {
+  .bru-header {
+    flex-direction: column;
+  }
+
+  .bru-actions {
+    align-self: stretch;
+    flex-wrap: wrap;
+  }
+}
