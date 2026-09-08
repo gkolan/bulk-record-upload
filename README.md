@@ -1,69 +1,136 @@
 # Bulk Record Upload for Salesforce
 
-**Upload CSV files inside Salesforce, with reusable rules and clear results for every row.**
+**Upload CSV files in Salesforce using saved field mappings and rules.**
 
-An administrator defines an upload process: which records to create or change, which columns to accept, and how to save them. Users follow its template to upload Accounts, Contacts, or other configured records. Field mapping stays consistent across uploads, and Salesforce permissions still apply.
+An administrator sets up an **upload process** for a task such as creating Contacts or updating Account details. It defines which object to use, which CSV columns to accept, and how to handle each field. Users download its template, fill it in, and upload from a Lightning page. The same mappings and rules apply each time.
 
 **Choose process → Download template → Preview CSV → Submit → Check row results**
 
-**[Quick start](docs/get-started/quick-start.md)** · **[See an example](#a-concrete-example)** · **[How it works](#how-an-upload-works)** · **[Design decisions](#engineering-challenges-and-design-choices)**
+**[Quick start](docs/get-started/quick-start.md)** · **[What makes it useful](#what-makes-this-project-useful)** · **[Choose processes](#choose-which-processes-users-see)** · **[Configure fields](#configure-what-each-field-does)** · **[Example](#a-concrete-example)** · **[Design decisions](#engineering-challenges-and-design-choices)**
 
-Try it in a Salesforce development org with API 67.0. Install from source; no one-click package is available yet.
+Install from source in a Salesforce development org with API 67.0. No one-click package is available yet.
 
-> **Active development — not production-ready.** Updates may break existing setups, and bugs or incomplete behavior are possible. Use sample data in a development org. See [release status](docs/project-status.md) for open verification work.
+> **Still in development. Not ready for production.** Updates may break existing setups. Try it with sample data in a development org, and check [release status](docs/project-status.md) for unfinished work.
 
-## Why this project exists
+## What makes this project useful
 
-A recurring upload involves more than reading a CSV file. Someone must decide which Salesforce object it changes, which columns are allowed, how existing records are matched, and what happens when a row fails. Those decisions need to remain consistent across uploads.
+You can give users a process for a recurring task and control how it changes records. For example, an Account update can append new notes to Description while leaving Phone unchanged when the CSV cell is blank. Those rules belong to the process, so users do not have to choose them for every upload.
 
-This project puts those decisions into a reusable **upload process**: Salesforce configuration that defines one job, such as creating Contacts or updating selected Account fields. Users choose that process and work from its template. They do not need to choose an object, remap columns, or write code for each upload.
+| Capability                              | What it lets you do                                                                                                                                                     |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Reusable upload processes**           | Define separate jobs such as “Create Contacts” and “Update Account Details,” each with its own object, operation, fields, and downloadable template.                    |
+| **Rules for each field**                | Append a note, keep an existing value, add to a number, or ignore a blank cell. Configure supported behaviors in Salesforce Setup.                                      |
+| **Control over process choices**        | Give a page one fixed process, a selected group, or all active processes compatible with its object.                                                                    |
+| **Use the page's record as the parent** | Upload Contacts from an Account page and link them to that Account without putting its Salesforce ID in every CSV row. App Pages also support choosing a parent record. |
+| **Results for every row**               | Save valid rows even when other rows fail, then use the result file to identify what succeeded and what needs correction.                                               |
+| **Salesforce access still applies**     | Configuration respects the user's object, field, and record access. Delete requires separate authorization.                                                             |
 
-The same application can support multiple processes for different standard or custom objects, subject to supported fields and the user's Salesforce permissions. Its focus is bounded, recurring uploads inside Lightning; the current limit is 5,000 rows per file.
+Standard and custom objects can have multiple processes, subject to [supported field types](docs/reference/supported-field-types.md) and permissions. The current limit is 5,000 rows per file. For behavior beyond the available settings, developers can use the documented [Apex extension](docs/developer/custom-handler.md).
 
 ## A concrete example
 
-Suppose an Account needs a new list of Contacts from a spreadsheet. An administrator configures a Contact Insert process with approved columns and places it on the Account record page. The process can require the current Account as the parent, so the person uploading does not need to look up or paste its Salesforce ID into each row.
+This example shows how a Contact upload can use the Account record you have open. Configure:
 
-The user downloads the template, adds the Contacts, reviews the file, and submits it. The application processes the rows in the background and produces a result file that identifies successful rows and explains failures. When an individual row cannot be saved, partial-success processing lets other valid rows succeed. The user can correct failed rows without uploading successful ones again.
+- **Process:** Contact Insert, which creates Contact records.
+- **Columns:** `first_name` maps to `FirstName`, `last_name` maps to `LastName`, and `email` maps to `Email`.
+- **Parent:** require the current Account and use it for the Contact's `AccountId` relationship.
 
-This is one supported configuration. The [quick start](docs/get-started/quick-start.md) uses a smaller example: creating two fictional Accounts from an included CSV.
+The CSV contains:
 
-## What problems it addresses
+```csv
+first_name,last_name,email
+Ada,Lovelace,ada@example.test
+Grace,Hopper,grace@example.test
+```
 
-| Upload challenge                                        | How the project addresses it                                                                                                                        |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repeating the same mapping and setup decisions          | A configured process defines the object, operation, CSV columns, and field behavior. Its template reflects those choices.                           |
-| Making uploads available where the work happens         | A Lightning component runs on Record Pages and App Pages, with one process or a controlled choice of processes.                                     |
-| Preventing an upload from becoming a permissions bypass | Apex validates configuration and applies the user's object, field, and record access to business data. Delete also requires separate authorization. |
-| Understanding a partially successful file               | Results preserve the original row numbers and report each row's outcome.                                                                            |
-| Adapting to different data rules                        | Configuration controls matching, blank values, and supported field behaviors; validated Apex extensions support additional processing.              |
+With the process, permissions, and required fields configured, this file should create two Contacts under the open Account. The CSV does not need an Account ID. Check both rows in the result file, then open the Contacts to confirm their Account.
+
+If one row fails, the other can still be saved. Correct and retry only the failed row after checking the results. Submitting an Insert file again can create additional records.
+
+To try a supplied example first, the [quick start](docs/get-started/quick-start.md) deploys the optional demo configuration and walks through creating two fictional Accounts from an [included CSV](docs/examples/demo/Account_Insert_Demo.csv).
+
+## Set up an upload process
+
+After [installing the project](docs/get-started/install.md) and [assigning permissions](docs/get-started/permissions.md):
+
+1. **Define the job.** In Setup → **Custom Metadata Types**, create a **Bulk Record Upload Process** record. Choose the Salesforce object and operation.
+2. **Define the columns and field rules.** Create **Bulk Record Upload Process Field** records linked to that process. Each mapping identifies a CSV column, its Salesforce field, and how its value is handled.
+3. **Make it available on a page.** Activate the completed configuration, add **Bulk Record Upload** in Lightning App Builder, and choose which processes the component shows.
+
+Choose the operation by the result you need:
+
+| Operation  | Use it to…                                                             |
+| ---------- | ---------------------------------------------------------------------- |
+| **Insert** | Create new records.                                                    |
+| **Update** | Change existing records identified by the configured match field.      |
+| **Upsert** | Create or update records using a configured external-ID field.         |
+| **Delete** | Remove matched records; users also need separate Delete authorization. |
+
+Follow [Configure an upload process](docs/admin/configure-upload-process.md) for the full setup, including matching and parent-record options. After activation, reload the component, select the process, and download its template to check the configuration. Saving a configuration record alone does not validate it for upload use.
+
+## Choose which processes users see
+
+In Lightning App Builder, **Processes to Show** controls the choices on each **Bulk Record Upload** component. Use the same options on a Record Page or an App Page.
+
+| You want the page to…                                            | Choose                  | Then configure                                                      |
+| ---------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------- |
+| Run one specific job, with no process picker                     | `SELECTED_PROCESS`      | **Selected Process**, such as the supplied `Account_Insert_Demo`.   |
+| Offer a selected group of jobs                                   | `CONFIGURED_PROCESSES`  | **Upload Bundle**, a saved group of processes with a display order. |
+| Offer every active, authorized process compatible with an object | `ALL_ACTIVE_FOR_OBJECT` | The record-page object, or **Object API Name** on an App Page.      |
+
+For example, an Account page can offer Insert, Update, and Upsert through the supplied `Account_Save_Operations_Demo` bundle. A component fixed to Account Insert takes users straight to that job. Process configuration never grants access to records or fields.
+
+Give each component a clear **Component Heading** so users know which task it serves. Follow [Configure Lightning pages](docs/admin/configure-lightning-pages.md) for page activation, bundle setup, and App Page parent-record choices.
+
+## Configure what each field does
+
+Each field mapping connects a CSV column to a Salesforce field and sets the rules for saving its value. Create these records in Setup → **Custom Metadata Types** → **Bulk Record Upload Process Field** → **Manage Records**.
+
+For example, the CSV header `first_name` can map to the Contact field `FirstName`. Set the column order and required options, then download the template to check its headers.
+
+Set these two options separately:
+
+- **Existing Value Action** controls how a supplied value changes an existing record.
+- **Blank CSV Action** controls what happens when the cell is blank.
+
+| You need to…                                                                     | Field behavior to configure                                  |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Update a phone number when supplied, leaving it unchanged when the cell is blank | **Replace** with **Ignore** for blanks.                      |
+| Add a new note after an existing description                                     | **Append**, with a text separator and duplicate-text action. |
+| Preserve a populated field while allowing an empty one to be filled              | **Keep Existing**.                                           |
+| Increase a stored number by the amount in the CSV                                | **Add** on a supported numeric field.                        |
+| Add selections without replacing all current selections                          | **Add Values** on a multi-select picklist.                   |
+| Use a fallback when a cell is blank                                              | **Use Default**, with a configured **Default Value**.        |
+
+For example, on an Update process, **Append** with a space separator can turn an existing Description of `Called Monday.` and an incoming value of `Follow up Friday.` into `Called Monday. Follow up Friday.` With **Replace**, the incoming text would replace the old description.
+
+Supported settings also cover trimming spaces, changing case, validating values, building a value from other CSV columns, and matching related records by a configured field. Available actions depend on the field type; Insert has no existing value to compare, and Delete does not apply field-merge behaviors.
+
+Start with [Configure field behaviors](docs/admin/configure-field-behaviors.md). The [field behavior reference](docs/reference/field-behaviors.md) gives exact settings and worked examples for each option.
 
 ## How an upload works
 
-1. **Configure:** an administrator defines the process, columns, permissions, and Lightning page placement.
-2. **Prepare:** a user selects the process, downloads its template, and fills in a UTF-8 CSV.
-3. **Review:** the component previews the file and reports validation problems before submission.
-4. **Process:** Apex validates the request and handles rows in bounded background work, applying the configured operation.
-5. **Check results:** the user follows the upload status and downloads the row results.
+Once the process and page are configured:
 
-Available operations are **Insert** (create), **Update** (change matched records), **Upsert** (create or update using a configured external-ID field), and **Delete** (remove matched records with separate permission).
+1. **Choose the process, if a picker appears.** Use the job that matches the records you intend to create or change.
+2. **Download the template.** Fill it in using the configured headers and save it as a UTF-8 CSV.
+3. **Review the preview.** Check the rows and correct reported problems before submitting. Salesforce validation and automation can still reject rows when they are saved.
+4. **Confirm and submit once.** The upload runs in the background; follow its status on the page.
+5. **Check the results.** Download the result file to see each row's outcome and any error. Successful rows are already saved, even if other rows fail.
+
+See [Run the first upload](docs/get-started/first-upload.md) for the walkthrough and [Understand results](docs/user/understand-results.md) for partial success and recovery.
 
 ## Try it yourself
 
 Use a dedicated Developer Edition org or development sandbox with API 67.0 available. You need Salesforce CLI v2 and Node.js 22 or later for setup. Once configured, uploads run through the Salesforce UI.
 
-The [quick-start guide](docs/get-started/quick-start.md) walks through:
+Follow the [quick start](docs/get-started/quick-start.md) to install the source and demo configuration, assign permissions, and upload the two-row Account CSV. It ends with checking the results and the records you created.
 
-1. Downloading this repository and signing in to your development org.
-2. Validating and deploying the source and supplied demo configuration.
-3. Assigning permissions and opening the demo Account page.
-4. Uploading the included two-row CSV and checking the created records.
-
-For an existing installation, go straight to [Run the first upload](docs/get-started/first-upload.md). For your own objects and fields, follow [Configure an upload process](docs/admin/configure-upload-process.md).
+For an existing installation, go straight to [Run the first upload](docs/get-started/first-upload.md). To explore Insert, Update, Upsert, and Delete for Accounts, Contacts, and Opportunities, see the [demonstration kit](docs/examples/demo/README.md).
 
 ## Engineering challenges and design choices
 
-The implementation uses **Apex, Lightning Web Components, Custom Metadata, and Salesforce Files**. The main engineering work is coordinating configuration, security, background processing, and useful failure reporting.
+The project uses **Apex, Lightning Web Components, Custom Metadata, and Salesforce Files**. These are the main design choices behind the upload workflow:
 
 | Engineering challenge                                     | Design choice and where to learn more                                                                                                                                                                                                                |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -72,8 +139,6 @@ The implementation uses **Apex, Lightning Web Components, Custom Metadata, and S
 | Safely handling administrator-selected objects and fields | Resolve configuration against Salesforce schema and enforce permissions on the server. Business-record persistence uses user-mode database operations. See [security and access](docs/admin/security-and-access.md).                                 |
 | Keeping failures traceable across batches                 | Preserve row identity through mapping, saving, and result generation; distinguish partial success from a failed upload. See [results](docs/user/understand-results.md).                                                                              |
 | Extending behavior without growing one large controller   | Separate configuration, authorization, parsing, mapping, persistence, and job services; expose defined extension contracts. See [extension guide](docs/developer/custom-handler.md).                                                                 |
-
-These choices aim to keep the code easy to maintain, bounded as workloads grow, straightforward to extend, and understandable to someone new to the project.
 
 ## Scope and current limitations
 
@@ -95,7 +160,7 @@ npm run check:all
 
 These local checks cover formatting, lint, Lightning unit tests, source rules, documentation links, release-file checks, and a synthetic large-schema benchmark. Apex execution and deployment require separate Salesforce org verification.
 
-The [testing guide](docs/developer/testing.md) explains those additional checks. Release limitations are listed in [Project status](docs/project-status.md). Verification belongs to the exact candidate being reviewed; local work logs are not included in the public repository.
+The [testing guide](docs/developer/testing.md) covers org verification. Check [Project status](docs/project-status.md) for outstanding release checks.
 
 ## Documentation and support
 
