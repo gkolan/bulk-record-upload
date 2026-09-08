@@ -9,7 +9,10 @@ private class BulkRecordUploadContextHashTest {
     User operatorUser = BulkRecordUploadTestDataFactory.createUser('ctxhash');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      new Set<String>{
+        'Bulk_Record_Upload_User',
+        'Bulk_Record_Upload_Demo_Target_Access'
+      }
     );
     List<Bulk_Record_Upload_Process_Field__mdt> fields = new List<Bulk_Record_Upload_Process_Field__mdt>{
       createField('last_name', 'LastName', 1)
@@ -60,7 +63,6 @@ private class BulkRecordUploadContextHashTest {
       RowsPerBatch__c = 100,
       RetentionDays__c = 90,
       IsActive__c = true,
-      ConfigurationVersion__c = 1,
       RecordContextAction__c = 'DEFAULT_PARENT',
       HostObjectApiName__c = 'Account',
       RecordContextFieldApiName__c = 'AccountId',

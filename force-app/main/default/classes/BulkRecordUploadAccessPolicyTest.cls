@@ -64,7 +64,10 @@ private class BulkRecordUploadAccessPolicyTest {
     User operatorUser = BulkRecordUploadTestDataFactory.createUser('operator');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      new Set<String>{
+        'Bulk_Record_Upload_User',
+        'Bulk_Record_Upload_Demo_Target_Access'
+      }
     );
     BulkRecordUploadAccessPolicy policy = new BulkRecordUploadAccessPolicy();
 
@@ -91,5 +94,128 @@ private class BulkRecordUploadAccessPolicyTest {
       }
       Test.stopTest();
     }
+  }
+
+  @IsTest
+  static void baseOperator_PassesUpdateAndUpsertAccessChecks() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser('upsert');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{
+        'Bulk_Record_Upload_User',
+        'Bulk_Record_Upload_Demo_Target_Access'
+      }
+    );
+    BulkRecordUploadAccessPolicy policy = new BulkRecordUploadAccessPolicy();
+    System.runAs(operatorUser) {
+      Schema.DescribeSObjectResult contactDescribe = Contact.SObjectType.getDescribe(
+        SObjectDescribeOptions.DEFERRED
+      );
+      Test.startTest();
+      policy.requireOperationAccess(contactDescribe, 'UPDATE');
+      policy.requireOperationAccess(contactDescribe, 'UPSERT');
+      policy.requireOperationAccess(contactDescribe, 'insert');
+      Test.stopTest();
+    }
+
+  }
+
+  @IsTest
+  static void deleteOperator_PassesWithSeparateDeletePermission() {
+    User deleteUser = BulkRecordUploadTestDataFactory.createUser('remover');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      deleteUser.Id,
+      new Set<String>{
+        'Bulk_Record_Upload_User',
+        'Bulk_Record_Upload_Demo_Target_Access',
+        'Bulk_Record_Upload_Delete_Access'
+      }
+    );
+    BulkRecordUploadAccessPolicy policy = new BulkRecordUploadAccessPolicy();
+
+    System.runAs(deleteUser) {
+      Test.startTest();
+      policy.requireRunPermission();
+      policy.requireOperationAccess(
+        Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED),
+        'DELETE'
+      );
+      Test.stopTest();
+    }
+
+    Assert.isTrue(
+      true,
+      'A delete-authorized user should pass both access checks.'
+    );
+  }
+
+  @IsTest
+  static void previewOperator_PassesWithPreviewPermission() {
+    User previewUser = BulkRecordUploadTestDataFactory.createUser('preview');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      previewUser.Id,
+      new Set<String>{
+        'Bulk_Record_Upload_User',
+        'Bulk_Record_Upload_Preview_Access'
+      }
+    );
+    BulkRecordUploadAccessPolicy policy = new BulkRecordUploadAccessPolicy();
+
+    System.runAs(previewUser) {
+      Test.startTest();
+      policy.requirePreviewPermission('Bulk_Record_Upload_Preview');
+      Test.stopTest();
+    }
+
+    Assert.isTrue(
+      true,
+      'A preview-authorized user should pass the preview check.'
+    );
+  }
+
+  @IsTest
+  static void operatorWithoutPreviewPermission_IsDenied() {
+    User operatorUser = BulkRecordUploadTestDataFactory.createUser('nopreview');
+    BulkRecordUploadTestDataFactory.assignPermissionSets(
+      operatorUser.Id,
+      new Set<String>{ 'Bulk_Record_Upload_User' }
+    );
+    BulkRecordUploadAccessPolicy policy = new BulkRecordUploadAccessPolicy();
+
+    System.runAs(operatorUser) {
+      Test.startTest();
+      try {
+        policy.requirePreviewPermission('Bulk_Record_Upload_Preview');
+        Assert.fail('Expected preview to require its own permission.');
+      } catch (BulkRecordUploadException exceptionValue) {
+        Assert.areEqual(
+          'You are not authorized to preview this process.',
+          exceptionValue.getMessage(),
+          'Preview denial should stay safe and specific.'
+        );
+      }
+      Test.stopTest();
+    }
+  }
+
+  @IsTest
+  static void blankOperation_RejectsInvalidBoundary() {
+    BulkRecordUploadAccessPolicy policy = new BulkRecordUploadAccessPolicy();
+
+    Test.startTest();
+    try {
+      policy.requireOperationAccess(
+        Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED),
+        '  '
+      );
+      Assert.fail('Expected a blank operation to fail.');
+    } catch (BulkRecordUploadException exceptionValue) {
+      Assert.areEqual(
+        'Target access configuration is invalid.',
+        exceptionValue.getMessage(),
+        'A blank operation should fail safely.'
+      );
+    }
+    Test.stopTest();
   }
 }

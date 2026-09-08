@@ -17,7 +17,6 @@ public class BulkRecordUploadFieldConfig implements Comparable {
   public Boolean trimValue { get; private set; }
   public String caseAction { get; private set; }
   public Set<String> blankTokens { get; private set; }
-  public String customMergeStrategyClass { get; private set; }
   public String validationPattern { get; private set; }
   public Decimal minValue { get; private set; }
   public Decimal maxValue { get; private set; }
@@ -41,8 +40,7 @@ public class BulkRecordUploadFieldConfig implements Comparable {
     'USE_LATER',
     'USE_EARLIER',
     'TRUE_IF_EITHER',
-    'TRUE_IF_BOTH',
-    'CUSTOM'
+    'TRUE_IF_BOTH'
   };
   private static final Set<String> BLANK_VALUE_ACTIONS = new Set<String>{
     'IGNORE',
@@ -101,7 +99,6 @@ public class BulkRecordUploadFieldConfig implements Comparable {
     trimValue = recordValue.TrimValue__c == true;
     caseAction = defaultCode(recordValue.CaseAction__c, 'NONE');
     blankTokens = parseBlankTokens(recordValue.BlankTokens__c);
-    customMergeStrategyClass = recordValue.CustomMergeStrategyClass__c;
     validationPattern = recordValue.ValidationPattern__c;
     minValue = recordValue.MinValue__c;
     maxValue = recordValue.MaxValue__c;
@@ -136,14 +133,6 @@ public class BulkRecordUploadFieldConfig implements Comparable {
     if (blankValueAction == 'DEFAULT' && String.isBlank(defaultValue)) {
       throw new BulkRecordUploadException(
         'Default Value is required when Blank CSV Action is Use Default.'
-      );
-    }
-    if (
-      existingValueAction == 'CUSTOM' &&
-      String.isBlank(customMergeStrategyClass)
-    ) {
-      throw new BulkRecordUploadException(
-        'Custom Merge Strategy Class is required when Existing Value Action is Custom.'
       );
     }
     if (String.isNotBlank(validationPattern)) {

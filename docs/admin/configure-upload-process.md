@@ -9,20 +9,21 @@ An upload process is one **Bulk Record Upload Process** (`Bulk_Record_Upload_Pro
 
 In Setup, search **Custom Metadata Types**, open it, find **Bulk Record Upload Process**, click **Manage Records**, then **New**. Fill in:
 
-| Field on the form                                 | What to enter                                                                                                                                                                                            |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Label / Developer Name                            | A stable name you won't need to rename later, e.g. `Contact_Insert_Weekly`                                                                                                                               |
-| Object API Name (`ObjectApiName__c`)              | The object this process loads into, e.g. `Contact`                                                                                                                                                       |
-| Upload Operation (`Operation__c`)                 | `Insert`, `Update`, `Upsert`, or `Delete`                                                                                                                                                                |
-| Rows per Batch (`RowsPerBatch__c`)                | A number from 25–200. `100` is the default and works for most objects — go lower only if automation on the target object (a trigger, a Flow) makes bigger batches slow.                                  |
-| History Retention Days (`RetentionDays__c`)       | A number from 7–365 for how long upload history and result files stick around before cleanup. Default is `90`.                                                                                           |
-| Configuration Version (`ConfigurationVersion__c`) | Use `1` for the basic field settings. Use `2` only when you need the separate blank, separator, duplicate, and overflow settings described in [Configure field behaviors](configure-field-behaviors.md). |
-| Custom Processor Key (`ProcessorKey__c`)          | Type `STANDARD_DML` for the normal, package-owned save path. This is a plain text field, not a picklist — type the key exactly.                                                                          |
-| Is Active                                         | Leave unchecked until you've finished configuring this process's columns, then check it.                                                                                                                 |
+| Field on the form                           | What to enter                                                                                                                                                           |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Label / Developer Name                      | A stable name you won't need to rename later, e.g. `Contact_Insert_Weekly`                                                                                              |
+| Object API Name (`ObjectApiName__c`)        | The object this process loads into, e.g. `Contact`                                                                                                                      |
+| Upload Operation (`Operation__c`)           | `Insert`, `Update`, `Upsert`, or `Delete`                                                                                                                               |
+| Rows per Batch (`RowsPerBatch__c`)          | A number from 25–200. `100` is the default and works for most objects — go lower only if automation on the target object (a trigger, a Flow) makes bigger batches slow. |
+| History Retention Days (`RetentionDays__c`) | A number from 7–365 for how long upload history and result files stick around before cleanup. Default is `90`.                                                          |
+| Is Active                                   | Leave unchecked until you've finished configuring this process's columns, then check it.                                                                                |
 
-**"Custom Processor Key" only ever needs `STANDARD_DML`** unless you're doing something unusual. If you need to run your own Apex before mapping or after saving — logging, notifications, extra validation — don't put a class name here (it's rejected either way). Instead, register that Apex as an extension; see [Write and register an extension](../developer/custom-handler.md).
+Persistence is package-owned and always uses partial-success user-mode DML. If you need to run your own Apex before mapping or after saving—logging, notifications, or extra validation—register it through the single extension seam; see [Write and register an extension](../developer/custom-handler.md).
 
-If you type an object, operation, or processor key Salesforce or the package doesn't recognize, the process won't activate — you'll see a clear error instead of it silently doing nothing.
+After you save and activate the records, reload the component and select the process. The server
+then resolves the object, operation, fields, extension registrations, and current-user access as one
+projection. Invalid or inaccessible configuration fails with a bounded message before a template,
+preview, or upload can use it. Saving Custom Metadata alone does not run this package validation.
 
 ## Use the current record as the parent
 

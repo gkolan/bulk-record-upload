@@ -8,17 +8,15 @@
 
 One record per upload process. See [Configure an upload process](../admin/configure-upload-process.md) for a full walkthrough with examples.
 
-| Field                  | API name                  | Type                                              | Default  |
-| ---------------------- | ------------------------- | ------------------------------------------------- | -------- |
-| Object API Name        | `ObjectApiName__c`        | Text                                              | —        |
-| Upload Operation       | `Operation__c`            | Picklist (`INSERT`, `UPDATE`, `UPSERT`, `DELETE`) | `INSERT` |
-| Rows per Batch         | `RowsPerBatch__c`         | Number, 25–200                                    | `100`    |
-| History Retention Days | `RetentionDays__c`        | Number, 7–365                                     | `90`     |
-| Configuration Version  | `ConfigurationVersion__c` | Number, `1` or `2`                                | `1`      |
-| Custom Processor Key   | `ProcessorKey__c`         | Text — a reviewed key, never an Apex class name   | —        |
-| Is Active              | `IsActive__c`             | Checkbox                                          | `false`  |
+| Field                  | API name           | Type                                              | Default  |
+| ---------------------- | ------------------ | ------------------------------------------------- | -------- |
+| Object API Name        | `ObjectApiName__c` | Text                                              | —        |
+| Upload Operation       | `Operation__c`     | Picklist (`INSERT`, `UPDATE`, `UPSERT`, `DELETE`) | `INSERT` |
+| Rows per Batch         | `RowsPerBatch__c`  | Number, 25–200                                    | `100`    |
+| History Retention Days | `RetentionDays__c` | Number, 7–365                                     | `90`     |
+| Is Active              | `IsActive__c`      | Checkbox                                          | `false`  |
 
-Never put an Apex class name in **Custom Processor Key** — it only ever accepts a small, reviewed set of keys. The packaged default and normal choice is `STANDARD_DML`.
+There is no configurable processor key. Persistence is package-owned and always uses the documented partial-success user-mode DML path.
 
 ### Record-page parenting
 
@@ -84,12 +82,12 @@ A process needs 1–100 active field records, with unique column keys and sequen
 
 Registers one Apex class to run for one process. See [Write and register an extension](../developer/custom-handler.md) for the full contract and a worked example.
 
-| Field            | API name                  | Type                                                                             |
-| ---------------- | ------------------------- | -------------------------------------------------------------------------------- |
-| Process API Name | `ProcessDeveloperName__c` | Text                                                                             |
-| Class Name       | `ClassName__c`            | Text — the exact Apex class name, checked at configuration load and at every run |
-| Sort Order       | `SortOrder__c`            | Number                                                                           |
-| Is Active        | `IsActive__c`             | Checkbox                                                                         |
+| Field            | API name                  | Type                                                                                                |
+| ---------------- | ------------------------- | --------------------------------------------------------------------------------------------------- |
+| Process API Name | `ProcessDeveloperName__c` | Text                                                                                                |
+| Class Name       | `ClassName__c`            | Text — the exact Apex class name in reviewed source, checked at configuration load and at every run |
+| Sort Order       | `SortOrder__c`            | Number                                                                                              |
+| Is Active        | `IsActive__c`             | Checkbox                                                                                            |
 
 ## Related
 

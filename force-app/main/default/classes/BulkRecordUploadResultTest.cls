@@ -34,6 +34,48 @@ private with sharing class BulkRecordUploadResultTest {
   }
 
   @IsTest
+  static void writer_AllSpreadsheetFormulaPrefixes_AreGuarded() {
+    List<String> dangerousValues = new List<String>{
+      '=cmd',
+      '+cmd',
+      '-cmd',
+      '@cmd',
+      '\tcmd',
+      '\rcmd',
+      '\ncmd'
+    };
+    List<BulkRecordUploadRowResult> results = new List<BulkRecordUploadRowResult>();
+    List<BulkRecordUploadRow> sourceRows = new List<BulkRecordUploadRow>();
+    Integer rowNumber = 2;
+    for (String dangerousValue : dangerousValues) {
+      results.add(
+        new BulkRecordUploadRowResult(rowNumber++, true, null, null, null)
+      );
+      sourceRows.add(
+        new BulkRecordUploadRow(
+          rowNumber - 1,
+          new Map<String, String>{ 'name' => dangerousValue }
+        )
+      );
+    }
+
+    Test.startTest();
+    String csv = new BulkRecordUploadResultWriter()
+      .write(results, resultProjection(), sourceRows)
+      .toString();
+    Test.stopTest();
+
+    for (String dangerousValue : dangerousValues) {
+      Assert.isTrue(
+        csv.contains('"\'' + dangerousValue + '"'),
+        'Formula-shaped prefix ' +
+          EncodingUtil.convertToHex(Blob.valueOf(dangerousValue.left(1))) +
+          ' must receive an apostrophe guard.'
+      );
+    }
+  }
+
+  @IsTest
   static void fileService_CreatesLinkedResultAndUpdatesUpload() {
     Bulk_Record_Upload__c upload = BulkRecordUploadTestDataFactory.createUpload(
       'RESULT_FILE'
@@ -55,6 +97,33 @@ private with sharing class BulkRecordUploadResultTest {
         FROM ContentDocumentLink
         WHERE LinkedEntityId = :upload.Id
       ]
+    );
+  }
+
+  private static BulkRecordUploadProjection resultProjection() {
+    BulkRecordUploadFieldProjection field = new BulkRecordUploadFieldProjection(
+      'name',
+      'Name',
+      'Name',
+      'STRING',
+      'REPLACE',
+      1,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    );
+    return new BulkRecordUploadProjection(
+      'RESULT_FORMULA',
+      'hash',
+      'Account',
+      'INSERT',
+      new List<String>(),
+      100,
+      30,
+      new List<BulkRecordUploadFieldProjection>{ field }
     );
   }
 }

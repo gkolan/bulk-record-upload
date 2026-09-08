@@ -146,9 +146,8 @@ public with sharing class BulkRecordUploadJob implements Queueable, Database.Bat
         .applyContext(projection, upload.ContextRecordId__c, mapped);
       Schema.SObjectField upsertField = resolveUpsertField(projection);
       persistenceBoundary = Database.setSavepoint();
-      List<BulkRecordUploadRowResult> outcomes = new BulkRecordUploadProcessors()
-        .resolve(projection.processorKey)
-        .process(projection, mapped, upsertField);
+      List<BulkRecordUploadRowResult> outcomes = new BulkRecordUploadPersistenceGateway()
+        .persist(projection.operation, mapped, upsertField);
       String resultPayload = new BulkRecordUploadResultWriter()
         .write(outcomes, projection, rows)
         .toString();

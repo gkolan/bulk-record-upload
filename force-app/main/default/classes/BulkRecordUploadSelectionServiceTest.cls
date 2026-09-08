@@ -209,7 +209,6 @@ private with sharing class BulkRecordUploadSelectionServiceTest {
       DeveloperName = name,
       MasterLabel = label,
       IsActive__c = true,
-      ConfigurationVersion__c = 2,
       ObjectApiName__c = 'Account'
     );
   }

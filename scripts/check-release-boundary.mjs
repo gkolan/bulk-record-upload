@@ -8,6 +8,9 @@ const forbiddenPaths = [
   "specs/",
   "bugs/",
   "docs/evidence/",
+  "docs/internal/",
+  "docs/research/",
+  "internal/",
   ".agents/",
   ".codex/",
   ".claude/",
@@ -15,6 +18,12 @@ const forbiddenPaths = [
   ".sfdx/",
   "coverage/",
   "report/",
+  "reports/",
+  "test-results/",
+  "review-artifacts/",
+  "artifacts/",
+  "tmp/",
+  "temp/",
   "code-analyzer/"
 ];
 const localFiles = new Set([
@@ -36,6 +45,46 @@ const sensitivePatterns = [
 const orgIdPattern = /00D[A-Za-z0-9]{12,15}/;
 const errors = [];
 
+function checkNpmArchive() {
+  const npmExecutable = process.env.npm_execpath ? process.execPath : "npm";
+  const npmArguments = process.env.npm_execpath
+    ? [process.env.npm_execpath]
+    : [];
+  const output = execFileSync(
+    npmExecutable,
+    [...npmArguments, "pack", "--dry-run", "--json", "--ignore-scripts"],
+    {
+      encoding: "utf8",
+      env: { ...process.env, npm_config_cache: resolve(".npm-cache") },
+      stdio: ["ignore", "pipe", "pipe"]
+    }
+  );
+  const archive = JSON.parse(output)[0];
+  const archivedFiles = archive.files.map((entry) =>
+    entry.path.replaceAll("\\", "/")
+  );
+  for (const file of archivedFiles) {
+    if (
+      forbiddenPaths.some((prefix) => file.startsWith(prefix)) ||
+      localFiles.has(file) ||
+      file.includes("/node_modules/") ||
+      /^manifest\/destructiveChanges-.*\.xml$/u.test(file)
+    ) {
+      errors.push(`${file}: forbidden npm archive path`);
+    }
+  }
+  if (archive.entryCount > 1000) {
+    errors.push(
+      `npm archive contains ${archive.entryCount} files; expected at most 1000`
+    );
+  }
+  if (archive.unpackedSize > 10 * 1024 * 1024) {
+    errors.push(
+      `npm archive expands to ${archive.unpackedSize} bytes; expected at most 10 MiB`
+    );
+  }
+}
+
 function walk(path) {
   const entries = readdirSync(path, { withFileTypes: true });
   const result = [];
@@ -46,9 +95,16 @@ function walk(path) {
         "node_modules",
         "research",
         "development-standards",
+        "internal",
         ".sf",
         "coverage",
         "report",
+        "reports",
+        "test-results",
+        "review-artifacts",
+        "artifacts",
+        "tmp",
+        "temp",
         "code-analyzer"
       ].includes(entry.name)
     )
@@ -114,7 +170,10 @@ for (const file of trackedCandidates) {
       ".cls",
       ".html",
       ".css",
-      ".txt"
+      ".txt",
+      ".csv",
+      ".apex",
+      ".soql"
     ].includes(extname(file))
   )
     continue;
@@ -137,6 +196,8 @@ for (const term of [
 ])
   if (manifest.includes(term))
     errors.push(`manifest/package.xml: unsupported member ${term}`);
+
+checkNpmArchive();
 
 if (errors.length) {
   console.error(errors.join("\n"));

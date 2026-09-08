@@ -34,7 +34,6 @@ private class BulkRecordUploadLookupMappingTest {
       null,
       null,
       null,
-      null,
       '{first_name} {last_name}',
       null,
       null,
@@ -171,11 +170,32 @@ private class BulkRecordUploadLookupMappingTest {
   @IsTest
   static void coercer_SupportedScalarTypes_ReturnTypedValues() {
     BulkRecordUploadValueCoercer coercer = new BulkRecordUploadValueCoercer();
+    Assert.areEqual('text', coercer.coerce('text', 'STRING'));
+    Assert.areEqual('text', coercer.coerce('text', 'TEXTAREA'));
+    Assert.areEqual('a@example.com', coercer.coerce('a@example.com', 'EMAIL'));
+    Assert.areEqual('555-0100', coercer.coerce('555-0100', 'PHONE'));
+    Assert.areEqual(
+      'https://example.com',
+      coercer.coerce('https://example.com', 'URL')
+    );
+    String currentUserId = UserInfo.getUserId();
+    Assert.areEqual(currentUserId, coercer.coerce(currentUserId, 'ID'));
+    Assert.areEqual('Hot', coercer.coerce('Hot', 'PICKLIST'));
+    Assert.areEqual('A;B', coercer.coerce('A | B', 'MULTIPICKLIST'));
     Assert.areEqual(true, coercer.coerce('yes', 'BOOLEAN'));
+    Assert.areEqual(false, coercer.coerce('0', 'BOOLEAN'));
+    Assert.areEqual(42, coercer.coerce('42', 'INTEGER'));
+    Assert.areEqual(42L, coercer.coerce('42', 'LONG'));
+    Assert.areEqual(12.5, coercer.coerce('12.5', 'DOUBLE'));
     Assert.areEqual(12.5, coercer.coerce('12.5', 'CURRENCY'));
+    Assert.areEqual(12.5, coercer.coerce('12.5%', 'PERCENT'));
     Assert.areEqual(
       Date.newInstance(2026, 8, 12),
       coercer.coerce('2026-08-12', 'DATE')
+    );
+    Assert.areEqual(
+      Datetime.newInstanceGmt(2026, 8, 12, 10, 11, 12),
+      coercer.coerce('2026-08-12T10:11:12Z', 'DATETIME')
     );
   }
 
@@ -250,7 +270,6 @@ private class BulkRecordUploadLookupMappingTest {
       false,
       'NONE',
       new Set<String>(),
-      null,
       null,
       null,
       null,

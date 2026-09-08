@@ -5,8 +5,15 @@ const root = process.cwd();
 const metadataDir = path.join(root, "examples", "main", "default");
 const customMetadataDir = path.join(metadataDir, "customMetadata");
 const csvDir = path.join(root, "docs", "examples", "demo");
-fs.rmSync(customMetadataDir, { recursive: true, force: true });
 fs.mkdirSync(customMetadataDir, { recursive: true });
+for (const entry of fs.readdirSync(customMetadataDir)) {
+  if (
+    entry.startsWith("Bulk_Record_Upload_Process.") ||
+    entry.startsWith("Bulk_Record_Upload_Process_Field.")
+  ) {
+    fs.rmSync(path.join(customMetadataDir, entry));
+  }
+}
 fs.mkdirSync(csvDir, { recursive: true });
 
 const objects = {
@@ -115,9 +122,6 @@ for (const [objectApi, config] of Object.entries(objects)) {
       value("Operation__c", "string", operation),
       value("RowsPerBatch__c", "double", 100),
       value("RetentionDays__c", "double", 30),
-      value("ConfigurationVersion__c", "double", 2),
-      value("ProcessingMode__c", "string", "STANDARD_DML"),
-      value("ProcessorKey__c", "string", "STANDARD_DML"),
       value("IsActive__c", "boolean", true)
     ];
     if (objectApi === "Contact" && operation === "INSERT") {

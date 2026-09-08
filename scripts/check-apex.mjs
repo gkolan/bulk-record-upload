@@ -4,6 +4,8 @@ import { basename, resolve } from "node:path";
 const classesDirectory = resolve("force-app/main/default/classes");
 const manifest = readFileSync(resolve("manifest/package.xml"), "utf8");
 const errors = [];
+const productionRegistries = [];
+const persistenceCallers = [];
 
 function valuesFromContract(source, prefix) {
   return new Set(
@@ -46,6 +48,19 @@ if (existsSync(classesDirectory)) {
     const source = readFileSync(path, "utf8");
     const className = basename(entry.name, ".cls");
     const lineCount = source.split(/\r?\n/).length;
+    const isTestClass = /Test$/u.test(className);
+
+    if (!isTestClass && /Registry$/u.test(className)) {
+      productionRegistries.push(className);
+    }
+    if (
+      !isTestClass &&
+      /new\s+BulkRecordUploadPersistenceGateway\s*\(\s*\)\s*\.persist\s*\(/u.test(
+        source
+      )
+    ) {
+      persistenceCallers.push(className);
+    }
 
     if (lineCount > 500)
       errors.push(
@@ -94,6 +109,23 @@ if (existsSync(classesDirectory)) {
       );
     }
   }
+}
+
+if (
+  productionRegistries.length !== 1 ||
+  productionRegistries[0] !== "BulkRecordUploadExtensionRegistry"
+) {
+  errors.push(
+    `Apex extension boundary: expected only BulkRecordUploadExtensionRegistry; found=${productionRegistries.join(",") || "none"}`
+  );
+}
+if (
+  persistenceCallers.length !== 1 ||
+  persistenceCallers[0] !== "BulkRecordUploadJob"
+) {
+  errors.push(
+    `Package persistence boundary: expected only BulkRecordUploadJob; found=${persistenceCallers.join(",") || "none"}`
+  );
 }
 
 const contractPath = resolve(

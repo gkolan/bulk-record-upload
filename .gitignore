@@ -23,10 +23,14 @@ yarn-error.log*
 
 # Dependency directories
 node_modules/
+.npm-cache/
 
 # Local research and borrowed standards (not part of the distributable project)
 research/
 development-standards/
+/internal/
+/docs/internal/
+/docs/research/
 
 # Local planning, review history, and agent instructions
 /specs/
@@ -52,13 +56,21 @@ development-standards/
 # Salesforce and test output
 test-results/
 report/
+reports/
 code-analyzer/
 code-analyzer-results-*.json
 review-artifacts/
+/artifacts/
+/tmp/
+/temp/
 **/testresults/
 *.tsbuildinfo
 *.coverage
 .nyc_output/
+*.tmp
+*.bak
+*.orig
+*.rej
 
 # IDE and local agent state
 .idea/

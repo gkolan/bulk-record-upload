@@ -32,7 +32,7 @@ An upload moves through `QUEUED`, `VALIDATING`, and `PROCESSING`, then reaches e
 
 ## Access and retention
 
-Every read and every data change an upload performs applies the running user's own sharing, object, and field access — configuration can never grant access to an object, field, extension class, or merge strategy that isn't already allowed through Salesforce's own permission model.
+Every read and every data change an upload performs applies the running user's own sharing, object, and field access—configuration can never grant access to an object, field, or extension class that isn't already allowed through Salesforce's own permission model. Field merging and persistence use package-owned implementations.
 
 Retention is one setting per process (**History Retention Days**, 7–365 days, default 90) that applies to that process's upload history and its input and result Files together — there's no separate retention period for files versus history.
 

@@ -35,31 +35,6 @@
     >30</value>
     </values>
     <values>
-        <field>ConfigurationVersion__c</field>
-        <value
-      xsi:type="xsd:double"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >2</value>
-    </values>
-    <values>
-        <field>ProcessingMode__c</field>
-        <value
-      xsi:type="xsd:string"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >STANDARD_DML</value>
-    </values>
-    <values>
-        <field>ProcessorKey__c</field>
-        <value
-      xsi:type="xsd:string"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >STANDARD_DML
-</value>
-    </values>
-    <values>
         <field>IsActive__c</field>
         <value
       xsi:type="xsd:boolean"
@@ -90,29 +65,5 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     >AccountId</value>
-    </values>
-    <values>
-        <field>Subtitle__c</field>
-        <value
-      xsi:type="xsd:string"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >Upload contacts for the current account.</value>
-    </values>
-    <values>
-        <field>IconName__c</field>
-        <value
-      xsi:type="xsd:string"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >standard:contact</value>
-    </values>
-    <values>
-        <field>Instructions__c</field>
-        <value
-      xsi:type="xsd:string"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    >&lt;p&gt;Before uploading:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Download and use the CSV template.&lt;/li&gt;&lt;li&gt;Include a Last Name for every contact.&lt;/li&gt;&lt;li&gt;Save the file as UTF-8 CSV.&lt;/li&gt;&lt;/ul&gt;</value>
     </values>
 </CustomMetadata>

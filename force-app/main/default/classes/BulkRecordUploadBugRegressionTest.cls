@@ -333,7 +333,6 @@ private with sharing class BulkRecordUploadBugRegressionTest {
       true,
       'NONE',
       new Set<String>(),
-      null,
       validationPattern,
       null,
       null,
@@ -424,7 +423,6 @@ private with sharing class BulkRecordUploadBugRegressionTest {
       Operation__c = 'INSERT',
       RowsPerBatch__c = 100,
       RetentionDays__c = 30,
-      ConfigurationVersion__c = 2,
       IsActive__c = true
     );
     BulkRecordUploadConfigRepository.Configuration configuration = new BulkRecordUploadConfigRepository(

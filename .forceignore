@@ -18,3 +18,12 @@ docs/evidence/
 specs/
 research/
 development-standards/
+bugs/
+report/
+reports/
+internal/
+docs/internal/
+docs/research/
+.agents/
+.codex/
+.claude/

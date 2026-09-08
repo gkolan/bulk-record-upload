@@ -5,13 +5,13 @@
 
 ## What ships
 
-The current project installs from source; no promoted package version is available. The planned distribution is a no-namespace second-generation unlocked package. Production metadata lives under `force-app/`; demo configuration in `examples/main/default` is a separate optional deployment. Deploy the supplied Account demo page from `examples/pages/main/default` after that configuration exists, then activate it in App Builder. Follow [Install from source](../get-started/install.md) for the current installation path.
+The current project installs from source; no promoted package version is available. The planned distribution is a no-namespace second-generation unlocked package. Production metadata lives under `force-app/`; demo configuration in `examples/main/default` is a separate optional deployment. Deploy the supplied Account demo page from `examples/pages/main/default` after that configuration exists; the optional bundle assigns it only to the Bulk Record Upload app. Follow [Install from source](../get-started/install.md) for the current installation path.
 
 ## Versioning
 
-The product's version number (for example `1.2.3`) maps directly to a Salesforce package version — while a new version is being built, it's tracked as `1.2.3.NEXT`; once it's promoted (released), that exact package version becomes permanent and unchangeable. Every supported upgrade path is validated starting from the immediately preceding promoted version, so upgrades happen one step at a time, not by skipping around.
+The product's version number (for example `1.2.3`) maps directly to a Salesforce package version—while a new version is being built, it's tracked as `1.2.3.NEXT`; once it's promoted (released), that exact package version becomes permanent and unchangeable. This Day-1 line has no supported predecessor and therefore no upgrade path. A future release must declare and validate its own supported path from the immediately preceding promoted version.
 
-Four things each get their own, independently-changing version number: the process configuration format, the processor Apex, the status values, and the results CSV file format. A newer version of one doesn't force a newer version of the others. Within one version of any of these, new optional fields can be added freely — existing code that doesn't recognize a new field just ignores it. Removing a field, renaming it, changing what a value means, or making something newly required is a breaking change and requires a new major version, with migration guidance published alongside it.
+The status values and results CSV schema are explicit public contracts. Process configuration uses one current metadata shape; it has no administrator-selectable compatibility version. Persistence and field merging are package-owned. After the first promoted release, removing or renaming a field, changing what a value means, or making something newly required is a breaking change and requires a new major version with migration guidance.
 
 ## Before you uninstall
 

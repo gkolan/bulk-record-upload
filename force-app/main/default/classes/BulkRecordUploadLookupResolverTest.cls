@@ -27,7 +27,6 @@ private class BulkRecordUploadLookupResolverTest {
       null,
       null,
       null,
-      null,
       'Name',
       'Account',
       1,

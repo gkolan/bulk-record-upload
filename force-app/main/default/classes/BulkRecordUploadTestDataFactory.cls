@@ -45,12 +45,32 @@ public with sharing class BulkRecordUploadTestDataFactory {
       LastName = 'Bulk Upload ' + key,
       LanguageLocaleKey = 'en_US',
       LocaleSidKey = 'en_US',
-      ProfileId = UserInfo.getProfileId(),
+      ProfileId = leastPrivilegeProfileId(),
       TimeZoneSidKey = 'America/Chicago',
       Username = uniqueValue
     );
     insert userRecord;
     return userRecord;
+  }
+
+  private static Id leastPrivilegeProfileId() {
+    List<Profile> profiles = [
+      SELECT Id
+      FROM Profile
+      WHERE
+        UserType = 'Standard'
+        AND UserLicense.Name = 'Salesforce'
+        AND PermissionsModifyAllData = FALSE
+        AND PermissionsViewAllData = FALSE
+      WITH SYSTEM_MODE
+      ORDER BY Name
+      LIMIT 1
+    ];
+    Assert.isFalse(
+      profiles.isEmpty(),
+      'A standard least-privilege profile is required for security tests.'
+    );
+    return profiles[0].Id;
   }
 
   /**
@@ -83,6 +103,17 @@ public with sharing class BulkRecordUploadTestDataFactory {
       assignments.size(),
       'Every requested project permission set should exist.'
     );
+  }
+
+  /** Revokes one project permission set from a reusable test user. */
+  public static void revokePermissionSet(Id userId, String permissionSetName) {
+    List<PermissionSetAssignment> assignments = [
+      SELECT Id
+      FROM PermissionSetAssignment
+      WHERE AssigneeId = :userId AND PermissionSet.Name = :permissionSetName
+      WITH SYSTEM_MODE
+    ];
+    delete as system assignments;
   }
 
   /**
@@ -118,6 +149,13 @@ public with sharing class BulkRecordUploadTestDataFactory {
     Integer rowCount
   ) {
     upload.RowCount__c = rowCount;
+    update as system upload;
+  }
+
+  /** Ages one active upload beyond the supported processing window. */
+  public static void ageActiveUploadForRecovery(Bulk_Record_Upload__c upload) {
+    upload.SubmittedAt__c = System.now()
+      .addHours(-BulkRecordUploadRuntimeContract.MAX_ACTIVE_UPLOAD_HOURS - 1);
     update as system upload;
   }
 
@@ -166,6 +204,47 @@ public with sharing class BulkRecordUploadTestDataFactory {
     );
     insert as system upload;
     return upload;
+  }
+
+  /**
+   * Creates one reusable Account carrying an existing value for merge tests.
+   * @param name Account name.
+   * @param description Existing description the merge policy will combine.
+   * @return Inserted Account with a populated existing value.
+   */
+  public static Account createAccountWithDescription(
+    String name,
+    String description
+  ) {
+    Account recordValue = new Account(Name = name, Description = description);
+    insert recordValue;
+    return recordValue;
+  }
+
+  /**
+   * Removes one reusable Account so a matched record becomes unavailable.
+   * @param recordValue Account to remove.
+   * @return Identifier of the removed Account.
+   */
+  public static Id removeAccount(Account recordValue) {
+    Id removedId = recordValue.Id;
+    delete recordValue;
+    return removedId;
+  }
+
+  /**
+   * Moves one reusable upload to a terminal status with committed counts.
+   * @param upload Upload parent to complete.
+   * @param successes Committed successful row count.
+   */
+  public static void completeUpload(
+    Bulk_Record_Upload__c upload,
+    Integer successes
+  ) {
+    upload.Status__c = BulkRecordUploadRuntimeContract.STATUS_COMPLETED;
+    upload.SuccessCount__c = successes;
+    upload.CompletedAt__c = System.now();
+    update as system upload;
   }
 
   /**

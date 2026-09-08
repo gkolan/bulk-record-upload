@@ -8,7 +8,7 @@ Version 1 does not include any of the following:
 - Slack notifications or webhooks when an upload finishes
 - A generic "upload completed" event a subscriber org could subscribe to — including a Platform Event named `SlackEnvelope__e`, which doesn't exist in this package
 - Running a Flow as part of processing a row (only the Apex extension seam — see [Write and register an extension](../developer/custom-handler.md) — is supported)
-- Typing an arbitrary Apex class name anywhere an admin configures the package, outside the two specific, reviewed extension fields the framework validates
+- Typing an Apex class name into process or field configuration, CSV data, or another runtime input. The sole class-selection surface is a reviewed, source-controlled `Bulk_Record_Upload_Extension__mdt.ClassName__c` registration.
 - Custom colors for status values in the UI
 - Cancelling an upload once it's queued
 - Reading or writing a field that isn't explicitly configured on the process — there's no "upload every field" option

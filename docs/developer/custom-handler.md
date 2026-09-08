@@ -1,11 +1,14 @@
 # Write and register an extension
 
 > [!NOTE]
-> On this page, write an Apex class that plugs into row preparation or field merging, register it, and see exactly what running it looks like — for both of this package's extension points.
+> On this page, write an Apex class that plugs into row preparation, register it, and see exactly what running it looks like.
 
-There are exactly two places you can run your own Apex: the **row-extension seam** (touch a row before it's mapped, or observe results after saving) and the **custom merge strategy seam** (decide how a new CSV value combines with an existing Salesforce value). Nothing else accepts a class name — not a CSV cell, not a free-text admin field anywhere else. A class only ever runs if it's named in one of these two specific Custom Metadata fields, both reviewed and set by an admin, not an end user.
+There is exactly one place to run subscriber Apex: the **row-extension seam** can touch a row before
+it is mapped or observe safe results after saving. Nothing else accepts a class name—not a CSV cell,
+process metadata, field metadata, or persistence setting. A class runs only when a reviewed,
+source-controlled `Bulk_Record_Upload_Extension__mdt` registration names it.
 
-## Extension point 1: the row-extension seam
+## The row-extension seam
 
 `BulkRecordUploadExtension` is the interface:
 
@@ -23,7 +26,14 @@ public interface BulkRecordUploadExtension {
 }
 ```
 
-`beforeMap` runs once per chunk, before row mapping — use it for bounded normalization or validation across a whole chunk of rows at once. It never receives record Ids, because mapping to Salesforce fields hasn't happened yet. `afterProcess` runs once per chunk, after that chunk has already been saved — use it to observe the safe, already-persisted results (never the raw CSV). Neither phase can perform DML, SOQL, callouts, or async work in an unbounded loop, and neither can write to the database directly — saving records stays entirely on the package's own reviewed path (see [architecture](architecture.md#limitations)). An extension transforms and observes; it never persists.
+`beforeMap` runs once per chunk, before row mapping — use it for bounded normalization or validation across a whole chunk of rows at once. It never receives record Ids, because mapping to Salesforce fields hasn't happened yet. `afterProcess` runs once per chunk, after that chunk has already been saved — use it to observe the safe, already-persisted results (never the raw CSV).
+
+An extension is subscriber Apex, and Salesforce does not sandbox it from SOQL, DML, callouts, or
+asynchronous work that its execution context permits. Treat its class and registration like any
+other production Apex deployment: review it for sharing, CRUD/FLS, user-mode access, secrets,
+bulkification, transaction behavior, and governor limits. The package never delegates its mapped
+target-row save to the extension; `BulkRecordUploadPersistenceGateway` remains the only package
+path that persists those rows.
 
 If you only need one phase, extend `BulkRecordUploadExtensionAdapter` instead of implementing the interface directly — it gives you a no-op default for the phase you don't use.
 
@@ -54,7 +64,7 @@ public class ExampleUppercaseExtension extends BulkRecordUploadExtensionAdapter 
 
 **Step 2 — deploy it**, the same way you'd deploy any Apex class in this repository.
 
-**Step 3 — register it**, by creating one **Bulk Record Upload Extension** (`Bulk_Record_Upload_Extension__mdt`) record:
+**Step 3 — register it**, by adding one source-controlled **Bulk Record Upload Extension** (`Bulk_Record_Upload_Extension__mdt`) record and deploying it through your reviewed release path:
 
 | Field                                              | Value                                                                                     |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -71,9 +81,9 @@ public class ExampleUppercaseExtension extends BulkRecordUploadExtensionAdapter 
 
 ### Registering your own, in short
 
-1. Write a class implementing `BulkRecordUploadExtension` (or extending `BulkRecordUploadExtensionAdapter`).
-2. Create a `Bulk_Record_Upload_Extension__mdt` record naming it, the same way as Step 3 above.
-3. Nothing else can name your class — not CSV content, not any other admin-editable field. Only this record can.
+1. Write and review a class implementing `BulkRecordUploadExtension` (or extending `BulkRecordUploadExtensionAdapter`).
+2. Add a `Bulk_Record_Upload_Extension__mdt` record to version-controlled source and deploy it through the same review path.
+3. Nothing else can name your class — not CSV content, process/field configuration, or another runtime input. Only an active registration record can.
 
 ### What happens if a row-extension registration is wrong
 
@@ -85,71 +95,7 @@ If your extension throws an exception, the upload fails cleanly with a recorded 
 
 Cover: the transformation or observation your extension performs, how it handles null or invalid input, and that it stays within governor limits at the maximum chunk size (200 rows). `BulkRecordUploadJobTest` has worked examples of registering two extensions and asserting their run order, and of asserting a throwing extension fails safely — read it alongside your own test for the pattern.
 
-## Extension point 2: custom merge strategies
-
-`BulkRecordUploadFieldMergeStrategy` covers a narrower decision: how a nonblank CSV value combines with an existing Salesforce value on Update or Upsert, for the one case none of the built-in Existing Value Action options fit. See [Field behaviors](../reference/field-behaviors.md#existing-value-action-at-a-glance) for what those built-in options already cover before reaching for this.
-
-```apex
-public interface BulkRecordUploadFieldMergeStrategy {
-  Boolean supportsType(String fieldType);
-  Object combine(
-    BulkRecordUploadFieldProjection field,
-    Object existingValue,
-    Object incomingValue,
-    Integer maximumLength
-  );
-}
-```
-
-`supportsType` declares which field types the strategy accepts — `combine` is only ever called after blank handling and that type check both pass.
-
-### A complete merge-strategy example, from class to running upload
-
-This is the actual class shipped with the package, `BulkRecordUploadLongerTextStrategy` — it keeps whichever of the existing or incoming text is longer:
-
-```apex
-public class BulkRecordUploadLongerTextStrategy implements BulkRecordUploadFieldMergeStrategy {
-  private static final Set<String> TEXT_TYPES = new Set<String>{
-    'STRING',
-    'TEXTAREA',
-    'EMAIL',
-    'PHONE',
-    'URL',
-    'PICKLIST'
-  };
-
-  public Boolean supportsType(String fieldType) {
-    return TEXT_TYPES.contains(fieldType);
-  }
-
-  public Object combine(
-    BulkRecordUploadFieldProjection field,
-    Object existingValue,
-    Object incomingValue,
-    Integer maximumLength
-  ) {
-    String existingText = String.valueOf(existingValue);
-    String incomingText = String.valueOf(incomingValue);
-    return incomingText.length() > existingText.length()
-      ? incomingText
-      : existingText;
-  }
-}
-```
-
-To use it (or a class you write the same way), set two fields on a **Bulk Record Upload Process Field** record:
-
-| Field                                                       | Value                                |
-| ----------------------------------------------------------- | ------------------------------------ |
-| Existing Value Action (`ExistingValueAction__c`)            | `CUSTOM`                             |
-| Custom Merge Strategy Class (`CustomMergeStrategyClass__c`) | `BulkRecordUploadLongerTextStrategy` |
-
-**What running it looks like:** on an Account with `Description` already set to `Short note.`, an Update row whose CSV cell for `description` is `A much longer note with more detail than before.` results in `Description` becoming `A much longer note with more detail than before.` — the longer of the two. A row where the incoming text was shorter than the existing text would leave `Description` unchanged instead.
-
-### What happens if a merge-strategy registration is wrong
-
-Validation mirrors the row-extension seam exactly: the class name must resolve to a real class, instantiate, and implement `BulkRecordUploadFieldMergeStrategy`. It's checked eagerly when the process configuration loads — so a typo or a missing class fails immediately, before any row is processed — and again every time the strategy actually merges a row, so a class removed after configuration is still caught before it can run.
-
 ## Next steps
 
-Run the [developer test workflow](testing.md) and update the [field behavior reference](../reference/field-behaviors.md) when your extension adds a behavior an admin would configure.
+Run the [developer test workflow](testing.md). Keep persistence and field-merge behavior inside the
+package-owned paths; `BulkRecordUploadExtension` is the only subscriber Apex extension seam.

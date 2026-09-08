@@ -81,7 +81,7 @@ private class BulkRecordUploadEdgeCoverageTest {
   static void processConfig_DefaultsAndBounds_AreValidated() {
     Test.startTest();
     BulkRecordUploadProcessConfig defaults = new BulkRecordUploadProcessConfig(
-      process('  DEMO  ', null, null, null, null)
+      process('  DEMO  ', null, null, null)
     );
     Assert.areEqual(100, defaults.batchSize, 'Default batch is stable.');
     Assert.areEqual(90, defaults.retentionDays, 'Default retention is stable.');
@@ -90,10 +90,9 @@ private class BulkRecordUploadEdgeCoverageTest {
       'Blank preview permission is null.'
     );
     assertProcessFailure(null, 'Developer Name');
-    assertProcessFailure(process('X', 24, 90, 1, null), 'batch size');
-    assertProcessFailure(process('X', 100, 6, 1, null), 'retention');
-    assertProcessFailure(process('X', 100, 90, 3, null), 'version');
-    Bulk_Record_Upload_Process__mdt missing = process('X', 100, 90, 1, null);
+    assertProcessFailure(process('X', 24, 90, null), 'batch size');
+    assertProcessFailure(process('X', 100, 6, null), 'retention');
+    Bulk_Record_Upload_Process__mdt missing = process('X', 100, 90, null);
     missing.ObjectApiName__c = ' ';
     assertProcessFailure(missing, 'Target object');
     Test.stopTest();
@@ -300,7 +299,6 @@ private class BulkRecordUploadEdgeCoverageTest {
     String name,
     Decimal batch,
     Decimal retention,
-    Decimal version,
     String permissionName
   ) {
     return new Bulk_Record_Upload_Process__mdt(
@@ -309,7 +307,6 @@ private class BulkRecordUploadEdgeCoverageTest {
       Operation__c = 'INSERT',
       RowsPerBatch__c = batch,
       RetentionDays__c = retention,
-      ConfigurationVersion__c = version,
       PreviewPermissionApiName__c = permissionName
     );
   }

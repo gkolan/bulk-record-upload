@@ -48,35 +48,6 @@ private class BulkRecordUploadFieldConfigTest {
   }
 
   @IsTest
-  static void constructor_CustomActionWithoutClass_ThrowsDomainException() {
-    Bulk_Record_Upload_Process_Field__mdt recordValue = baseRecord();
-    recordValue.ExistingValueAction__c = 'CUSTOM';
-
-    try {
-      new BulkRecordUploadFieldConfig(recordValue);
-      Assert.fail('Expected a missing custom merge strategy class exception.');
-    } catch (BulkRecordUploadException error) {
-      Assert.isTrue(error.getMessage().contains('Custom Merge Strategy Class'));
-    }
-  }
-
-  @IsTest
-  static void constructor_CustomActionWithClass_IsAccepted() {
-    Bulk_Record_Upload_Process_Field__mdt recordValue = baseRecord();
-    recordValue.ExistingValueAction__c = 'CUSTOM';
-    recordValue.CustomMergeStrategyClass__c = 'BulkRecordUploadLongerTextStrategy';
-
-    BulkRecordUploadFieldConfig config = new BulkRecordUploadFieldConfig(
-      recordValue
-    );
-
-    Assert.areEqual(
-      'BulkRecordUploadLongerTextStrategy',
-      config.customMergeStrategyClass
-    );
-  }
-
-  @IsTest
   static void constructor_InvalidValidationPattern_ThrowsDomainException() {
     Bulk_Record_Upload_Process_Field__mdt recordValue = baseRecord();
     recordValue.ValidationPattern__c = '[unterminated';

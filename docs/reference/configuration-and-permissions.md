@@ -6,7 +6,7 @@
 
 ## Configuration is not authorization
 
-A **Bulk Record Upload Process** record's target object, operation, processor key, batch size, retention period, and active state are configuration inputs — none of them grant access on their own. Every object, field, Apex extension class, or merge strategy class a process names is still re-checked against Schema and the package's own reviewed registries at run time; naming something in configuration that isn't actually allowed produces a configuration error, not a bypass.
+A **Bulk Record Upload Process** record's target object, operation, batch size, retention period, and active state are configuration inputs—none of them grant access on their own. Every configured object and field is re-checked against Schema, and every Apex extension class is resolved through the package's one reviewed registry at run time. Naming something in configuration that isn't actually allowed produces a configuration error, not a bypass. Persistence and field-merge implementations remain package-owned.
 
 Version 1 ships with no Custom Metadata records of its own — a subscriber creates every process, field, bundle, and extension record for their own approved objects and fields after installing. The shipped example and test records live outside the core package manifest.
 
@@ -34,11 +34,11 @@ Each person still needs the normal Salesforce permissions for the object and fie
 
 ## Retention
 
-Retention is one setting per process, 7–365 days (default 90), applied together to that process's upload history and its input and result Files — cleanup removes expired chunks and Files without needing Modify All Data, and only ever records safe identifiers and counts, never CSV content.
+Retention is one setting per process, 7–365 days (default 90), applied together to that process's upload history and its input and result Files. An administrator must schedule the package's daily maintenance job during installation; see [Install from source](../get-started/install.md#4-schedule-retention-and-recovery). Cleanup removes expired chunks and package-owned Files without needing Modify All Data and records only safe identifiers and counts, never CSV content. A File with an unrelated link is preserved.
 
 ## What fails configuration validation before any record is touched
 
-An inactive process, an object or field Salesforce doesn't recognize, a disallowed operation, an unregistered extension or merge strategy class, a missing required preview permission, a duplicate column key or sequence, or a field the current user can't actually access — every one of these is caught at configuration-load time, before any target-object DML runs. The error a user sees names the configuration entry and a safe identifier, never a CSV value.
+An inactive process, an object or field Salesforce doesn't recognize, a disallowed operation, an unregistered extension class, a missing required preview permission, a duplicate column key or sequence, or a field the current user can't actually access—every one of these is caught at configuration-load time, before any target-object DML runs. The error a user sees names the configuration entry and a safe identifier, never a CSV value.
 
 ## Related
 

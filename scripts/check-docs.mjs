@@ -192,6 +192,32 @@ for (const match of runtimeContract.matchAll(
   }
 }
 
+const demoGuide = readFileSync(resolve("docs/examples/demo/README.md"), "utf8");
+for (const objectName of ["Account", "Contact", "Opportunity"]) {
+  for (const operationName of ["Insert", "Update", "Upsert", "Delete"]) {
+    const processKey = `${objectName}_${operationName}_Demo`;
+    if (!new RegExp("^\\| `" + processKey + "`\\s+\\|", "m").test(demoGuide)) {
+      errors.push(
+        `docs/examples/demo/README.md: missing complete example contract row for ${processKey}`
+      );
+    }
+  }
+}
+for (const requiredText of [
+  "Exact headers",
+  "Configured behavior",
+  "Expected business records and result",
+  "Repeat-run effect",
+  "For any failed or partial run",
+  "For cleanup after any row"
+]) {
+  if (!demoGuide.includes(requiredText)) {
+    errors.push(
+      `docs/examples/demo/README.md: missing example contract section ${requiredText}`
+    );
+  }
+}
+
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);

@@ -27,7 +27,9 @@ The CSV file you upload is stored as a Salesforce File, which follows Salesforce
 ## A couple of things Bulk Record Upload checks strictly
 
 - Every object and field name a process is configured with is checked against Salesforce's own object/field metadata before it's used — a typo or a made-up field name is rejected at configuration time, not allowed to fail unpredictably later.
-- A custom Apex class (a row-extension or a custom merge strategy — see [Write and register an extension](../developer/custom-handler.md)) only runs if it's been explicitly registered by an admin in Custom Metadata. A class isn't trusted just because it exists in the org.
+- A custom Apex class runs only through the `BulkRecordUploadExtension` seam after an admin
+  explicitly registers it in Custom Metadata. A class isn't trusted just because it exists in the
+  org. See [Write and register an extension](../developer/custom-handler.md).
 
 ## Next steps
 

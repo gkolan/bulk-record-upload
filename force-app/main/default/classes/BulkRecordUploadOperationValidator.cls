@@ -30,5 +30,15 @@ public with sharing class BulkRecordUploadOperationValidator implements BulkReco
         'Upsert requires exactly one upsert key.'
       );
     }
+    if (
+      (operation == 'INSERT' && (matchKeys != 0 || upsertKeys != 0)) ||
+      ((operation == 'UPDATE' || operation == 'DELETE') && upsertKeys != 0) ||
+      (operation == 'UPSERT' &&
+      matchKeys != 0)
+    ) {
+      throw new BulkRecordUploadException(
+        'The configured key type is not supported for this operation.'
+      );
+    }
   }
 }

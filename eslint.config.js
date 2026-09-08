@@ -66,5 +66,19 @@ module.exports = defineConfig([
       eslintJs
     },
     extends: ["eslintJs/recommended"]
+  },
+
+  // Repository automation runs in Node rather than the LWC runtime.
+  {
+    files: ["scripts/**/*.mjs"],
+    extends: [eslintJs.configs.recommended],
+    languageOptions: {
+      sourceType: "module",
+      ecmaVersion: "latest",
+      globals: {
+        ...globals.node,
+        ...globals.es2021
+      }
+    }
   }
 ]);

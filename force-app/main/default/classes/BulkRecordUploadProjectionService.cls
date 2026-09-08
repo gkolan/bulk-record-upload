@@ -163,14 +163,15 @@ public with sharing class BulkRecordUploadProjectionService {
         fieldConfig,
         fieldDescribe
       );
+      BulkRecordUploadProjectionValidator.validateBehaviorOptions(
+        fieldConfig,
+        fieldDescribe
+      );
       projectedFields.add(createFieldProjection(fieldConfig, fieldDescribe));
     }
     BulkRecordUploadProjectionValidator.validateSourceTemplates(
       projectedFields,
       rawColumnKeys
-    );
-    BulkRecordUploadProjectionValidator.validateCustomMergeStrategies(
-      projectedFields
     );
     BulkRecordUploadProjectionValidator.validateRecordContext(
       configuration.process,
@@ -182,7 +183,6 @@ public with sharing class BulkRecordUploadProjectionService {
       objectDescribe.getName(),
       configuration.process.operation,
       extensionClassNames,
-      configuration.process.processorKey,
       configuration.process.recordContextAction,
       configuration.process.hostObjectApiName,
       configuration.process.recordContextFieldApiName,
@@ -230,7 +230,6 @@ public with sharing class BulkRecordUploadProjectionService {
       config.trimValue,
       config.caseAction,
       config.blankTokens,
-      config.customMergeStrategyClass,
       config.validationPattern,
       config.minValue,
       config.maxValue,

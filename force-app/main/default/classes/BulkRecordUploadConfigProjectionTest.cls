@@ -72,6 +72,57 @@ private class BulkRecordUploadConfigProjectionTest {
   }
 
   @IsTest
+  static void repository_DuplicateExtensionSortOrder_IsRejected() {
+    BulkRecordUploadConfigRepository repository = createRepository(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>{
+        extensionRecord('FirstExtension', 10),
+        extensionRecord('SecondExtension', 10)
+      }
+    );
+
+    Test.startTest();
+    try {
+      repository.findActive('CONTACT_INSERT');
+      Assert.fail('Expected duplicate extension order to fail.');
+    } catch (BulkRecordUploadException error) {
+      Assert.isTrue(
+        error.getMessage().contains('sort order'),
+        'The safe error should identify the invalid extension order.'
+      );
+    }
+    Test.stopTest();
+  }
+
+  @IsTest
+  static void repository_InactiveExtension_IsExcluded() {
+    Bulk_Record_Upload_Extension__mdt inactive = extensionRecord(
+      'InactiveExtension',
+      10
+    );
+    inactive.IsActive__c = false;
+    BulkRecordUploadConfigRepository repository = createRepository(
+      new List<Bulk_Record_Upload_Process_Field__mdt>{
+        createField('last_name', 'LastName', 1)
+      },
+      new List<Bulk_Record_Upload_Extension__mdt>{ inactive }
+    );
+
+    Test.startTest();
+    BulkRecordUploadConfigRepository.Configuration result = repository.findActive(
+      'CONTACT_INSERT'
+    );
+    Test.stopTest();
+
+    Assert.isTrue(
+      result.getExtensions().isEmpty(),
+      'Inactive extension registrations must not enter the projection.'
+    );
+  }
+
+  @IsTest
   static void repository_MissingProcess_ThrowsSafeException() {
     BulkRecordUploadConfigRepository repository = createRepository(
       new List<Bulk_Record_Upload_Process_Field__mdt>(),
@@ -99,7 +150,7 @@ private class BulkRecordUploadConfigProjectionTest {
     );
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      operatorPermissionSets()
     );
     BulkRecordUploadProjectionService service = createService(
       new List<Bulk_Record_Upload_Process_Field__mdt>{
@@ -139,7 +190,7 @@ private class BulkRecordUploadConfigProjectionTest {
     User operatorUser = BulkRecordUploadTestDataFactory.createUser('template');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      operatorPermissionSets()
     );
     Bulk_Record_Upload_Process_Field__mdt derivedField = createField(
       'full_name',
@@ -178,7 +229,7 @@ private class BulkRecordUploadConfigProjectionTest {
     );
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      operatorPermissionSets()
     );
     Bulk_Record_Upload_Process_Field__mdt derivedField = createField(
       'full_name',
@@ -212,7 +263,7 @@ private class BulkRecordUploadConfigProjectionTest {
     User operatorUser = BulkRecordUploadTestDataFactory.createUser('handler');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      operatorPermissionSets()
     );
     BulkRecordUploadProjectionService service = createService(
       new List<Bulk_Record_Upload_Process_Field__mdt>{
@@ -243,7 +294,7 @@ private class BulkRecordUploadConfigProjectionTest {
     User operatorUser = BulkRecordUploadTestDataFactory.createUser('field');
     BulkRecordUploadTestDataFactory.assignPermissionSets(
       operatorUser.Id,
-      new Set<String>{ 'Bulk_Record_Upload_User' }
+      operatorPermissionSets()
     );
     BulkRecordUploadProjectionService service = createService(
       new List<Bulk_Record_Upload_Process_Field__mdt>{
@@ -293,8 +344,7 @@ private class BulkRecordUploadConfigProjectionTest {
       Operation__c = 'MERGE',
       RowsPerBatch__c = 100,
       RetentionDays__c = 90,
-      IsActive__c = true,
-      ConfigurationVersion__c = 1
+      IsActive__c = true
     );
 
     Test.startTest();
@@ -322,6 +372,13 @@ private class BulkRecordUploadConfigProjectionTest {
     );
   }
 
+  private static Set<String> operatorPermissionSets() {
+    return new Set<String>{
+      'Bulk_Record_Upload_User',
+      'Bulk_Record_Upload_Demo_Target_Access'
+    };
+  }
+
   private static BulkRecordUploadConfigRepository createRepository(
     List<Bulk_Record_Upload_Process_Field__mdt> fields,
     List<Bulk_Record_Upload_Extension__mdt> extensions
@@ -332,8 +389,7 @@ private class BulkRecordUploadConfigProjectionTest {
       Operation__c = 'INSERT',
       RowsPerBatch__c = 100,
       RetentionDays__c = 90,
-      IsActive__c = true,
-      ConfigurationVersion__c = 1
+      IsActive__c = true
     );
     return new BulkRecordUploadConfigRepository(
       new Map<String, Bulk_Record_Upload_Process__mdt>{

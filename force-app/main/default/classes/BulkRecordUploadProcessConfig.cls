@@ -8,9 +8,6 @@ public class BulkRecordUploadProcessConfig {
   public String previewPermission { get; private set; }
   public Integer batchSize { get; private set; }
   public Integer retentionDays { get; private set; }
-  public Integer contractVersion { get; private set; }
-  public String processingMode { get; private set; }
-  public String processorKey { get; private set; }
   public String recordContextAction { get; private set; }
   public String hostObjectApiName { get; private set; }
   public String recordContextFieldApiName { get; private set; }
@@ -41,13 +38,6 @@ public class BulkRecordUploadProcessConfig {
       : recordValue.PreviewPermissionApiName__c.trim();
     batchSize = decimalToInteger(recordValue.RowsPerBatch__c, 100);
     retentionDays = decimalToInteger(recordValue.RetentionDays__c, 90);
-    contractVersion = decimalToInteger(recordValue.ConfigurationVersion__c, 1);
-    processingMode = String.isBlank(recordValue.ProcessingMode__c)
-      ? 'STANDARD_DML'
-      : recordValue.ProcessingMode__c.trim().toUpperCase();
-    processorKey = String.isBlank(recordValue.ProcessorKey__c)
-      ? 'STANDARD_DML'
-      : recordValue.ProcessorKey__c.trim().toUpperCase();
     recordContextAction = String.isBlank(recordValue.RecordContextAction__c)
       ? 'NONE'
       : recordValue.RecordContextAction__c.trim().toUpperCase();
@@ -101,19 +91,6 @@ public class BulkRecordUploadProcessConfig {
     if (retentionDays < 7 || retentionDays > 365) {
       throw new BulkRecordUploadException(
         'Process retention must be between 7 and 365 days.'
-      );
-    }
-    if (!new Set<Integer>{ 1, 2 }.contains(contractVersion)) {
-      throw new BulkRecordUploadException(
-        'Process contract version is not supported.'
-      );
-    }
-    if (
-      processingMode != 'STANDARD_DML' ||
-      !BulkRecordUploadProcessors.isRegistered(processorKey)
-    ) {
-      throw new BulkRecordUploadException(
-        'Process processor configuration is not supported.'
       );
     }
   }

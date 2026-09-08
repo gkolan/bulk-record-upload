@@ -184,10 +184,7 @@ public with sharing class BulkRecordUploadSelectionService {
   }
 
   private static Boolean isActive(Bulk_Record_Upload_Process__mdt process) {
-    return process != null &&
-      process.IsActive__c == true &&
-      (process.ConfigurationVersion__c == 1 ||
-      process.ConfigurationVersion__c == 2);
+    return process != null && process.IsActive__c == true;
   }
 
   private static Boolean isAuthorized(String processKey) {

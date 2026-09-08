@@ -8,8 +8,14 @@ List<String> processKeys = new List<String>{
 
 for (String processKey : processKeys) {
   String templateCsv = BulkRecordUploadController.getTemplate(processKey);
-  System.assert(String.isNotBlank(templateCsv), processKey + ' must generate a CSV template.');
-  System.assert(templateCsv.contains('\n'), processKey + ' template must include a CSV header and sample row.');
+  System.assert(
+    String.isNotBlank(templateCsv),
+    processKey + ' must generate a CSV template.'
+  );
+  System.assert(
+    templateCsv.contains('\n'),
+    processKey + ' template must include a CSV header and sample row.'
+  );
 }
 
 System.assertEquals(
@@ -24,6 +30,10 @@ System.assertEquals(
 
 System.assertEquals(
   3,
-  [SELECT COUNT() FROM Account WHERE BulkRecordUploadDemoExternalId__c LIKE 'ACC-DEMO-%'],
+  [
+    SELECT COUNT()
+    FROM Account
+    WHERE BulkRecordUploadDemoExternalId__c LIKE 'ACC-DEMO-%'
+  ],
   'The Account demo must include one, multiple, and selectable record fixtures.'
 );

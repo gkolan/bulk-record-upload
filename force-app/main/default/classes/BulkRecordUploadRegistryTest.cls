@@ -57,6 +57,32 @@ private class BulkRecordUploadRegistryTest {
   }
 
   @IsTest
+  static void extensionRegistry_InjectionShapedClassName_IsRejected() {
+    Boolean rejected = false;
+    String message;
+
+    Test.startTest();
+    try {
+      new BulkRecordUploadExtensionRegistry()
+        .resolve(
+          new List<String>{
+            'BulkRecordUploadTrimHandler); System.abortJob(null); //'
+          }
+        );
+    } catch (BulkRecordUploadException error) {
+      rejected = true;
+      message = error.getMessage();
+    }
+    Test.stopTest();
+
+    Assert.isTrue(rejected, 'Injection-shaped class text must fail closed.');
+    Assert.isTrue(
+      message.contains('not registered'),
+      'The rejection should use the bounded registration error.'
+    );
+  }
+
+  @IsTest
   static void extensionRegistry_TooManyExtensions_IsRejected() {
     List<String> tooMany = new List<String>();
     for (
@@ -106,6 +132,33 @@ private class BulkRecordUploadRegistryTest {
   }
 
   @IsTest
+  static void operationStrategy_IncompatibleKeyFlags_AreRejected() {
+    Map<String, BulkRecordUploadProjection> invalidByOperation = new Map<String, BulkRecordUploadProjection>{
+      'INSERT' => projection('INSERT', true, false),
+      'UPDATE' => projection('UPDATE', true, true),
+      'UPSERT' => projection('UPSERT', true, true),
+      'DELETE' => projection('DELETE', true, true)
+    };
+
+    Test.startTest();
+    for (String operation : invalidByOperation.keySet()) {
+      try {
+        new BulkRecordUploadOperations()
+          .resolve(operation)
+          .validateProjection(invalidByOperation.get(operation));
+        Assert.fail(operation + ' should reject an incompatible key flag.');
+      } catch (BulkRecordUploadException error) {
+        Assert.areEqual(
+          'The configured key type is not supported for this operation.',
+          error.getMessage(),
+          operation + ' should fail with the bounded configuration error.'
+        );
+      }
+    }
+    Test.stopTest();
+  }
+
+  @IsTest
   static void operations_UnknownOperation_IsRejected() {
     try {
       new BulkRecordUploadOperations().resolve('MERGE');
@@ -113,22 +166,6 @@ private class BulkRecordUploadRegistryTest {
     } catch (BulkRecordUploadException error) {
       Assert.areEqual(
         'The configured operation is not supported.',
-        error.getMessage()
-      );
-    }
-  }
-
-  @IsTest
-  static void processors_ResolveOnlyTrustedKeys() {
-    Assert.isNotNull(new BulkRecordUploadProcessors().resolve('STANDARD_DML'));
-    Assert.isTrue(BulkRecordUploadProcessors.isRegistered('STANDARD_DML'));
-
-    try {
-      new BulkRecordUploadProcessors().resolve('System.String');
-      Assert.fail('Expected an unregistered-processor exception.');
-    } catch (BulkRecordUploadException error) {
-      Assert.areEqual(
-        'The configured custom processor is not registered.',
         error.getMessage()
       );
     }
@@ -154,7 +191,6 @@ private class BulkRecordUploadRegistryTest {
       true,
       'NONE',
       new Set<String>(),
-      null,
       null,
       null,
       null,

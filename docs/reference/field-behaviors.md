@@ -20,7 +20,6 @@ Most fields on the form are exactly what they look like: type a name, pick a pic
 | Blank Tokens (`BlankTokens__c`)                                                                   | Plain words separated by commas, nothing more — `N/A, NULL, -`                                                                                                                                                                                                  |
 | Source Template (`SourceTemplate__c`)                                                             | Plain text, with another column's CSV Column Header wrapped in curly braces where you want its value inserted — `{first_name} {last_name}`. The braces aren't JSON or code; they just mark "put that column's value here," the same idea as a mail-merge field. |
 | Validation Pattern (`ValidationPattern__c`)                                                       | A regular expression — a short pattern a value must match, e.g. `[0-9]{5}` means "exactly 5 digits"                                                                                                                                                             |
-| Custom Merge Strategy Class (`CustomMergeStrategyClass__c`)                                       | The exact name of an Apex class already deployed to your org, e.g. `BulkRecordUploadLongerTextStrategy`                                                                                                                                                         |
 | Everything else on this page (Existing Value Action, Blank CSV Action, Text Separator, and so on) | Pick a value from that field's picklist — you don't type these at all                                                                                                                                                                                           |
 
 Fill in the settings for one column, save, check **Is Active**, and repeat for the next CSV column. That's the whole process. Every example below shows what to put in these same fields.
@@ -51,21 +50,20 @@ Before the individual settings: every field type the framework accepts, a real o
 
 **Existing Value Action** (`ExistingValueAction__c`) decides what happens when the target record already has a value in that field (Update and Upsert only). Insert never has an existing value, so this setting has nothing to act on.
 
-| Existing Value Action | Works on                                                            | What it does                                                                                        |
-| --------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `REPLACE`             | Any field                                                           | Use the CSV value as-is. This is the default.                                                       |
-| `KEEP_EXISTING`       | Any field                                                           | Keep the Salesforce value; ignore the CSV cell.                                                     |
-| `APPEND`              | Text, Text Area, Email, Phone, URL, Picklist, Multi-Select Picklist | Add the CSV value after the existing value, with a separator between them.                          |
-| `PREPEND`             | Same as Append                                                      | Add the CSV value before the existing value, with a separator between them.                         |
-| `ADD_VALUES`          | Multi-Select Picklist                                               | Add the CSV selections to whatever is already selected.                                             |
-| `REMOVE_VALUES`       | Multi-Select Picklist                                               | Remove the CSV selections from whatever is already selected.                                        |
-| `ADD`                 | Number, Currency, Percent                                           | Add the CSV number to the existing number.                                                          |
-| `SUBTRACT`            | Number, Currency, Percent                                           | Subtract the CSV number from the existing number.                                                   |
-| `USE_LATER`           | Date, Date/Time                                                     | Keep whichever date is later — existing or incoming.                                                |
-| `USE_EARLIER`         | Date, Date/Time                                                     | Keep whichever date is earlier — existing or incoming.                                              |
-| `TRUE_IF_EITHER`      | Checkbox                                                            | Turn the checkbox on if either value is checked.                                                    |
-| `TRUE_IF_BOTH`        | Checkbox                                                            | Turn the checkbox on only if both values are checked.                                               |
-| `CUSTOM`              | Whatever your Apex class supports                                   | Runs your own class instead. See [Write and register an extension](../developer/custom-handler.md). |
+| Existing Value Action | Works on                                                            | What it does                                                                |
+| --------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `REPLACE`             | Any field                                                           | Use the CSV value as-is. This is the default.                               |
+| `KEEP_EXISTING`       | Any field                                                           | Keep the Salesforce value; ignore the CSV cell.                             |
+| `APPEND`              | Text, Text Area, Email, Phone, URL, Picklist, Multi-Select Picklist | Add the CSV value after the existing value, with a separator between them.  |
+| `PREPEND`             | Same as Append                                                      | Add the CSV value before the existing value, with a separator between them. |
+| `ADD_VALUES`          | Multi-Select Picklist                                               | Add the CSV selections to whatever is already selected.                     |
+| `REMOVE_VALUES`       | Multi-Select Picklist                                               | Remove the CSV selections from whatever is already selected.                |
+| `ADD`                 | Number, Currency, Percent                                           | Add the CSV number to the existing number.                                  |
+| `SUBTRACT`            | Number, Currency, Percent                                           | Subtract the CSV number from the existing number.                           |
+| `USE_LATER`           | Date, Date/Time                                                     | Keep whichever date is later — existing or incoming.                        |
+| `USE_EARLIER`         | Date, Date/Time                                                     | Keep whichever date is earlier — existing or incoming.                      |
+| `TRUE_IF_EITHER`      | Checkbox                                                            | Turn the checkbox on if either value is checked.                            |
+| `TRUE_IF_BOTH`        | Checkbox                                                            | Turn the checkbox on only if both values are checked.                       |
 
 Setting an action a field doesn't support — `ADD` on a Text field, for example — fails that row with a clear error instead of silently doing nothing.
 
@@ -210,24 +208,6 @@ Both actions work the same way on Date and Date/Time fields.
 | CSV cell for `verified`        | `false`                                                           |
 | Result                         | `false` — one source no longer confirms it, so the flag turns off |
 
-## Custom (your own Apex class)
-
-**Use case:** None of the built-in actions fit — for example, keeping whichever of two text values is longer, or a merge rule specific to your business that no built-in action covers.
-
-This framework ships one working example class, `BulkRecordUploadLongerTextStrategy`, which keeps whichever of the existing or incoming text is longer. Point a column at it directly, no Apex writing required to try this:
-
-| Setting                     | Value                                                                           |
-| --------------------------- | ------------------------------------------------------------------------------- |
-| Existing Value Action       | `CUSTOM`                                                                        |
-| Custom Merge Strategy Class | `BulkRecordUploadLongerTextStrategy`                                            |
-| Existing `Description`      | `Short note.`                                                                   |
-| CSV cell for `description`  | `A much longer note with more detail than before.`                              |
-| Result                      | `A much longer note with more detail than before.` — the longer of the two wins |
-
-The class name is checked the moment the process configuration is saved — a typo or a class that doesn't exist is caught immediately, before any file is ever uploaded, instead of failing partway through a real upload.
-
-To write your own instead of using the shipped example, name your own Apex class the same way — **Custom Merge Strategy Class** just needs the exact name of any Apex class already deployed to your org that implements the framework's merge interface. See [Write and register an extension](../developer/custom-handler.md) for the full class you'd write and how to register it.
-
 ## Blank CSV cells
 
 **Blank CSV Action** (`BlankValueAction__c`) decides what an empty cell does, independently of Existing Value Action:
@@ -316,7 +296,11 @@ On a Multi-Select Picklist, Case Action applies to each selected value on its ow
 
 ## Validation Pattern and value limits
 
-Two independent checks fail a row before it reaches Salesforce, applied after the cleanup above and before any merge decision. Both are checked when the process configuration is saved, so a typo in the pattern, or a minimum greater than a maximum, is caught immediately — not on the next upload.
+Two independent checks fail a row before it reaches Salesforce, applied after the cleanup above and
+before any merge decision. The package validates the pattern and range when it loads the active
+process projection. A malformed pattern or a minimum greater than a maximum therefore blocks the
+template, preview, and submission paths after the page is reloaded; saving Custom Metadata alone
+does not execute this validation.
 
 **Use case:** A contact-import file sometimes has an `Email` value that does not match the configured
 email pattern or a `NumberOfEmployees` placeholder outside the allowed range. Each value should fail

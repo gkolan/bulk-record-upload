@@ -27,25 +27,6 @@ public with sharing class BulkRecordUploadProjectionValidator {
     Schema.DisplayType.PERCENT
   };
 
-  /** Confirms a custom existing-value action can handle its selected field. */
-  public static void validateCustomMergeStrategies(
-    List<BulkRecordUploadFieldProjection> projectedFields
-  ) {
-    BulkRecordUploadMergeStrategyRegistry registry = new BulkRecordUploadMergeStrategyRegistry();
-    for (BulkRecordUploadFieldProjection field : projectedFields) {
-      if (field.existingValueAction == 'CUSTOM') {
-        BulkRecordUploadFieldMergeStrategy strategy = registry.resolve(
-          field.customMergeStrategyClass
-        );
-        if (!strategy.supportsType(field.fieldType)) {
-          throw new BulkRecordUploadException(
-            'The custom merge strategy does not support its configured field type.'
-          );
-        }
-      }
-    }
-  }
-
   /** Confirms that number limits are used only with number fields. */
   public static void validateRange(
     BulkRecordUploadFieldConfig config,
@@ -107,8 +88,7 @@ public with sharing class BulkRecordUploadProjectionValidator {
     String action = config.existingValueAction;
     String typeName = String.valueOf(fieldDescribe.getType());
     Boolean supported =
-      new Set<String>{ 'REPLACE', 'KEEP_EXISTING', 'CUSTOM' }
-        .contains(action) ||
+      new Set<String>{ 'REPLACE', 'KEEP_EXISTING' }.contains(action) ||
       (new Set<String>{ 'APPEND', 'PREPEND' }.contains(action) &&
       BulkRecordUploadTextJoinStrategy.TEXT_TYPES.contains(typeName)) ||
       (new Set<String>{ 'ADD_VALUES', 'REMOVE_VALUES' }.contains(action) &&
@@ -122,6 +102,47 @@ public with sharing class BulkRecordUploadProjectionValidator {
     if (!supported) {
       throw new BulkRecordUploadException(
         'The existing-value action does not support its configured field type.'
+      );
+    }
+  }
+
+  /** Confirms that conditional field options are not silently ignored. */
+  public static void validateBehaviorOptions(
+    BulkRecordUploadFieldConfig config,
+    Schema.DescribeFieldResult fieldDescribe
+  ) {
+    Boolean isTextLike = BulkRecordUploadTextJoinStrategy.TEXT_TYPES.contains(
+      String.valueOf(fieldDescribe.getType())
+    );
+    Boolean joinsText = new Set<String>{ 'APPEND', 'PREPEND' }
+      .contains(config.existingValueAction);
+    if (
+      !isTextLike &&
+      (config.caseAction != 'NONE' ||
+      String.isNotBlank(config.validationPattern) ||
+      config.overflowAction != 'REJECT')
+    ) {
+      throw new BulkRecordUploadException(
+        'Text normalization and overflow options require a text-like field.'
+      );
+    }
+    if (
+      !joinsText &&
+      (config.textSeparator != 'SPACE' ||
+      String.isNotBlank(config.customSeparator) ||
+      config.duplicateTextAction != 'SKIP')
+    ) {
+      throw new BulkRecordUploadException(
+        'Text separator and duplicate options require Append or Prepend.'
+      );
+    }
+    if (
+      joinsText &&
+      config.textSeparator != 'CUSTOM' &&
+      String.isNotBlank(config.customSeparator)
+    ) {
+      throw new BulkRecordUploadException(
+        'Custom Separator requires the Custom text separator option.'
       );
     }
   }

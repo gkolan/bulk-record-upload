@@ -31,7 +31,5 @@
         >True If Either</label></value>
         <value><fullName>TRUE_IF_BOTH</fullName><default>false</default><label
         >True If Both</label></value>
-        <value><fullName>CUSTOM</fullName><default>false</default><label
-        >Custom</label></value>
     </valueSetDefinition></valueSet>
 </CustomField>

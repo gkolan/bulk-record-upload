@@ -11,7 +11,6 @@ public class BulkRecordUploadProjection {
   public List<String> extensionClassNames { get; private set; }
   public Integer batchSize { get; private set; }
   public Integer retentionDays { get; private set; }
-  public String processorKey { get; private set; }
   public String recordContextAction { get; private set; }
   public String hostObjectApiName { get; private set; }
   public String recordContextFieldApiName { get; private set; }
@@ -48,36 +47,6 @@ public class BulkRecordUploadProjection {
       objectApiName,
       operation,
       extensionClassNames,
-      'STANDARD_DML',
-      'NONE',
-      null,
-      null,
-      null,
-      batchSize,
-      retentionDays,
-      fields
-    );
-  }
-
-  /** Creates a process projection with a registered processor. */
-  public BulkRecordUploadProjection(
-    String processKey,
-    String configHash,
-    String objectApiName,
-    String operation,
-    List<String> extensionClassNames,
-    String processorKey,
-    Integer batchSize,
-    Integer retentionDays,
-    List<BulkRecordUploadFieldProjection> fields
-  ) {
-    this(
-      processKey,
-      configHash,
-      objectApiName,
-      operation,
-      extensionClassNames,
-      processorKey,
       'NONE',
       null,
       null,
@@ -95,7 +64,6 @@ public class BulkRecordUploadProjection {
     String objectApiName,
     String operation,
     List<String> extensionClassNames,
-    String processorKey,
     String recordContextAction,
     String hostObjectApiName,
     String recordContextFieldApiName,
@@ -120,7 +88,6 @@ public class BulkRecordUploadProjection {
     this.extensionClassNames = extensionClassNames == null
       ? new List<String>()
       : new List<String>(extensionClassNames);
-    this.processorKey = requireText(processorKey, 'processorKey');
     this.recordContextAction = String.isBlank(recordContextAction)
       ? 'NONE'
       : recordContextAction.trim();

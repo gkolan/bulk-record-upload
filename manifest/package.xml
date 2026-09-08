@@ -16,18 +16,16 @@
         <members>BulkRecordUploadContextValueCodec</members>
         <members>BulkRecordUploadCsvReader</members>
         <members>BulkRecordUploadCsvReaderTest</members>
-        <members>BulkRecordUploadCustomMergeTest</members>
         <members>BulkRecordUploadEdgeCoverageTest</members>
         <members>BulkRecordUploadEncodingTest</members>
         <members>BulkRecordUploadException</members>
         <members>BulkRecordUploadFieldConfig</members>
         <members>BulkRecordUploadFieldConfigTest</members>
         <members>BulkRecordUploadFieldMappingTest</members>
+        <members>BulkRecordUploadFieldOptionTest</members>
         <members>BulkRecordUploadLookupMappingTest</members>
         <members>BulkRecordUploadFieldMergePolicy</members>
         <members>BulkRecordUploadFieldMergeStrategy</members>
-        <members>BulkRecordUploadMergeStrategyRegistry</members>
-        <members>BulkRecordUploadLongerTextStrategy</members>
         <members>BulkRecordUploadTextJoinStrategy</members>
         <members>BulkRecordUploadMultiPicklistSetStrategy</members>
         <members>BulkRecordUploadNumericMathStrategy</members>
@@ -47,9 +45,6 @@
         <members>BulkRecordUploadOperations</members>
         <members>BulkRecordUploadOperationValidator</members>
         <members>BulkRecordUploadOperationStrategy</members>
-        <members>BulkRecordUploadProcessor</members>
-        <members>BulkRecordUploadProcessors</members>
-        <members>BulkRecordUploadStandardProcessor</members>
         <members>BulkRecordUploadOrchestrator</members>
         <members>BulkRecordUploadParsedCsv</members>
         <members>BulkRecordUploadPersistenceGateway</members>
@@ -75,9 +70,11 @@
         <members>BulkRecordUploadProjection</members>
         <members>BulkRecordUploadProjectionService</members>
         <members>BulkRecordUploadProjectionValidator</members>
+        <members>BulkRecordUploadPrivacyTest</members>
         <members>BulkRecordUploadRowResult</members>
         <members>BulkRecordUploadRow</members>
         <members>BulkRecordUploadScaleTest</members>
+        <members>BulkRecordUploadSecurityRecoveryTest</members>
         <members>BulkRecordUploadRequestValidator</members>
         <members>BulkRecordUploadRequestService</members>
         <members>BulkRecordUploadRequestServiceTest</members>
@@ -100,6 +97,11 @@
         <members>BulkRecordUploadSubmitRequest</members>
         <members>BulkRecordUploadTrimHandler</members>
         <members>BulkRecordUploadValueCoercer</members>
+        <members>BulkRecordUploadAppBuilderTest</members>
+        <members>BulkRecordUploadContextCodecTest</members>
+        <members>BulkRecordUploadControllerTest</members>
+        <members>BulkRecordUploadMergeCoverageTest</members>
+        <members>BulkRecordUploadProjectionValidatorTest</members>
         <name>ApexClass</name>
     </types>
     <types>
@@ -202,8 +204,6 @@
         <members>Bulk_Record_Upload_Process_Field__mdt.BlankTokens__c</members>
         <members>Bulk_Record_Upload_Process_Field__mdt.CaseAction__c</members>
         <members
-    >Bulk_Record_Upload_Process_Field__mdt.CustomMergeStrategyClass__c</members>
-        <members
     >Bulk_Record_Upload_Process_Field__mdt.CustomSeparator__c</members>
         <members>Bulk_Record_Upload_Process_Field__mdt.DefaultValue__c</members>
         <members
@@ -246,10 +246,6 @@
     >Bulk_Record_Upload_Process__mdt.ContextDisplayFields__c</members>
         <members
     >Bulk_Record_Upload_Process__mdt.ContextFilterCriteria__c</members>
-        <members>Bulk_Record_Upload_Process__mdt.ProcessingMode__c</members>
-        <members>Bulk_Record_Upload_Process__mdt.ProcessorKey__c</members>
-        <members
-    >Bulk_Record_Upload_Process__mdt.ConfigurationVersion__c</members>
         <members>Bulk_Record_Upload_Process__mdt.IsActive__c</members>
         <members>Bulk_Record_Upload_Process__mdt.Operation__c</members>
         <members

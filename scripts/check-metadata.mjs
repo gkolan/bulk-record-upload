@@ -4,6 +4,47 @@ import { basename, relative, resolve, sep } from "node:path";
 const root = resolve("force-app/main/default");
 const manifest = readFileSync(resolve("manifest/package.xml"), "utf8");
 const errors = [];
+const retiredConfigurationFields = [
+  "Bulk_Record_Upload_Process__mdt.ConfigurationVersion__c",
+  "Bulk_Record_Upload_Process__mdt.ProcessingMode__c",
+  "Bulk_Record_Upload_Process__mdt.ProcessorKey__c",
+  "Bulk_Record_Upload_Process_Field__mdt.CustomMergeStrategyClass__c"
+];
+const retainedExistingValueActions = new Set([
+  "REPLACE",
+  "KEEP_EXISTING",
+  "APPEND",
+  "PREPEND",
+  "ADD_VALUES",
+  "REMOVE_VALUES",
+  "ADD",
+  "SUBTRACT",
+  "USE_LATER",
+  "USE_EARLIER",
+  "TRUE_IF_EITHER",
+  "TRUE_IF_BOTH"
+]);
+const retiredConfigurationIdentifiers = [
+  "ConfigurationVersion__c",
+  "ProcessingMode__c",
+  "ProcessorKey__c",
+  "CustomMergeStrategyClass__c",
+  "CUSTOM_APEX",
+  "BulkRecordUploadProcessor",
+  "BulkRecordUploadProcessors",
+  "BulkRecordUploadMergeStrategyRegistry",
+  "BulkRecordUploadLongerTextStrategy"
+];
+const checkedTextExtensions = new Set([
+  ".apex",
+  ".cls",
+  ".js",
+  ".json",
+  ".md",
+  ".xml",
+  ".yaml",
+  ".yml"
+]);
 
 function walk(directory) {
   if (!existsSync(directory)) return [];
@@ -25,6 +66,83 @@ function requireManifestMember(member, source) {
   if (!values(manifest, "members").includes(member)) {
     errors.push(`${source}: missing manifest member ${member}`);
   }
+}
+
+function requireSameValues(name, expected, actual) {
+  const missing = [...expected].filter((value) => !actual.has(value));
+  const extra = [...actual].filter((value) => !expected.has(value));
+  if (missing.length || extra.length) {
+    errors.push(
+      `${name}: unexpected values; missing=${missing.join(",") || "none"}; extra=${extra.join(",") || "none"}`
+    );
+  }
+}
+
+const publicContractFiles = [
+  ...walk(root),
+  ...walk(resolve("examples")),
+  ...walk(resolve("docs")),
+  ...walk(resolve("scripts")),
+  resolve("README.md"),
+  resolve("manifest/package.xml")
+].filter(
+  (file) =>
+    checkedTextExtensions.has(file.slice(file.lastIndexOf("."))) &&
+    basename(file) !== "check-metadata.mjs" &&
+    !file.includes(`${sep}docs${sep}evidence${sep}`)
+);
+
+for (const file of publicContractFiles) {
+  const contents = readFileSync(file, "utf8");
+  for (const identifier of retiredConfigurationIdentifiers) {
+    if (contents.includes(identifier)) {
+      errors.push(
+        `${relative(resolve("."), file).split(sep).join("/")}: retired configuration identifier ${identifier}`
+      );
+    }
+  }
+}
+
+for (const field of retiredConfigurationFields) {
+  if (values(manifest, "members").includes(field)) {
+    errors.push(`manifest/package.xml: retired configuration field ${field}`);
+  }
+  const [objectName, fieldName] = field.split(".");
+  const path = resolve(
+    root,
+    "objects",
+    objectName,
+    "fields",
+    `${fieldName}.field-meta.xml`
+  );
+  if (existsSync(path)) {
+    errors.push(`${field}: retired configuration metadata still exists`);
+  }
+}
+
+const existingValueActionPath = resolve(
+  root,
+  "objects",
+  "Bulk_Record_Upload_Process_Field__mdt",
+  "fields",
+  "ExistingValueAction__c.field-meta.xml"
+);
+if (!existsSync(existingValueActionPath)) {
+  errors.push("ExistingValueAction__c: required retained field is missing");
+} else {
+  const existingValueActionXml = readFileSync(existingValueActionPath, "utf8");
+  const actions = new Set(
+    [
+      ...existingValueActionXml.matchAll(
+        /<value>[\s\S]*?<fullName>([^<]+)<\/fullName>[\s\S]*?<\/value>/g
+      )
+    ].map((match) => match[1])
+  );
+  requireSameValues(
+    "ExistingValueAction__c",
+    retainedExistingValueActions,
+    actions
+  );
 }
 
 const files = walk(root);

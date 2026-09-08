@@ -18,7 +18,6 @@ public class BulkRecordUploadFieldProjection {
   public Boolean trimValue { get; private set; }
   public String caseAction { get; private set; }
   public Set<String> blankTokens { get; private set; }
-  public String customMergeStrategyClass { get; private set; }
   public String validationPattern { get; private set; }
   public Decimal minValue { get; private set; }
   public Decimal maxValue { get; private set; }
@@ -122,7 +121,6 @@ public class BulkRecordUploadFieldProjection {
       null,
       null,
       null,
-      null,
       sequence,
       isRequired,
       isMatchKey,
@@ -152,7 +150,6 @@ public class BulkRecordUploadFieldProjection {
     Boolean trimValue,
     String caseAction,
     Set<String> blankTokens,
-    String customMergeStrategyClass,
     String validationPattern,
     Decimal minValue,
     Decimal maxValue,
@@ -187,7 +184,6 @@ public class BulkRecordUploadFieldProjection {
     this.trimValue = trimValue == true;
     this.caseAction = String.isBlank(caseAction) ? 'NONE' : caseAction;
     this.blankTokens = blankTokens == null ? new Set<String>() : blankTokens;
-    this.customMergeStrategyClass = customMergeStrategyClass;
     this.validationPattern = validationPattern;
     this.minValue = minValue;
     this.maxValue = maxValue;

@@ -16,12 +16,6 @@ public with sharing class BulkRecordUploadProjectionFingerprint {
       'previewPermission',
       configuration.process.previewPermission
     );
-    writeString(json, 'processorKey', configuration.process.processorKey);
-    writeString(json, 'processingMode', configuration.process.processingMode);
-    json.writeNumberField(
-      'contractVersion',
-      configuration.process.contractVersion
-    );
     writeString(
       json,
       'recordContextAction',
@@ -105,11 +99,6 @@ public with sharing class BulkRecordUploadProjectionFingerprint {
     List<String> blankTokens = new List<String>(field.blankTokens);
     blankTokens.sort();
     writeStrings(json, 'blankTokens', blankTokens);
-    writeString(
-      json,
-      'customMergeStrategyClass',
-      field.customMergeStrategyClass
-    );
     writeString(json, 'validationPattern', field.validationPattern);
     writeDecimal(json, 'minValue', field.minValue);
     writeDecimal(json, 'maxValue', field.maxValue);

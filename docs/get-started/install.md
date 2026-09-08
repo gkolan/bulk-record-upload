@@ -69,7 +69,20 @@ sf project deploy start --manifest manifest/package.xml --target-org bru-demo --
 
 Continue only when the deployment reports **Succeeded** with no component or test failures. If the command returns a job ID while the deployment is still running, check its status with `sf project deploy report --job-id YOUR_JOB_ID --target-org bru-demo`, replacing `YOUR_JOB_ID` with that returned ID.
 
-## 4. Make it usable
+## 4. Schedule retention and recovery
+
+Bulk Record Upload keeps maintenance explicit so installation never creates a hidden scheduled job. Run the supplied idempotent script once as an administrator:
+
+```bash
+sf org display --target-org bru-demo
+sf apex run --file scripts/apex/schedule-maintenance.apex --target-org bru-demo
+```
+
+The script schedules `BulkRecordUploadRetentionJob` daily at 2:00 AM in the scheduling user's time zone. Running it again does not create a duplicate. In Setup, confirm **Scheduled Jobs** contains **Bulk Record Upload Daily Maintenance**. This job recovers stale processing claims and removes terminal uploads only after each process's configured retention deadline.
+
+Salesforce blocks deployment of a schedulable Apex class while its job is pending. Before deploying a later source revision, run `scripts/apex/unschedule-maintenance.apex`; after the deployment succeeds, run `schedule-maintenance.apex` again. Both scripts affect only the job named **Bulk Record Upload Daily Maintenance**.
+
+## 5. Make it usable
 
 Deployment installs the application and components. Your users still need permissions, active process and field configuration, and a Lightning page:
 
@@ -82,11 +95,12 @@ Deployment installs the application and components. Your users still need permis
 
 If you previously installed a development revision that exposed `bulkRecordUpload` as a Lightning Component Tab, Salesforce can reject deployment with **You can't remove the lightning__Tab target**. In Setup, review **Tabs** and the applications using that old tab. Remove the obsolete tab from their navigation and delete that tab before retrying. The current component supports Record Pages and App Pages. Do not delete upload records or Files to resolve a tab dependency. A fresh installation has no such legacy tab.
 
-| Problem                             | Next action                                                                                                                    |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `sf` or `npm` is not recognized     | Install the prerequisite and open a new terminal.                                                                              |
-| API version is unsupported          | Use an org supporting API 67.0; changing only the manifest version does not establish compatibility.                           |
-| Deployment access is denied         | Ask the org administrator to perform the deployment with an authorized deployment account.                                     |
-| An Apex test or component fails     | Read the named failure in the deploy report and resolve it before proceeding. Other local tests can also fail in a shared org. |
-| The app is missing after deployment | Assign the application permission set and refresh Salesforce.                                                                  |
-| The component has no processes      | Configure active process and field records, or deploy the optional demo configuration.                                         |
+| Problem                                         | Next action                                                                                                                       |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `sf` or `npm` is not recognized                 | Install the prerequisite and open a new terminal.                                                                                 |
+| API version is unsupported                      | Use an org supporting API 67.0; changing only the manifest version does not establish compatibility.                              |
+| Deployment access is denied                     | Ask the org administrator to perform the deployment with an authorized deployment account.                                        |
+| An Apex test or component fails                 | Read the named failure in the deploy report and resolve it before proceeding. Other local tests can also fail in a shared org.    |
+| The app is missing after deployment             | Assign the application permission set and refresh Salesforce.                                                                     |
+| The component has no processes                  | Configure active process and field records, or deploy the optional demo configuration.                                            |
+| Apex deployment reports a pending scheduled job | Run `sf apex run --file scripts/apex/unschedule-maintenance.apex --target-org bru-demo`, deploy, then schedule maintenance again. |

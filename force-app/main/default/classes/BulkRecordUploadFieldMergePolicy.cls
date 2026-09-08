@@ -13,9 +13,6 @@ public with sharing class BulkRecordUploadFieldMergePolicy {
     'TRUE_IF_BOTH' => new BulkRecordUploadBooleanLogicStrategy(false)
   };
 
-  private final BulkRecordUploadMergeStrategyRegistry customStrategyRegistry = new BulkRecordUploadMergeStrategyRegistry();
-  private final Map<String, BulkRecordUploadFieldMergeStrategy> customStrategyCache = new Map<String, BulkRecordUploadFieldMergeStrategy>();
-
   /**
    * Returns the safely merged value for one Schema-resolved field.
    * A blank incoming value with blankValueAction DEFAULT never reaches this
@@ -54,10 +51,9 @@ public with sharing class BulkRecordUploadFieldMergePolicy {
     if (field.existingValueAction == 'KEEP_EXISTING') {
       return existingValue;
     }
-    BulkRecordUploadFieldMergeStrategy strategy = field.existingValueAction ==
-      'CUSTOM'
-      ? resolveCustomStrategy(field.customMergeStrategyClass)
-      : STRATEGIES.get(field.existingValueAction);
+    BulkRecordUploadFieldMergeStrategy strategy = STRATEGIES.get(
+      field.existingValueAction
+    );
     if (strategy == null || !strategy.supportsType(field.fieldType)) {
       throw new BulkRecordUploadException(
         'This existing-value action is not supported for the configured field type.'
@@ -71,20 +67,6 @@ public with sharing class BulkRecordUploadFieldMergePolicy {
     );
     validateRange(field, combined);
     return combined;
-  }
-
-  /** Resolves a Custom merge strategy class once per instance, not once per row. */
-  private BulkRecordUploadFieldMergeStrategy resolveCustomStrategy(
-    String className
-  ) {
-    BulkRecordUploadFieldMergeStrategy cached = customStrategyCache.get(
-      className
-    );
-    if (cached == null) {
-      cached = customStrategyRegistry.resolve(className);
-      customStrategyCache.put(className, cached);
-    }
-    return cached;
   }
 
   private static void validateRange(

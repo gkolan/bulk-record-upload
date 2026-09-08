@@ -39,7 +39,7 @@ A text walkthrough of the same stages, with the class that owns each one:
 3. **Chunk processing.** Chunks run one at a time, in order, using whichever mechanism fits the upload's size: a single small upload (one chunk) runs as one Queueable job; a bigger upload runs as Batch Apex, processing exactly one chunk per transaction. Using Batch Apex here — rather than chaining Queueable jobs — avoids the platform's limit on how many Queueable jobs can chain together, so a large upload isn't capped by that unrelated limit. Each chunk: maps CSV values onto the target object's fields (`BulkRecordUploadRecordMapper`), resolves any existing records it needs to merge into or match against in one bounded query (`BulkRecordUploadRecordResolver`), and saves with partial success — so one bad row in a chunk doesn't fail the other good rows in the same chunk (`BulkRecordUploadPersistenceGateway`).
 4. **Extension points, if configured.** If the process has a registered extension class, it runs `beforeMap` (to adjust a row before it's mapped) and `afterProcess` (after a chunk is saved, seeing only the safe result — never the raw CSV). See [Write and register an extension](custom-handler.md) for the full contract.
 5. **Results and logging.** Once every chunk finishes, one result row per original CSV row is written to the results file (`BulkRecordUploadResultWriter`), and a safe summary of what happened is logged (`BulkRecordUploadLogService`) — the log never contains raw CSV content or field values, only lifecycle facts like row counts and timing.
-6. **Retention.** After the process's configured retention period, `BulkRecordUploadRetentionJob` cleans up the upload's own stored state. It never deletes a Salesforce File that something else still links to.
+6. **Retention.** The explicitly scheduled `BulkRecordUploadRetentionJob` recovers stale claims and, after the process's configured retention period, cleans up the upload's own stored state. It never deletes a Salesforce File that something else still links to.
 
 ## How a user reaches an upload process
 
@@ -49,7 +49,12 @@ On a record page, App Builder's bundle picker only offers bundles that actually 
 
 ## Limitations
 
-- Extensions (both the row-extension seam and custom merge strategies) are the supported subscriber-written Apex entry points. The operation (Insert/Update/Upsert/Delete) and the built-in save path remain fixed so extensions do not replace the framework's persistence and permission checks. See [Custom handlers](custom-handler.md) for the extension contract.
+- `BulkRecordUploadExtension` is the only subscriber-written Apex entry point. The operation
+  (Insert/Update/Upsert/Delete), built-in merge actions, and mapped target-row save path remain
+  package-owned, so an extension cannot replace that pipeline or its permission checks. Subscriber
+  Apex is not sandboxed from doing its own work; review each extension and its source-controlled
+  registration as production code. See [Custom handlers](custom-handler.md) for the extension
+  contract.
 - The pipeline processes chunks strictly in order, one at a time — it does not parallelize chunk processing within one upload.
 
 ## Related

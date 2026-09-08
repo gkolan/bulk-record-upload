@@ -99,11 +99,24 @@ public with sharing class BulkRecordUploadConfigRepository {
       }
     }
     matchingExtensions.sort();
+    requireUniqueExtensionOrder(matchingExtensions);
     return new Configuration(
       new BulkRecordUploadProcessConfig(processRecord),
       matchingFields,
       matchingExtensions
     );
+  }
+
+  private static void requireUniqueExtensionOrder(
+    List<BulkRecordUploadExtensionConfig> extensions
+  ) {
+    for (Integer index = 1; index < extensions.size(); index++) {
+      if (extensions[index - 1].sortOrder == extensions[index].sortOrder) {
+        throw new BulkRecordUploadException(
+          'Extension sort order must be unique for one upload process.'
+        );
+      }
+    }
   }
 
   private static Bulk_Record_Upload_Process__mdt queryProcess(String key) {
@@ -118,9 +131,6 @@ public with sharing class BulkRecordUploadConfigRepository {
         PreviewPermissionApiName__c,
         RowsPerBatch__c,
         RetentionDays__c,
-        ConfigurationVersion__c,
-        ProcessingMode__c,
-        ProcessorKey__c,
         RecordContextAction__c,
         HostObjectApiName__c,
         RecordContextFieldApiName__c,
@@ -159,7 +169,6 @@ public with sharing class BulkRecordUploadConfigRepository {
         TrimValue__c,
         CaseAction__c,
         BlankTokens__c,
-        CustomMergeStrategyClass__c,
         ValidationPattern__c,
         MinValue__c,
         MaxValue__c,
